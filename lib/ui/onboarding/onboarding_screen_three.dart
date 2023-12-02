@@ -1,5 +1,6 @@
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/utils/pref_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -61,6 +62,7 @@ class _OnboardingScreenThreeState extends State<OnboardingScreenThree> {
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
                     onTap: () {
+                      PrefUtils().setIsUserOnboarded = true;
                       Navigator.of(context).pushNamedAndRemoveUntil(
                           roleSelectionRoute, (e) => false);
                     },

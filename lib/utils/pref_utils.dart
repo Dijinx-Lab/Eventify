@@ -18,10 +18,17 @@ class PrefUtils {
     _sharedPreferences!.setBool(appType, type);
   }
 
-
-  bool get getIsUserLoggedIn => _sharedPreferences!.getBool(appType) ?? true;
+  bool get getIsUserLoggedIn =>
+      _sharedPreferences!.getBool(userLoggedIn) ?? false;
 
   set setIsUserLoggedIn(bool type) {
-    _sharedPreferences!.setBool(appType, type);
+    _sharedPreferences!.setBool(userLoggedIn, type);
+  }
+
+  bool get getIsUserOnboarded =>
+      _sharedPreferences!.getBool(userOnboarded) ?? false;
+
+  set setIsUserOnboarded(bool type) {
+    _sharedPreferences!.setBool(userOnboarded, type);
   }
 }

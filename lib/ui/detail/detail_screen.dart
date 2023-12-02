@@ -5,6 +5,7 @@ import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/pref_utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -82,16 +83,25 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
           ),
           actions: [
-            Container(
-              margin: const EdgeInsets.only(right: 20),
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: ColorStyle.primaryColor.withOpacity(0.60),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.bookmark_outline,
-                  color: ColorStyle.accentColor, size: 18),
-            ),
+            PrefUtils().getIsAppTypeCustomer
+                ? Container(
+                    margin: const EdgeInsets.only(right: 20),
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: ColorStyle.primaryColor.withOpacity(0.60),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.bookmark_outline,
+                        color: ColorStyle.accentColor, size: 18),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(right: 15),
+                    child: IconButton(
+                        onPressed: () {
+                          _openOptionsSheet();
+                        },
+                        icon: const Icon(Icons.menu)),
+                  ),
           ],
         ),
         body: Stack(
@@ -387,7 +397,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(Icons.calendar_today,
+                                      Icon(Icons.today_outlined,
                                           color: ColorStyle.primaryColorLight,
                                           size: 20),
                                       SizedBox(
@@ -397,7 +407,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                         "22, Aug 2023",
                                         style: TextStyle(
                                             color: ColorStyle.primaryTextColor,
-                                            fontSize: 14),
+                                            fontSize: 12),
                                       ),
                                     ],
                                   ),
@@ -415,7 +425,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                         "9:30 PM",
                                         style: TextStyle(
                                           color: ColorStyle.primaryTextColor,
-                                          fontSize: 14,
+                                          fontSize: 12,
                                         ),
                                       ),
                                     ],
@@ -451,10 +461,10 @@ class _DetailScreenState extends State<DetailScreen> {
                                         width: 10,
                                       ),
                                       Text(
-                                        "22, Aug 2023",
+                                        "Starts from 200",
                                         style: TextStyle(
                                             color: ColorStyle.primaryTextColor,
-                                            fontSize: 14),
+                                            fontSize: 12),
                                       ),
                                     ],
                                   ),
@@ -471,10 +481,10 @@ class _DetailScreenState extends State<DetailScreen> {
                                         width: 10,
                                       ),
                                       const Text(
-                                        "9:30 PM",
+                                        "Goes up to 2000",
                                         style: TextStyle(
                                           color: ColorStyle.primaryTextColor,
-                                          fontSize: 14,
+                                          fontSize: 12,
                                         ),
                                       ),
                                     ],
@@ -524,7 +534,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                           style: TextStyle(
                                               color:
                                                   ColorStyle.primaryTextColor,
-                                              fontSize: 14),
+                                              fontSize: 12),
                                         ),
                                       ),
                                     ],
@@ -546,7 +556,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                           "30 Passes Left",
                                           style: TextStyle(
                                             color: ColorStyle.primaryTextColor,
-                                            fontSize: 14,
+                                            fontSize: 12,
                                           ),
                                         ),
                                       ),
@@ -558,6 +568,7 @@ class _DetailScreenState extends State<DetailScreen> {
                             const Spacer(),
                             Container(
                               width: 160,
+                              constraints: const BoxConstraints(minHeight: 85),
                               padding: const EdgeInsets.only(
                                   top: 15, bottom: 15, left: 10, right: 10),
                               decoration: BoxDecoration(
@@ -590,7 +601,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                           style: TextStyle(
                                               color:
                                                   ColorStyle.primaryTextColor,
-                                              fontSize: 14),
+                                              fontSize: 12),
                                         ),
                                       ),
                                     ],
@@ -626,7 +637,7 @@ class _DetailScreenState extends State<DetailScreen> {
                             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam non tortor nec erat fermentum scelerisque vel suscipit risus. Integer lacinia justo a pharetra tristique. Nulla mollis feugiat magna, quis dictum orci feugiat id. Donec quis magna ut nunc sagittis sodales. Etiam convallis laoreet iaculis.",
                             style: TextStyle(
                               color: ColorStyle.primaryTextColor,
-                              fontSize: 14,
+                              fontSize: 12,
                             ),
                           ),
                         ),
@@ -775,5 +786,90 @@ class _DetailScreenState extends State<DetailScreen> {
         ),
       ),
     );
+  }
+
+  _openOptionsSheet() {
+    showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: CupertinoActionSheet(
+                actions: [
+                  GestureDetector(
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      //await openImages();
+                    },
+                    child: Container(
+                        height: 60,
+                        color: Colors.white,
+                        child: Container(
+                          // margin: const EdgeInsets.only(left: 25),
+                          child: const Center(
+                            child: Text("Edit Information",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: ColorStyle.primaryTextColor)),
+                          ),
+                        )),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      //await openImages();
+                    },
+                    child: Container(
+                        height: 60,
+                        color: Colors.white,
+                        child: Container(
+                          // margin: const EdgeInsets.only(left: 25),
+                          child: const Center(
+                            child: Text("Disable Visibility",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: ColorStyle.primaryTextColor)),
+                          ),
+                        )),
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      //await openImages();
+                    },
+                    child: Container(
+                        height: 60,
+                        color: Colors.white,
+                        child: Container(
+                          // margin: const EdgeInsets.only(left: 25),
+                          child: const Center(
+                            child: Text("Delete Listing",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: ColorStyle.primaryTextColor)),
+                          ),
+                        )),
+                  ),
+                ],
+                cancelButton: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                        height: 60,
+                        decoration: BoxDecoration(
+                            color: ColorStyle.primaryColor,
+                            borderRadius: BorderRadius.circular(12)),
+                        child: const Center(
+                          child: Text("Cancel",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: ColorStyle.whiteColor)),
+                        ))),
+              ),
+            ));
   }
 }

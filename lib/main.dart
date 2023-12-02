@@ -23,7 +23,7 @@ void main() async {
       primarySwatch: ColorStyle.primaryMaterialColor,
       visualDensity: VisualDensity.adaptivePlatformDensity,
     ),
-    initialRoute: initialRoute,
+    initialRoute: initialRouteWithNoArgs,
     onGenerateRoute: CustomRoutes.allRoutes,
   ));
 }

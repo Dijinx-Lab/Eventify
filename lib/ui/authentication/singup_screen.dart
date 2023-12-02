@@ -42,14 +42,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: [
               Stack(
                 children: [
-                  SvgPicture.asset('assets/svgs/login_ellipse.svg',
+                  SvgPicture.asset(
+                      PrefUtils().getIsAppTypeCustomer
+                          ? 'assets/svgs/login_ellipse.svg'
+                          : 'assets/svgs/login_ellipse_alt.svg',
                       width: MediaQuery.of(context).size.width),
                   Padding(
                     padding: const EdgeInsets.only(top: 50),
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: SvgPicture.asset(
-                          'assets/svgs/ic_eventify_client_logo.svg',
+                          PrefUtils().getIsAppTypeCustomer
+                              ? 'assets/svgs/ic_eventify_client_logo.svg'
+                              : 'assets/svgs/ic_eventify_seller_logo.svg',
                           width: 160),
                     ),
                   ),
@@ -174,43 +179,51 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           isSignupSeleted ? 'Sign Up' : 'Sign In',
                           () {
                             PrefUtils().setIsUserLoggedIn = true;
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                                mainRoute,
-                                arguments: MainArgs(0),
-                                (e) => false);
+                            if (PrefUtils().getIsAppTypeCustomer) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  mainRoute,
+                                  arguments: MainArgs(0),
+                                  (e) => false);
+                            } else {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  sellerHomeRoute, (e) => false);
+                            }
                           },
                           roundedCorners: 12,
                           textWeight: FontWeight.bold,
                         )),
                     const SizedBox(height: 15),
-                    Container(
-                        width: 200,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                  offset: const Offset(0, 4),
-                                  blurRadius: 4,
-                                  color:
-                                      ColorStyle.blackColor.withOpacity(0.25))
-                            ]),
-                        child: CustomRoundedButton(
-                          'Skip For Now',
-                          () {
-                            PrefUtils().setIsUserLoggedIn = false;
-                            Navigator.of(context).pushNamedAndRemoveUntil(
-                                mainRoute,
-                                arguments: MainArgs(0),
-                                (e) => false);
-                          },
-                          roundedCorners: 18,
-                          textSize: 14,
-                          textWeight: FontWeight.w500,
-                          buttonBackgroundColor: ColorStyle.whiteColor,
-                          borderColor: ColorStyle.secondaryTextColor,
-                          textColor: ColorStyle.secondaryTextColor,
-                        )),
+                    Visibility(
+                      visible: PrefUtils().getIsAppTypeCustomer,
+                      child: Container(
+                          width: 200,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                    offset: const Offset(0, 4),
+                                    blurRadius: 4,
+                                    color:
+                                        ColorStyle.blackColor.withOpacity(0.25))
+                              ]),
+                          child: CustomRoundedButton(
+                            'Skip For Now',
+                            () {
+                              PrefUtils().setIsUserLoggedIn = false;
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  mainRoute,
+                                  arguments: MainArgs(0),
+                                  (e) => false);
+                            },
+                            roundedCorners: 18,
+                            textSize: 14,
+                            textWeight: FontWeight.w500,
+                            buttonBackgroundColor: ColorStyle.whiteColor,
+                            borderColor: ColorStyle.secondaryTextColor,
+                            textColor: ColorStyle.secondaryTextColor,
+                          )),
+                    ),
                     const SizedBox(height: 30),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -240,8 +253,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Container(
-                            height: 70,
-                            width: 70,
+                            height: 60,
+                            width: 60,
                             decoration: BoxDecoration(
                                 color: ColorStyle.whiteColor,
                                 shape: BoxShape.circle,
@@ -255,11 +268,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             child: Icon(
                               Icons.phone_outlined,
                               color: ColorStyle.secondaryTextColor,
-                              size: 40,
+                              size: 30,
                             )),
                         Container(
-                          height: 70,
-                          width: 70,
+                          height: 60,
+                          width: 60,
+                          padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
                               color: ColorStyle.whiteColor,
                               shape: BoxShape.circle,
@@ -282,6 +296,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         Container(
                           height: 60,
                           width: 60,
+                          padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
                               color: ColorStyle.whiteColor,
                               shape: BoxShape.circle,
@@ -300,7 +315,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                       ],
-                    )
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
                   ],
                 ),
               ),

@@ -1,6 +1,7 @@
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/utils/pref_utils.dart';
 import 'package:flutter/material.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
@@ -30,8 +31,9 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               const SizedBox(height: 30),
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).pushNamed(
-                      signupRoute, arguments: SignupArgs(true, true));
+                  PrefUtils().setIsAppTypeCustomer = true;
+                  Navigator.of(context).pushNamed(signupRoute,
+                      arguments: SignupArgs(true, true));
                 },
                 child: Container(
                   height: 120,
@@ -67,8 +69,11 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               const SizedBox(height: 20),
               GestureDetector(
                 onTap: () {
+                  PrefUtils().setIsAppTypeCustomer = false;
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                      signupRoute, arguments: SignupArgs(false, true), (e) => false);
+                      signupRoute,
+                      arguments: SignupArgs(false, true),
+                      (e) => false);
                 },
                 child: Container(
                   height: 120,

@@ -22,6 +22,10 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Needed to allow user to upload their profile picture or their ads</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Needed to allow user to upload their profile picture or their ads</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSApplicationQueriesSchemes</key>

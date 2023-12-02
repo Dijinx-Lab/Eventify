@@ -1,11 +1,14 @@
 import 'package:eventify/constants/route_keys.dart';
+import 'package:eventify/models/screen_args/signup_args.dart';
+import 'package:eventify/models/screen_args/splash_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final SplashArgs? args;
+  const SplashScreen({super.key, this.args});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -20,8 +23,19 @@ class _SplashScreenState extends State<SplashScreen> {
 
   _moveToNextScreen() {
     Future.delayed(const Duration(milliseconds: 800)).then((value) {
-      Navigator.of(context)
-          .pushNamedAndRemoveUntil(onboardingOneRoute, (e) => false);
+      if (widget.args?.isFromProfile ?? false) {
+        PrefUtils().getIsAppTypeCustomer;
+        Navigator.of(context).pushNamedAndRemoveUntil(signupRoute, (e) => false,
+            arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, false));
+      } else if (PrefUtils().getIsUserOnboarded) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          roleSelectionRoute,
+          (e) => false,
+        );
+      } else {
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil(onboardingOneRoute, (e) => false);
+      }
     });
   }
 

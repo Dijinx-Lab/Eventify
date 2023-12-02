@@ -1,4 +1,5 @@
-const initialRoute = "/";
+const initialRoute = "/i";
+const initialRouteWithNoArgs = "/";
 const onboardingOneRoute = "/onboard-one";
 const onboardingTwoRoute = "/onboard-two";
 const onboardingThreeRoute = "/onboard-three";
@@ -7,3 +8,10 @@ const signupRoute = "/signup";
 const mainRoute = "/main";
 const searchRoute = "/search";
 const detailRoute = "/detail";
+const privacyRoute = "/privacy-policy";
+const termsRoute = "/terms-and-conditions";
+const profileRoute = "/profile";
+const resetpassRoute = "/reset-password";
+const sellerHomeRoute = "/seller-home";
+const accountsRoute = "/accounts";
+const createEventRoute = "/create-event";
