@@ -33,6 +33,7 @@ class _OnboardingScreenThreeState extends State<OnboardingScreenThree> {
           child: SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Spacer(),
                 const Text(
@@ -51,10 +52,12 @@ class _OnboardingScreenThreeState extends State<OnboardingScreenThree> {
                   ),
                 ),
                 const SizedBox(height: 15),
-                SvgPicture.asset(
-                  'assets/svgs/onboarding_three.svg',
-                  height: 300,
-                  fit: BoxFit.contain,
+                Center(
+                  child: SvgPicture.asset(
+                    'assets/svgs/onboarding_three.svg',
+                    height: 300,
+                    fit: BoxFit.contain,
+                  ),
                 ),
                 _makeDots(),
                 const SizedBox(height: 10),

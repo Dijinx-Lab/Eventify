@@ -22,12 +22,6 @@ class _StepThreeContainerState extends State<StepThreeContainer> {
             icon: const Icon(Icons.groups_outlined),
             keyboardType: TextInputType.number),
         const SizedBox(height: 30),
-        CustomTextField(
-            controller: _passesController,
-            hint: "Passes Left",
-            icon: const Icon(Icons.badge_outlined),
-            keyboardType: TextInputType.number),
-        const SizedBox(height: 30),
       ],
     );
   }

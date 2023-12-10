@@ -13,6 +13,7 @@ class ResetPassScreen extends StatefulWidget {
 class _ResetPassScreenState extends State<ResetPassScreen> {
   TextEditingController _passController = TextEditingController();
   TextEditingController _cpassController = TextEditingController();
+  TextEditingController _currentPassController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +31,7 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
           ),
         ),
         title: const Text(
-          "Reset Password",
+          "Change Password",
           style: TextStyle(
               color: ColorStyle.primaryTextColor,
               fontSize: 16,
@@ -48,6 +49,16 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  "Current password",
+                  style: TextStyle(color: ColorStyle.secondaryTextColor),
+                ),
+                SizedBox(height: 10),
+                CustomTextField(
+                  controller: _currentPassController,
+                  borderColor: ColorStyle.primaryTextColor,
+                ),
+                SizedBox(height: 20),
                 Text(
                   "New password",
                   style: TextStyle(color: ColorStyle.secondaryTextColor),

@@ -18,7 +18,7 @@ void main() async {
     builder: FlutterSmartDialog.init(),
     theme: ThemeData(
       primaryColor: ColorStyle.primaryColor,
-      fontFamily: "Montserrat",
+      fontFamily: "Lato",
       canvasColor: ColorStyle.whiteColor,
       primarySwatch: ColorStyle.primaryMaterialColor,
       visualDensity: VisualDensity.adaptivePlatformDensity,

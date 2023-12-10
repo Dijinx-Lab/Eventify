@@ -11,9 +11,11 @@ class CustomTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final int? maxLength;
   final int? maxLines;
+  final bool autofocus;
   const CustomTextField(
       {super.key,
       required this.controller,
+      this.autofocus = false,
       this.hint = '',
       this.icon,
       this.trailing,
@@ -31,6 +33,7 @@ class CustomTextField extends StatelessWidget {
       keyboardType: keyboardType,
       maxLength: maxLength,
       maxLines: maxLines,
+      autofocus: autofocus,
       decoration: InputDecoration(
           prefixIcon: icon,
           suffixIcon: trailing,

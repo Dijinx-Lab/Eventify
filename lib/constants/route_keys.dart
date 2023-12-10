@@ -15,3 +15,6 @@ const resetpassRoute = "/reset-password";
 const sellerHomeRoute = "/seller-home";
 const accountsRoute = "/accounts";
 const createEventRoute = "/create-event";
+const forgotPassOneRoute = "/forgot-pass-one";
+const forgotPassTwoRoute = "/forgot-pass-two";
+const forgotPassThreeRoute = "/forgot-pass-three";

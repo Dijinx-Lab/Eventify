@@ -9,6 +9,9 @@ import 'package:eventify/ui/accounts/privacy_policy_screen.dart';
 import 'package:eventify/ui/accounts/profile_screen.dart';
 import 'package:eventify/ui/accounts/reset_password_screen.dart';
 import 'package:eventify/ui/accounts/terms_and_conditions_screen.dart';
+import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_one_screen.dart';
+import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_three_screen.dart';
+import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_two_screen.dart';
 import 'package:eventify/ui/authentication/role_selection.dart';
 import 'package:eventify/ui/authentication/singup_screen.dart';
 import 'package:eventify/ui/detail/detail_screen.dart';
@@ -27,7 +30,7 @@ class CustomRoutes {
     switch (settings.name) {
       case initialRouteWithNoArgs:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
-      
+
       case initialRoute:
         return MaterialPageRoute(
             builder: (_) =>
@@ -70,6 +73,15 @@ class CustomRoutes {
         return MaterialPageRoute(
             builder: (_) => CreateEventScreen(
                 args: settings.arguments as CreateEventsArgs));
+      case forgotPassOneRoute:
+        return MaterialPageRoute(
+            builder: (_) => const ForgotPasswordOneScreen());
+      case forgotPassTwoRoute:
+        return MaterialPageRoute(
+            builder: (_) => const ForgotPasswordTwoScreen());
+      case forgotPassThreeRoute:
+        return MaterialPageRoute(
+            builder: (_) => const ForgotPasswordThreeScreen());
       default:
         return MaterialPageRoute(
             builder: (_) =>

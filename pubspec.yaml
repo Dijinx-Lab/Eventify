@@ -43,6 +43,7 @@ dependencies:
   permission_handler: ^11.0.1
   intl: ^0.18.1
   dotted_border: ^2.1.0
+  pinput: ^3.0.1
 
 dev_dependencies:
   flutter_test:
@@ -82,37 +83,32 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: "Montserrat"
+    - family: "Lato"
       fonts:
-        - asset: assets/fonts/Montserrat-Light.ttf
-          weight: 300
-        - asset: assets/fonts/Montserrat-LightItalic.ttf
+        - asset: assets/fonts/Lato-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Lato-ThinItalic.ttf
           style: italic
-          weight: 300
-        - asset: assets/fonts/Montserrat-Regular.ttf
+          weight: 100
+        - asset: assets/fonts/Lato-Light.ttf
+          weight: 100
+        - asset: assets/fonts/Lato-LightItalic.ttf
+          style: italic
+          weight: 100
+        - asset: assets/fonts/Lato-Regular.ttf
           weight: 400
-        - asset: assets/fonts/Montserrat-Italic.ttf
+        - asset: assets/fonts/Lato-Italic.ttf
           style: italic
           weight: 400
-        - asset: assets/fonts/Montserrat-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Montserrat-MediumItalic.ttf
-          style: italic
-          weight: 500
-        - asset: assets/fonts/Montserrat-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Montserrat-SemiBoldItalic.ttf
-          style: italic
-          weight: 600
-        - asset: assets/fonts/Montserrat-Bold.ttf
+        - asset: assets/fonts/Lato-Bold.ttf
           weight: 700
-        - asset: assets/fonts/Montserrat-BoldItalic.ttf
+        - asset: assets/fonts/Lato-BoldItalic.ttf
           style: italic
           weight: 700
-        - asset: assets/fonts/Montserrat-ExtraBold.ttf
-          weight: 800
-        - asset: assets/fonts/Montserrat-ExtraBoldItalic.ttf
+        - asset: assets/fonts/Lato-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Lato-BlackItalic.ttf
           style: italic
-          weight: 800
+          weight: 900
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

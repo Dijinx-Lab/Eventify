@@ -176,7 +176,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Reset Password",
+                        "Change Password",
                         style: TextStyle(
                             color: ColorStyle.primaryTextColor,
                             fontSize: 14,

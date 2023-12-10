@@ -19,6 +19,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Spacer(),
               const Text(
@@ -70,10 +71,10 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               GestureDetector(
                 onTap: () {
                   PrefUtils().setIsAppTypeCustomer = false;
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      signupRoute,
-                      arguments: SignupArgs(false, true),
-                      (e) => false);
+                  Navigator.of(context).pushNamed(
+                    signupRoute,
+                    arguments: SignupArgs(false, true),
+                  );
                 },
                 child: Container(
                   height: 120,

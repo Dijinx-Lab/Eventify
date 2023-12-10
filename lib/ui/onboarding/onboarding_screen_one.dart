@@ -18,6 +18,7 @@ class _OnboardingScreenOneState extends State<OnboardingScreenOne> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Spacer(),
               const Text(
@@ -36,10 +37,12 @@ class _OnboardingScreenOneState extends State<OnboardingScreenOne> {
                 ),
               ),
               const SizedBox(height: 15),
-              SvgPicture.asset(
-                'assets/svgs/onboarding_one.svg',
-                height: 300,
-                fit: BoxFit.contain,
+              Center(
+                child: SvgPicture.asset(
+                  'assets/svgs/onboarding_one.svg',
+                  height: 300,
+                  fit: BoxFit.contain,
+                ),
               ),
               _makeDots(),
               Align(
