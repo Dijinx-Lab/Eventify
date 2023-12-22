@@ -1,4 +1,5 @@
 import 'package:eventify/constants/route_keys.dart';
+import 'package:eventify/models/screen_args/role_selection_args.dart';
 import 'package:eventify/models/screen_args/splash_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/pref_utils.dart';
@@ -306,6 +307,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                   PrefUtils().setIsUserLoggedIn = false;
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     roleSelectionRoute,
+                    arguments: RoleSelectionArgs(null),
                     (e) => false,
                   );
                 },

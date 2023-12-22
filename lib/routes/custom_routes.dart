@@ -1,6 +1,7 @@
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/screen_args/create_event_args.dart';
 import 'package:eventify/models/screen_args/main_args.dart';
+import 'package:eventify/models/screen_args/role_selection_args.dart';
 import 'package:eventify/models/screen_args/search_args.dart';
 import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/models/screen_args/splash_args.dart';
@@ -42,7 +43,9 @@ class CustomRoutes {
       case onboardingThreeRoute:
         return MaterialPageRoute(builder: (_) => const OnboardingScreenThree());
       case roleSelectionRoute:
-        return MaterialPageRoute(builder: (_) => const RoleSelectionScreen());
+        return MaterialPageRoute(
+            builder: (_) => RoleSelectionScreen(
+                args: settings.arguments as RoleSelectionArgs));
       case signupRoute:
         return MaterialPageRoute(
             builder: (_) =>

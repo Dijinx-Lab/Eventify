@@ -25,6 +25,7 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
+  final TextEditingController _confPwdController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _orgController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
@@ -289,12 +290,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             icon: Icon(isPwdVisible
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined))),
+                    const SizedBox(height: 10),
+                    CustomTextField(
+                        controller: _confPwdController,
+                        hint: "Confirm Password",
+                        icon: const Icon(Icons.lock_outline),
+                        obscuretext: !isPwdVisible,
+                        trailing: IconButton(
+                            splashColor: Colors.transparent,
+                            onPressed: () {
+                              setState(() {
+                                isPwdVisible = !isPwdVisible;
+                              });
+                            },
+                            icon: Icon(isPwdVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined))),
                     Visibility(
                         visible: !isSignupSeleted,
                         child: Align(
                           alignment: Alignment.topRight,
                           child: TextButton(
-                            child: Text(
+                            child: const Text(
                               "Forgot Password",
                             ),
                             onPressed: () {
@@ -305,32 +322,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         )),
                     Visibility(
                       visible: isSignupSeleted,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isTermsChecked = !isTermsChecked;
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Checkbox(
-                                value: isTermsChecked,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    isTermsChecked = !isTermsChecked;
-                                  });
-                                },
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Checkbox(
+                              value: isTermsChecked,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  isTermsChecked = !isTermsChecked;
+                                });
+                              },
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pushNamed(termsRoute);
+                              },
+                              child: RichText(
+                                text: const TextSpan(
+                                    text: "I agree to the ",
+                                    style: TextStyle(
+                                        color: ColorStyle.primaryTextColor),
+                                    children: [
+                                      TextSpan(
+                                        text: "terms and conditions",
+                                        style: TextStyle(
+                                            decoration:
+                                                TextDecoration.underline,
+                                            color: ColorStyle.primaryColor),
+                                      )
+                                    ]),
                               ),
-                              const Text(
-                                "I agree to the terms and conditions",
-                                style: TextStyle(
-                                    color: ColorStyle.primaryTextColor),
-                              )
-                            ],
-                          ),
+                            )
+                          ],
                         ),
                       ),
                     ),

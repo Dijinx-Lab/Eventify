@@ -1,17 +1,30 @@
 import 'package:eventify/constants/route_keys.dart';
+import 'package:eventify/models/screen_args/role_selection_args.dart';
 import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/pref_utils.dart';
+import 'package:eventify/utils/toast_utils.dart';
 import 'package:flutter/material.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
-  const RoleSelectionScreen({super.key});
+  final RoleSelectionArgs? args;
+  const RoleSelectionScreen({super.key, this.args});
 
   @override
   State<RoleSelectionScreen> createState() => _RoleSelectionScreenState();
 }
 
 class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
+  @override
+  void initState() {
+    if (widget.args != null && widget.args!.nextRoute != null) {
+      Future.delayed(const Duration(milliseconds: 10)).then((value) =>
+          Navigator.of(context).pushNamed(widget.args!.nextRoute!,
+              arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, false)));
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
