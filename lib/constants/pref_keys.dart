@@ -1,3 +1,9 @@
 const String appType = "app_type";
 const String userLoggedIn = "is_user_logged";
 const String userOnboarded = "is_user_onboarded";
+const String userToken = "user_token";
+const String userFirstName = "user_first_name";
+const String userLastName = "user_last_name";
+const String userEmail = "user_email";
+const String userPhone = "user_phone";
+const String userAge = "user_age";

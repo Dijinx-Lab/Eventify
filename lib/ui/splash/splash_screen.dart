@@ -1,4 +1,5 @@
 import 'package:eventify/constants/route_keys.dart';
+import 'package:eventify/models/screen_args/main_args.dart';
 import 'package:eventify/models/screen_args/role_selection_args.dart';
 import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/models/screen_args/splash_args.dart';
@@ -24,14 +25,22 @@ class _SplashScreenState extends State<SplashScreen> {
 
   _moveToNextScreen() {
     Future.delayed(const Duration(milliseconds: 800)).then((value) {
-      if (widget.args?.isFromProfile ?? false) {
+      if (PrefUtils().getIsUserLoggedIn) {
+        if (PrefUtils().getIsAppTypeCustomer) {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              mainRoute, arguments: MainArgs(0), (e) => false);
+        } else {
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil(sellerHomeRoute, (e) => false);
+        }
+      } else if (widget.args?.isFromProfile ?? false) {
         PrefUtils().getIsAppTypeCustomer;
         Navigator.of(context).pushNamedAndRemoveUntil(signupRoute, (e) => false,
             arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, false));
       } else if (PrefUtils().getIsUserOnboarded) {
         Navigator.of(context).pushNamedAndRemoveUntil(
           roleSelectionRoute,
-           arguments: RoleSelectionArgs(null),
+          arguments: RoleSelectionArgs(null),
           (e) => false,
         );
       } else {

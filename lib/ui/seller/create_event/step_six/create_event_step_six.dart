@@ -81,6 +81,57 @@ class _StepSixContainerState extends State<StepSixContainer> {
                 ),
               )
               .toList(),
+        ),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              selectedCategory = "Other";
+            });
+          },
+          child: Container(
+              margin: const EdgeInsets.only(bottom: 15),
+              width: double.maxFinite,
+              height: 60,
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(
+                    color: selectedCategory == "Other"
+                        ? ColorStyle.primaryColor
+                        : ColorStyle.secondaryTextColor,
+                    width: 0.7),
+              ),
+              child: Row(children: [
+                Radio(
+                    value: "Other",
+                    groupValue: selectedCategory,
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          selectedCategory = "Other";
+                        });
+                      }
+                    }),
+                Text(
+                  "Other",
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: selectedCategory == "Other"
+                          ? ColorStyle.primaryColor
+                          : ColorStyle.secondaryTextColor),
+                ),
+              ])),
+        ),
+        Visibility(
+          visible: selectedCategory == "Other",
+          child: CustomTextField(
+              controller: _capacityController,
+              hint: "Category Name",
+              icon: null,
+              keyboardType: TextInputType.name),
+        ),
+        const SizedBox(
+          height: 20,
         )
       ],
     );

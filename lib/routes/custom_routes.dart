@@ -14,7 +14,7 @@ import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_one_screen.da
 import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_three_screen.dart';
 import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_two_screen.dart';
 import 'package:eventify/ui/authentication/role_selection.dart';
-import 'package:eventify/ui/authentication/singup_screen.dart';
+import 'package:eventify/ui/authentication/signup_screen.dart';
 import 'package:eventify/ui/detail/detail_screen.dart';
 import 'package:eventify/ui/discover/search_screen.dart';
 import 'package:eventify/ui/main/main_screen.dart';

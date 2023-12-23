@@ -19,6 +19,7 @@ class ForgotPasswordThreeScreen extends StatefulWidget {
 class _ForgotPasswordThreeScreenState extends State<ForgotPasswordThreeScreen> {
   TextEditingController _pwdController = TextEditingController();
   TextEditingController _confPwdController = TextEditingController();
+  bool isPwdVisible = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,22 +78,40 @@ class _ForgotPasswordThreeScreenState extends State<ForgotPasswordThreeScreen> {
                 ),
                 const SizedBox(height: 35),
                 CustomTextField(
-                  hint: "Password",
-                  autofocus: true,
-                  controller: _pwdController,
-                  obscuretext: true,
-                  keyboardType: TextInputType.name,
-                  icon: Icon(Icons.lock_outline),
-                ),
+                    hint: "Password",
+                    autofocus: true,
+                    controller: _pwdController,
+                    keyboardType: TextInputType.name,
+                    icon: Icon(Icons.lock_outline),
+                    obscuretext: !isPwdVisible,
+                    trailing: IconButton(
+                        splashColor: Colors.transparent,
+                        onPressed: () {
+                          setState(() {
+                            isPwdVisible = !isPwdVisible;
+                          });
+                        },
+                        icon: Icon(isPwdVisible
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined))),
                 SizedBox(height: 30),
                 CustomTextField(
-                  hint: "Confirm Password",
-                  autofocus: true,
-                  controller: _confPwdController,
-                  keyboardType: TextInputType.name,
-                  obscuretext: true,
-                  icon: Icon(Icons.lock_outline),
-                ),
+                    hint: "Confirm Password",
+                    autofocus: true,
+                    controller: _confPwdController,
+                    keyboardType: TextInputType.name,
+                    icon: Icon(Icons.lock_outline),
+                    obscuretext: !isPwdVisible,
+                    trailing: IconButton(
+                        splashColor: Colors.transparent,
+                        onPressed: () {
+                          setState(() {
+                            isPwdVisible = !isPwdVisible;
+                          });
+                        },
+                        icon: Icon(isPwdVisible
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined))),
                 Spacer(),
                 Container(
                   height: 50,

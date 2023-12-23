@@ -32,6 +32,21 @@ class _AccountsScreenState extends State<AccountsScreen> {
     );
   }
 
+  _signOut() {
+    PrefUtils().setUserAge = "0";
+    PrefUtils().setUserEmail = "";
+    PrefUtils().setUserFirstName = "";
+    PrefUtils().setUserLastName = "";
+    PrefUtils().setUserPhone = "";
+    PrefUtils().setUserToken = "";
+    PrefUtils().setIsUserLoggedIn = false;
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      roleSelectionRoute,
+      arguments: RoleSelectionArgs(null),
+      (e) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -304,12 +319,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
               ),
               GestureDetector(
                 onTap: () {
-                  PrefUtils().setIsUserLoggedIn = false;
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    roleSelectionRoute,
-                    arguments: RoleSelectionArgs(null),
-                    (e) => false,
-                  );
+                  _signOut();
                 },
                 child: Container(
                   height: 55,
