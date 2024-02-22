@@ -1,5 +1,7 @@
-class CreateEventsArgs {
-  bool isForCreate;
+import 'package:eventify/models/api_models/event_list_response/event.dart';
 
-  CreateEventsArgs(this.isForCreate);
+class CreateEventsArgs {
+  final Event? event;
+
+  CreateEventsArgs({required this.event});
 }

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:eventify/constants/api_keys.dart';
 import 'package:eventify/models/api_models/base_response/base_response.dart';
 
-class UserManager {
+class UserService {
   Future<BaseResponse> signIn(String emailOrPhone, String password) async {
     try {
       var url = Uri.parse(ApiConstants.signIn);
@@ -21,6 +21,7 @@ class UserManager {
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
+
         UserResponse apiResponse = UserResponse.fromJson(responseBody);
         return BaseResponse(apiResponse, null);
       } else {

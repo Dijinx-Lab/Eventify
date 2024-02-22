@@ -1,29 +1,52 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eventify/constants/route_keys.dart';
+import 'package:eventify/models/api_models/event_list_response/event.dart';
+import 'package:eventify/models/api_models/event_list_response/pass_detail.dart';
+import 'package:eventify/models/screen_args/create_event_args.dart';
+import 'package:eventify/models/screen_args/detail_args.dart';
 import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/pref_utils.dart';
+import 'package:eventify/widgets/bottom_sheets/location_detail_sheet.dart';
+import 'package:eventify/widgets/bottom_sheets/pass_details_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetailScreen extends StatefulWidget {
-  const DetailScreen({super.key});
+  final DetailArgs args;
+  const DetailScreen({super.key, required this.args});
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  String? action = null;
+  String? action;
+  late Event event;
+  final PageController _pageController =
+      PageController(viewportFraction: 1, keepPage: true);
+  int currentPage = 0;
+
+  @override
+  initState() {
+    super.initState();
+    event = widget.args.event;
+    _pageController.addListener(() {
+      setState(() {
+        currentPage = _pageController.page!.toInt();
+      });
+    });
+  }
 
   launchSms() async {
     final Uri launchUri = Uri(
       scheme: 'sms',
-      path: '030000000',
+      path: event.contactPhoneNumber,
     );
     await launchUrl(launchUri);
   }
@@ -31,13 +54,13 @@ class _DetailScreenState extends State<DetailScreen> {
   launchPhone() async {
     final Uri launchUri = Uri(
       scheme: 'tel',
-      path: '030000000',
+      path: event.contactPhoneNumber,
     );
     await launchUrl(launchUri);
   }
 
-  void launchWhatsapp() async {
-    var whatsapp = "+9200000000"; //+92xx enter like this
+  launchWhatsapp() async {
+    var whatsapp = event.contactWhatsApp ?? ""; //+92xx enter like this
     var whatsappURlAndroid = "whatsapp://send?phone=" + whatsapp + "&text=";
     var whatsappURLIos = "https://wa.me/$whatsapp?text=";
     if (Platform.isIOS) {
@@ -62,6 +85,25 @@ class _DetailScreenState extends State<DetailScreen> {
               const SnackBar(content: Text("Whatsapp not installed")));
         }
       }
+    }
+  }
+
+  launchEmail() async {
+    // Email address you want to send the email to
+    final Uri _emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: event.contactEmail, // Replace with the recipient's email
+      queryParameters: {
+        'subject': 'Subject of the email',
+        'body': 'Body of the email',
+      },
+    );
+
+    // Check if the device can open the specified URL
+    if (await canLaunch(_emailLaunchUri.toString())) {
+      await launch(_emailLaunchUri.toString());
+    } else {
+      print('Could not launch $_emailLaunchUri');
     }
   }
 
@@ -113,43 +155,70 @@ class _DetailScreenState extends State<DetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 30),
-                    Stack(
+                    SizedBox(
+                      width: double.maxFinite,
+                      height: 160,
+                      child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: event.eventImages!.length,
+                          clipBehavior: Clip.antiAlias,
+                          itemBuilder: (context, index) {
+                            return ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: SizedBox(
+                                width: double.maxFinite,
+                                height: 160,
+                                child: CachedNetworkImage(
+                                    imageUrl:
+                                        event.eventImages?[index].imagePath ??
+                                            "",
+                                    errorWidget: (context, url, error) {
+                                      return Container(
+                                        color: ColorStyle.secondaryTextColor,
+                                        child: Center(
+                                            child: Icon(
+                                          Icons.error_outline,
+                                          color: ColorStyle.whiteColor,
+                                        )),
+                                      );
+                                    },
+                                    fit: BoxFit.cover),
+                              ),
+                            );
+                          }),
+                    ),
+                    // Container(
+                    //   width: double.maxFinite,
+                    //   height: 160,
+                    //   decoration: BoxDecoration(
+                    //       borderRadius: BorderRadius.circular(16),
+                    //       image: const DecorationImage(
+                    //           image: AssetImage(
+                    //               "assets/pngs/example_card_image.png"),
+                    //           fit: BoxFit.cover)),
+                    // ),
+
+                    Visibility(
+                        visible: event.eventImages != null &&
+                            event.eventImages!.length >= 2,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 15),
+                          child: _buildPagerDotIndicator(),
+                        )),
+                    const SizedBox(height: 15),
+                    Row(
                       children: [
-                        Container(
-                          width: double.maxFinite,
-                          height: 160,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              image: const DecorationImage(
-                                  image: AssetImage(
-                                      "assets/pngs/example_card_image.png"),
-                                  fit: BoxFit.cover)),
-                        ),
-                        Container(
-                          width: double.maxFinite,
-                          height: 160,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    ColorStyle.blackColor.withOpacity(0),
-                                    ColorStyle.blackColor
-                                  ])),
-                        ),
-                        const Positioned(
-                          bottom: 10,
-                          left: 10,
+                        Expanded(
                           child: Text(
-                            "UN MUN 2023 Spring",
+                            event.eventName ?? "",
                             maxLines: null,
-                            style: TextStyle(
-                                color: ColorStyle.whiteColor,
+                            style: const TextStyle(
+                                color: ColorStyle.blackColor,
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600),
+                                fontWeight: FontWeight.w500),
                           ),
                         ),
+                        _buildSellerCard()
                       ],
                     ),
                     const SizedBox(height: 15),
@@ -276,27 +345,27 @@ class _DetailScreenState extends State<DetailScreen> {
                             ]),
                         child: Row(
                           children: [
-                            ClipRRect(
-                                borderRadius: BorderRadius.circular(200.0),
-                                child: SizedBox(
-                                    height: 50,
-                                    width: 50,
-                                    child: Image.asset(
-                                      "assets/pngs/image_placeholder.png",
-                                      fit: BoxFit.contain,
-                                    ))),
-                            const SizedBox(width: 5),
-                            const Column(
+                            // ClipRRect(
+                            //     borderRadius: BorderRadius.circular(200.0),
+                            //     child: SizedBox(
+                            //         height: 50,
+                            //         width: 50,
+                            //         child: Image.asset(
+                            //           "assets/pngs/image_placeholder.png",
+                            //           fit: BoxFit.contain,
+                            //         ))),
+                            // const SizedBox(width: 5),
+                            Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Moasfar Javed",
-                                  style: TextStyle(
+                                  event.contactPersonName ?? "",
+                                  style: const TextStyle(
                                     color: ColorStyle.primaryTextColor,
                                     fontSize: 14,
                                   ),
                                 ),
-                                Text(
+                                const Text(
                                   "Ad lister",
                                   style: TextStyle(
                                     color: ColorStyle.secondaryTextColor,
@@ -306,59 +375,90 @@ class _DetailScreenState extends State<DetailScreen> {
                               ],
                             ),
                             const Spacer(),
-                            GestureDetector(
-                              onTap: () async {
-                                await launchPhone();
-                              },
-                              child: Container(
-                                width: 45,
-                                height: 45,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 3),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    color: ColorStyle.primaryColorExtraLight,
-                                    borderRadius: BorderRadius.circular(8)),
-                                child: const Icon(Icons.call_outlined,
-                                    color: ColorStyle.primaryColor, size: 25),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () async {
-                                await launchSms();
-                              },
-                              child: Container(
-                                width: 45,
-                                height: 45,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 3),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    color: ColorStyle.primaryColorExtraLight,
-                                    borderRadius: BorderRadius.circular(8)),
-                                child: const Icon(Icons.chat_outlined,
-                                    color: ColorStyle.primaryColor, size: 25),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                launchWhatsapp();
-                              },
-                              child: Container(
-                                width: 45,
-                                height: 45,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 3),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    color: ColorStyle.primaryColorExtraLight,
-                                    borderRadius: BorderRadius.circular(8)),
-                                child: Image.asset(
-                                  "assets/pngs/ic_whatsapp.png",
-                                  fit: BoxFit.cover,
+                            Wrap(
+                              alignment: WrapAlignment.center,
+                              runAlignment: WrapAlignment.center,
+                              runSpacing: 10,
+                              children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    await launchEmail();
+                                  },
+                                  child: Container(
+                                    width: 35,
+                                    height: 35,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 3),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        color:
+                                            ColorStyle.primaryColorExtraLight,
+                                        borderRadius: BorderRadius.circular(8)),
+                                    child: const Icon(Icons.email_outlined,
+                                        color: ColorStyle.primaryColor,
+                                        size: 16),
+                                  ),
                                 ),
-                              ),
-                            ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await launchSms();
+                                  },
+                                  child: Container(
+                                    width: 35,
+                                    height: 35,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 3),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        color:
+                                            ColorStyle.primaryColorExtraLight,
+                                        borderRadius: BorderRadius.circular(8)),
+                                    child: const Icon(Icons.chat_outlined,
+                                        color: ColorStyle.primaryColor,
+                                        size: 16),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    launchWhatsapp();
+                                  },
+                                  child: Container(
+                                    width: 35,
+                                    height: 35,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 3),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        color:
+                                            ColorStyle.primaryColorExtraLight,
+                                        borderRadius: BorderRadius.circular(8)),
+                                    child: Image.asset(
+                                      "assets/pngs/ic_whatsapp.png",
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await launchPhone();
+                                  },
+                                  child: Container(
+                                    width: 35,
+                                    height: 35,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 3),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        color:
+                                            ColorStyle.primaryColorExtraLight,
+                                        borderRadius: BorderRadius.circular(8)),
+                                    child: const Icon(Icons.call_outlined,
+                                        color: ColorStyle.primaryColor,
+                                        size: 16),
+                                  ),
+                                ),
+                              ],
+                            )
                           ],
                         )),
                     const SizedBox(height: 30),
@@ -376,120 +476,126 @@ class _DetailScreenState extends State<DetailScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              //height: 45,
-                              width: 160,
-                              padding: const EdgeInsets.only(
-                                  top: 15, bottom: 15, left: 10),
-                              decoration: BoxDecoration(
-                                  color: ColorStyle.whiteColor,
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        offset: const Offset(0, 4),
-                                        blurRadius: 4,
-                                        color: ColorStyle.blackColor
-                                            .withOpacity(0.25))
-                                  ]),
-                              child: const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.today_outlined,
-                                          color: ColorStyle.primaryColorLight,
-                                          size: 20),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        "22, Aug 2023",
-                                        style: TextStyle(
-                                            color: ColorStyle.primaryTextColor,
-                                            fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 15),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.schedule,
-                                          color: ColorStyle.primaryColorLight,
-                                          size: 20),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        "9:30 PM",
-                                        style: TextStyle(
-                                          color: ColorStyle.primaryTextColor,
-                                          fontSize: 12,
+                            Expanded(
+                              child: Container(
+                                //height: 45,
+                                // width: 160,
+                                padding: const EdgeInsets.only(
+                                    top: 15, bottom: 15, left: 10),
+                                decoration: BoxDecoration(
+                                    color: ColorStyle.whiteColor,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          offset: const Offset(0, 4),
+                                          blurRadius: 4,
+                                          color: ColorStyle.blackColor
+                                              .withOpacity(0.25))
+                                    ]),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.today_outlined,
+                                            color: ColorStyle.primaryColorLight,
+                                            size: 20),
+                                        const SizedBox(
+                                          width: 10,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                        Text(
+                                          event.eventDate ?? "",
+                                          style: const TextStyle(
+                                              color:
+                                                  ColorStyle.primaryTextColor,
+                                              fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 15),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.schedule,
+                                            color: ColorStyle.primaryColorLight,
+                                            size: 20),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          event.eventTime ?? "",
+                                          style: const TextStyle(
+                                            color: ColorStyle.primaryTextColor,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            const Spacer(),
-                            Container(
-                              width: 160,
-                              padding: const EdgeInsets.only(
-                                  top: 15, bottom: 15, left: 10),
-                              decoration: BoxDecoration(
-                                  color: ColorStyle.whiteColor,
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        offset: const Offset(0, 4),
-                                        blurRadius: 4,
-                                        color: ColorStyle.blackColor
-                                            .withOpacity(0.25))
-                                  ]),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.sell_outlined,
-                                          color: ColorStyle.primaryColorLight,
-                                          size: 20),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        "Starts from 200",
-                                        style: TextStyle(
-                                            color: ColorStyle.primaryTextColor,
-                                            fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 15),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      SvgPicture.asset(
-                                        "assets/svgs/ic_double_sell.svg",
-                                        height: 20,
-                                        width: 20,
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      const Text(
-                                        "Goes up to 2000",
-                                        style: TextStyle(
-                                          color: ColorStyle.primaryTextColor,
-                                          fontSize: 12,
+                            SizedBox(width: 20),
+                            Expanded(
+                              child: Container(
+                                // width: 160,
+                                padding: const EdgeInsets.only(
+                                    top: 15, bottom: 15, left: 10),
+                                decoration: BoxDecoration(
+                                    color: ColorStyle.whiteColor,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          offset: const Offset(0, 4),
+                                          blurRadius: 4,
+                                          color: ColorStyle.blackColor
+                                              .withOpacity(0.25))
+                                    ]),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.sell_outlined,
+                                            color: ColorStyle.primaryColorLight,
+                                            size: 20),
+                                        const SizedBox(
+                                          width: 10,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                        Text(
+                                          "Starts from ${event.priceStartFrom ?? 0}",
+                                          style: const TextStyle(
+                                              color:
+                                                  ColorStyle.primaryTextColor,
+                                              fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 15),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SvgPicture.asset(
+                                          "assets/svgs/ic_double_sell.svg",
+                                          height: 20,
+                                          width: 20,
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          "Goes up to ${event.priceGoesUpto ?? 0}",
+                                          style: const TextStyle(
+                                            color: ColorStyle.primaryTextColor,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             )
                           ],
@@ -498,115 +604,171 @@ class _DetailScreenState extends State<DetailScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              //height: 45,
-                              width: 160,
-                              padding: const EdgeInsets.only(
-                                  top: 15, bottom: 15, left: 10),
-                              decoration: BoxDecoration(
-                                  color: ColorStyle.whiteColor,
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        offset: const Offset(0, 4),
-                                        blurRadius: 4,
-                                        color: ColorStyle.blackColor
-                                            .withOpacity(0.25))
-                                  ]),
-                              child: const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  _openBottomSheet(
+                                      context,
+                                      PassDetailsSheet(
+                                          passDetails:
+                                              event.eventPassDetails ?? []));
+                                },
+                                child: Container(
+                                  //height: 45,
+                                  // width: 160,
+                                  padding: const EdgeInsets.only(
+                                      top: 15, bottom: 15, left: 10),
+                                  decoration: BoxDecoration(
+                                      color: ColorStyle.whiteColor,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            offset: const Offset(0, 4),
+                                            blurRadius: 4,
+                                            color: ColorStyle.blackColor
+                                                .withOpacity(0.25))
+                                      ]),
+                                  child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      Icon(Icons.groups_outlined,
-                                          color: ColorStyle.primaryColorLight,
-                                          size: 20),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          "200 Max Capacity",
-                                          style: TextStyle(
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.groups_outlined,
                                               color:
-                                                  ColorStyle.primaryTextColor,
-                                              fontSize: 12),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 15),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Icon(Icons.badge_outlined,
-                                          color: ColorStyle.primaryColorLight,
-                                          size: 20),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          "30 Passes Left",
-                                          style: TextStyle(
-                                            color: ColorStyle.primaryTextColor,
-                                            fontSize: 12,
+                                                  ColorStyle.primaryColorLight,
+                                              size: 20),
+                                          const SizedBox(
+                                            width: 10,
                                           ),
-                                        ),
+                                          Expanded(
+                                            child: Text(
+                                              "${event.capacity} Max Capacity",
+                                              style: const TextStyle(
+                                                  color: ColorStyle
+                                                      .primaryTextColor,
+                                                  fontSize: 12),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 15),
+                                      const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        // crossAxisAlignment:
+                                        //     CrossAxisAlignment.start,
+                                        children: [
+                                          Icon(Icons.badge_outlined,
+                                              color:
+                                                  ColorStyle.primaryColorLight,
+                                              size: 20),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              "View Passes",
+                                              style: TextStyle(
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                color: ColorStyle
+                                                    .primaryColorLight,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
-                            const Spacer(),
-                            Container(
-                              width: 160,
-                              constraints: const BoxConstraints(minHeight: 85),
-                              padding: const EdgeInsets.only(
-                                  top: 15, bottom: 15, left: 10, right: 10),
-                              decoration: BoxDecoration(
-                                  color: ColorStyle.whiteColor,
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        offset: const Offset(0, 4),
-                                        blurRadius: 4,
-                                        color: ColorStyle.blackColor
-                                            .withOpacity(0.25))
-                                  ]),
-                              child: const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
+                            SizedBox(width: 20),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  _openBottomSheet(
+                                      context,
+                                      LocationDetailSheet(
+                                        lat: event.latitude ?? 0,
+                                        lng: event.longitude ?? 0,
+                                        address: event.address ?? "",
+                                      ));
+                                },
+                                child: Container(
+                                  width: 160,
+                                  constraints:
+                                      const BoxConstraints(minHeight: 85),
+                                  padding: const EdgeInsets.only(
+                                      top: 15, bottom: 15, left: 10, right: 10),
+                                  decoration: BoxDecoration(
+                                      color: ColorStyle.whiteColor,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            offset: const Offset(0, 4),
+                                            blurRadius: 4,
+                                            color: ColorStyle.blackColor
+                                                .withOpacity(0.25))
+                                      ]),
+                                  child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Icon(Icons.location_on_outlined,
-                                          color: ColorStyle.primaryColorLight,
-                                          size: 20),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          "Port Grand Food St, West Wharf",
-                                          style: TextStyle(
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Icon(Icons.location_on_outlined,
                                               color:
-                                                  ColorStyle.primaryTextColor,
-                                              fontSize: 12),
-                                        ),
+                                                  ColorStyle.primaryColorLight,
+                                              size: 20),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              event.address ?? "",
+                                              style: TextStyle(
+                                                  color: ColorStyle
+                                                      .primaryTextColor,
+                                                  fontSize: 12),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 15),
+                                      const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.redo,
+                                              color:
+                                                  ColorStyle.primaryColorLight,
+                                              size: 20),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              "View Location",
+                                              style: TextStyle(
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                color: ColorStyle
+                                                    .primaryColorLight,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
+                                ),
                               ),
                             )
                           ],
@@ -621,6 +783,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         ),
                         const SizedBox(height: 15),
                         Container(
+                          width: double.maxFinite,
                           padding: const EdgeInsets.only(
                               top: 15, bottom: 15, left: 10, right: 10),
                           decoration: BoxDecoration(
@@ -633,9 +796,9 @@ class _DetailScreenState extends State<DetailScreen> {
                                     color:
                                         ColorStyle.blackColor.withOpacity(0.25))
                               ]),
-                          child: const Text(
-                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam non tortor nec erat fermentum scelerisque vel suscipit risus. Integer lacinia justo a pharetra tristique. Nulla mollis feugiat magna, quis dictum orci feugiat id. Donec quis magna ut nunc sagittis sodales. Etiam convallis laoreet iaculis.",
-                            style: TextStyle(
+                          child: Text(
+                            event.eventDescription ?? "",
+                            style: const TextStyle(
                               color: ColorStyle.primaryTextColor,
                               fontSize: 12,
                             ),
@@ -755,6 +918,67 @@ class _DetailScreenState extends State<DetailScreen> {
         ));
   }
 
+  Widget _buildPagerDotIndicator() {
+    List<Widget> dotsWidget = [];
+    for (int i = 0; i < event.eventImages!.length; i++) {
+      dotsWidget.add(Container(
+        margin: const EdgeInsets.symmetric(horizontal: 1.0),
+        width: 6,
+        height: 6,
+        decoration: BoxDecoration(
+            color: i == currentPage
+                ? ColorStyle.primaryColor
+                : ColorStyle.secondaryTextColor,
+            shape: BoxShape.circle),
+      ));
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: dotsWidget,
+    );
+  }
+
+  _buildSellerCard() {
+    return Container(
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+          border:
+              Border.all(color: ColorStyle.primaryTextColor.withOpacity(0.68)),
+          borderRadius: BorderRadius.circular(8)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.assignment_ind_outlined,
+              color: ColorStyle.primaryTextColor, size: 18),
+          const SizedBox(
+            width: 3,
+          ),
+          Text(
+            event.organizeBy ?? "",
+            style: const TextStyle(
+                color: ColorStyle.primaryTextColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openBottomSheet(BuildContext context, Widget sheet) async {
+    await showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(30.0),
+        ),
+      ),
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (BuildContext context) => sheet,
+    );
+  }
+
   _overlayContainer() {
     return Container(
       height: double.maxFinite,
@@ -798,20 +1022,18 @@ class _DetailScreenState extends State<DetailScreen> {
                   GestureDetector(
                     onTap: () async {
                       Navigator.of(context).pop();
-                      //await openImages();
+                      Navigator.of(context).pushNamed(createEventRoute,
+                          arguments: CreateEventsArgs(event: event));
                     },
                     child: Container(
                         height: 60,
                         color: Colors.white,
-                        child: Container(
-                          // margin: const EdgeInsets.only(left: 25),
-                          child: const Center(
-                            child: Text("Edit Information",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: ColorStyle.primaryTextColor)),
-                          ),
+                        child: const Center(
+                          child: Text("Edit Information",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: ColorStyle.primaryTextColor)),
                         )),
                   ),
                   GestureDetector(

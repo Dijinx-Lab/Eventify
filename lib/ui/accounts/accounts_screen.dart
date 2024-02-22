@@ -1,5 +1,6 @@
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/screen_args/role_selection_args.dart';
+import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/models/screen_args/splash_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/pref_utils.dart';
@@ -40,11 +41,13 @@ class _AccountsScreenState extends State<AccountsScreen> {
     PrefUtils().setUserPhone = "";
     PrefUtils().setUserToken = "";
     PrefUtils().setIsUserLoggedIn = false;
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      roleSelectionRoute,
-      arguments: RoleSelectionArgs(null),
-      (e) => false,
-    );
+    Navigator.of(context).pushNamed(signupRoute,
+        arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, false));
+    // Navigator.of(context).pushNamedAndRemoveUntil(
+    //   roleSelectionRoute,
+    //   arguments: RoleSelectionArgs(null),
+    //   (e) => false,
+    // );
   }
 
   @override
@@ -91,9 +94,9 @@ class _AccountsScreenState extends State<AccountsScreen> {
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
-                "Moasfar Javed",
-                style: TextStyle(
+              Text(
+                "${PrefUtils().getUserFirstName} ${PrefUtils().getUserLastName}",
+                style: const TextStyle(
                     color: ColorStyle.primaryTextColor,
                     fontWeight: FontWeight.w600,
                     fontSize: 12),

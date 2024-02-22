@@ -44,7 +44,14 @@ dependencies:
   intl: ^0.18.1
   dotted_border: ^2.1.0
   pinput: ^3.0.1
-  http: ^1.1.0
+
+  cached_network_image: ^3.3.1
+  google_maps_flutter: ^2.5.3
+  geolocator: ^11.0.0
+  http: ^1.2.0
+  google_places_flutter: ^2.0.8
+  geocoding: ^2.1.1
+  event_bus: ^2.0.0
 
 dev_dependencies:
   flutter_test:

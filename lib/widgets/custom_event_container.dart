@@ -1,9 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eventify/constants/route_keys.dart';
+import 'package:eventify/models/api_models/event_list_response/event.dart';
+import 'package:eventify/models/screen_args/detail_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:flutter/material.dart';
 
 class CustomEventContainer extends StatelessWidget {
-  const CustomEventContainer({super.key});
+  final Event event;
+  const CustomEventContainer({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
@@ -11,22 +15,49 @@ class CustomEventContainer extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: GestureDetector(
         onTap: () {
-          Navigator.of(context).pushNamed(detailRoute);
+          Navigator.of(context)
+              .pushNamed(detailRoute, arguments: DetailArgs(event));
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: SizedBox(
+                    width: double.maxFinite,
+                    height: 160,
+                    child: CachedNetworkImage(
+                        imageUrl: event.eventImages?.first.imagePath ?? "",
+                      
+                        errorWidget: (context, url, error) {
+                          return Container(
+                            color: ColorStyle.secondaryTextColor,
+                            child: Center(
+                                child: Icon(
+                              Icons.error_outline,
+                              color: ColorStyle.whiteColor,
+                            )),
+                          );
+                        },
+                        fit: BoxFit.cover),
+                  ),
+                ),
                 Container(
                   width: double.maxFinite,
                   height: 160,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      image: const DecorationImage(
-                          image:
-                              AssetImage("assets/pngs/example_card_image.png"),
-                          fit: BoxFit.cover)),
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.5),
+                        Colors.black.withOpacity(0),
+                      ],
+                    ),
+                  ),
                 ),
                 Positioned(
                   bottom: 5,
@@ -51,9 +82,9 @@ class CustomEventContainer extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            const Text(
-              "UN MUN 2023 Spring",
-              style: TextStyle(
+            Text(
+              event.eventName ?? "",
+              style: const TextStyle(
                   color: ColorStyle.primaryTextColor,
                   fontSize: 16,
                   overflow: TextOverflow.ellipsis,
@@ -71,17 +102,17 @@ class CustomEventContainer extends StatelessWidget {
       decoration: BoxDecoration(
           color: ColorStyle.primaryTextColor.withOpacity(0.68),
           borderRadius: BorderRadius.circular(8)),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.assignment_ind_outlined,
+          const Icon(Icons.assignment_ind_outlined,
               color: ColorStyle.whiteColor, size: 14),
-          SizedBox(
+          const SizedBox(
             width: 3,
           ),
           Text(
-            "Ahmed Afzal",
-            style: TextStyle(
+            event.organizeBy ?? "",
+            style: const TextStyle(
                 color: ColorStyle.whiteColor,
                 fontSize: 10,
                 fontWeight: FontWeight.w600),
@@ -97,16 +128,19 @@ class CustomEventContainer extends StatelessWidget {
       decoration: BoxDecoration(
           color: ColorStyle.primaryColor.withOpacity(0.70),
           borderRadius: BorderRadius.circular(8)),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.sell_outlined, color: ColorStyle.accentColor, size: 14),
-          SizedBox(
+          const Icon(Icons.sell_outlined,
+              color: ColorStyle.accentColor, size: 14),
+          const SizedBox(
             width: 3,
           ),
           Text(
-            "Starts From Rs 2000",
-            style: TextStyle(
+            event.priceStartFrom == 0 && event.priceGoesUpto == 0
+                ? "Free"
+                : "Starts From Rs ${event.priceStartFrom ?? 0}",
+            style: const TextStyle(
                 color: ColorStyle.accentColor,
                 fontSize: 10,
                 fontWeight: FontWeight.w600),
@@ -134,37 +168,38 @@ class CustomEventContainer extends StatelessWidget {
       decoration: BoxDecoration(
           color: ColorStyle.primaryTextColor.withOpacity(0.68),
           borderRadius: BorderRadius.circular(8)),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.calendar_today,
+              const Icon(Icons.calendar_today,
                   color: ColorStyle.whiteColor, size: 14),
-              SizedBox(
+              const SizedBox(
                 width: 3,
               ),
               Text(
-                "22, Aug 2023",
-                style: TextStyle(
+                event.eventDate ?? "",
+                style: const TextStyle(
                     color: ColorStyle.whiteColor,
                     fontSize: 10,
                     fontWeight: FontWeight.w600),
               ),
             ],
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.schedule, color: ColorStyle.whiteColor, size: 14),
-              SizedBox(
+              const Icon(Icons.schedule,
+                  color: ColorStyle.whiteColor, size: 14),
+              const SizedBox(
                 width: 3,
               ),
               Text(
-                "9:30 PM",
-                style: TextStyle(
+                event.eventTime ?? "",
+                style: const TextStyle(
                     color: ColorStyle.whiteColor,
                     fontSize: 10,
                     fontWeight: FontWeight.w600),

@@ -29,7 +29,8 @@ class _SavedScreenState extends State<SavedScreen> {
           padding: EdgeInsets.zero,
           itemCount: 2,
           itemBuilder: (context, index) {
-            return const CustomEventContainer();
+            return Container();
+           // return const CustomEventContainer();
           }),
     );
   }

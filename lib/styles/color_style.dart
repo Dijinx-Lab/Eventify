@@ -22,6 +22,7 @@ class ColorStyle {
   static const primaryColorExtraLight = Color(0xFFFFC3D4);
   static const primaryTextColor = Color(0xFF4B4F5D);
   static const secondaryTextColor = Color(0xFF6A738B);
+  static const greyColor = Color.fromARGB(255, 222, 222, 222);
   static const accentColor = Color(0xFFFFD6A5);
 
   static const whiteColor = Color(0xFFFFFFFF);

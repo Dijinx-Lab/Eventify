@@ -1,5 +1,6 @@
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/screen_args/role_selection_args.dart';
+import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:flutter/material.dart';
@@ -67,9 +68,11 @@ class _OnboardingScreenThreeState extends State<OnboardingScreenThree> {
                   child: GestureDetector(
                     onTap: () {
                       PrefUtils().setIsUserOnboarded = true;
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          roleSelectionRoute,  arguments: RoleSelectionArgs(null),
-                          (e) => false);
+                      Navigator.of(context).pushNamed(signupRoute,
+              arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, true));
+                      // Navigator.of(context).pushNamedAndRemoveUntil(
+                      //     roleSelectionRoute,  arguments: RoleSelectionArgs(null),
+                      //     (e) => false);
                     },
                     child: AnimatedContainer(
                       width: isAnimationTriggered

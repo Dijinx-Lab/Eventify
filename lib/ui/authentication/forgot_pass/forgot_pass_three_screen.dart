@@ -130,12 +130,15 @@ class _ForgotPasswordThreeScreenState extends State<ForgotPasswordThreeScreen> {
                             "Congratulations! Your password has been reset successfully. You can now log in with your new credentials",
                       );
                       Future.delayed(const Duration(milliseconds: 10)).then(
-                          (value) => Navigator.of(context)
-                                  .pushNamedAndRemoveUntil(roleSelectionRoute,
-                                      arguments: RoleSelectionArgs(signupRoute),
-                                      (e) {
-                                return false;
-                              }));
+                          (value) => 
+                          Navigator.of(context).pushNamed(signupRoute,
+              arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, false)));
+                          // Navigator.of(context)
+                          //         .pushNamedAndRemoveUntil(roleSelectionRoute,
+                          //             arguments: RoleSelectionArgs(signupRoute),
+                          //             (e) {
+                          //       return false;
+                          //     }));
                     },
                     roundedCorners: 12,
                     textWeight: FontWeight.bold,

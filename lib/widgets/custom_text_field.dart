@@ -1,5 +1,6 @@
 import 'package:eventify/styles/color_style.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -12,6 +13,7 @@ class CustomTextField extends StatelessWidget {
   final int? maxLength;
   final int? maxLines;
   final bool autofocus;
+  final List<TextInputFormatter>? inputFormatters;
   const CustomTextField(
       {super.key,
       required this.controller,
@@ -23,6 +25,7 @@ class CustomTextField extends StatelessWidget {
       this.borderColor = ColorStyle.secondaryTextColor,
       this.keyboardType = TextInputType.text,
       this.maxLength,
+      this.inputFormatters,
       this.maxLines = 1});
 
   @override
@@ -34,10 +37,13 @@ class CustomTextField extends StatelessWidget {
       maxLength: maxLength,
       maxLines: maxLines,
       autofocus: autofocus,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
           prefixIcon: icon,
           suffixIcon: trailing,
           hintText: hint,
+          fillColor: ColorStyle.whiteColor,
+          filled: true,
           contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
           border: OutlineInputBorder(
               borderSide: BorderSide(color: borderColor),

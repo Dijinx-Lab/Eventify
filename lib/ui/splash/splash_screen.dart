@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _moveToNextScreen() {
-    Future.delayed(const Duration(milliseconds: 800)).then((value) {
+    Future.delayed(const Duration(milliseconds: 1500)).then((value) {
       if (PrefUtils().getIsUserLoggedIn) {
         if (PrefUtils().getIsAppTypeCustomer) {
           Navigator.of(context).pushNamedAndRemoveUntil(
@@ -38,11 +38,13 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.of(context).pushNamedAndRemoveUntil(signupRoute, (e) => false,
             arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, false));
       } else if (PrefUtils().getIsUserOnboarded) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          roleSelectionRoute,
-          arguments: RoleSelectionArgs(null),
-          (e) => false,
-        );
+        Navigator.of(context).pushNamedAndRemoveUntil(signupRoute, (e) => false,
+            arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, false));
+        // Navigator.of(context).pushNamedAndRemoveUntil(
+        //   roleSelectionRoute,
+        //   arguments: RoleSelectionArgs(null),
+        //   (e) => false,
+        // );
       } else {
         Navigator.of(context)
             .pushNamedAndRemoveUntil(onboardingOneRoute, (e) => false);

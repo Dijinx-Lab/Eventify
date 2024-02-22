@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:eventify/models/api_models/event_list_response/event.dart';
+import 'package:eventify/models/api_models/event_list_response/event_image.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
@@ -8,36 +11,91 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class StepFiveContainer extends StatefulWidget {
-  const StepFiveContainer({super.key});
+  final Event event;
+  final Function(Event, bool) onDataFilled;
+  const StepFiveContainer(
+      {super.key, required this.event, required this.onDataFilled});
 
   @override
   State<StepFiveContainer> createState() => _StepFiveContainerState();
 }
 
 class _StepFiveContainerState extends State<StepFiveContainer> {
-  TextEditingController _capacityController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   bool isPhotoTaken = false;
-  String? imagePath;
+  List<String>? _imagePaths;
+  final PageController _pageController =
+      PageController(viewportFraction: 1, keepPage: true);
+  int currentPage = 0;
+  late Event event;
 
-  Future<void> openImages() async {
+  @override
+  initState() {
+    event = widget.event;
+
+    if ((event.eventImages?.isNotEmpty ?? false) && event.eventName != null) {
+      _nameController.text = event.eventName ?? "";
+      _imagePaths = event.eventImages!.map((e) => e.imagePath!).toList();
+      isPhotoTaken = _imagePaths != null ? true : false;
+    }
+
+    Future.delayed(const Duration(microseconds: 800)).then((value) {
+      _alertParentWidget();
+    });
+
+    _pageController.addListener(() {
+      setState(() {
+        currentPage = _pageController.page!.toInt();
+      });
+    });
+
+    _nameController.addListener(() {
+      _alertParentWidget();
+    });
+
+    super.initState();
+  }
+
+  _alertParentWidget() async {
+    if (_imagePaths != null &&
+        _imagePaths!.isNotEmpty &&
+        _nameController.text != "") {
+      event.eventName = _nameController.text;
+      List<EventImage> eventImages = [];
+      for (var eventImage in _imagePaths!) {
+        eventImages.add(EventImage(imagePath: eventImage));
+      }
+      event.eventImages = eventImages;
+      widget.onDataFilled(event, true);
+    } else {
+      widget.onDataFilled(event, false);
+    }
+  }
+
+  Future<void> _openImages() async {
     var status;
     if (Platform.isAndroid) {
       status = await Permission.storage.request();
     } else {
       status = await Permission.photos.request();
     }
-    XFile? xfile = await _picker.pickImage(
-      source: ImageSource.gallery,
+    List<XFile>? xfile = await _picker.pickMultiImage(
+      // source: ImageSource.gallery,
       imageQuality: 100,
     );
-    if (xfile != null && await File(xfile.path).exists()) {
-      imagePath = xfile.path;
-      if (mounted) {
-        setState(() {
-          isPhotoTaken = true;
-        });
+    if (xfile.isNotEmpty) {
+      // List<String> filepaths = [];
+      for (var file in xfile) {
+        if (await File(file.path).exists()) {
+          _imagePaths?.add(file.path);
+        }
       }
+      setState(() {
+        // _imagePaths = filepaths;
+        isPhotoTaken = true;
+      });
+      _alertParentWidget();
     }
   }
 
@@ -47,46 +105,84 @@ class _StepFiveContainerState extends State<StepFiveContainer> {
       children: [
         GestureDetector(
           onTap: () {
-            openImages();
+            _openImages();
           },
           child: isPhotoTaken
               ? SizedBox(
-                  height: 165,
+                  height: 200,
                   child: Stack(
                     children: [
-                      Center(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: SizedBox(
-                            height: 150,
-                            width: double.maxFinite,
-                            child: Image.file(
-                              File(imagePath!),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: PageView.builder(
+                            controller: _pageController,
+                            itemCount: _imagePaths!.length,
+                            clipBehavior: Clip.antiAlias,
+                            itemBuilder: (context, index) {
+                              return SizedBox(
+                                child: Stack(
+                                  children: [
+                                    Center(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: SizedBox(
+                                          height: 150,
+                                          width: double.maxFinite,
+                                          child: _imagePaths![index]
+                                                  .startsWith('http')
+                                              ? CachedNetworkImage(
+                                                  imageUrl: _imagePaths![index],
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.file(
+                                                  File(_imagePaths![index]),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      right: 0,
+                                      top: 15,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          if (_imagePaths!.length == 1) {
+                                            setState(() {
+                                              isPhotoTaken = false;
+                                              _imagePaths = null;
+                                            });
+                                          } else {
+                                            setState(() {
+                                              _imagePaths!.removeAt(index);
+                                            });
+                                          }
+                                          _alertParentWidget();
+                                        },
+                                        child: Container(
+                                            decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: ColorStyle.cardColor),
+                                            child: const Icon(
+                                              Icons.close,
+                                              color:
+                                                  ColorStyle.secondaryTextColor,
+                                            )),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }),
                       ),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isPhotoTaken = false;
-                              imagePath = null;
-                            });
-                          },
-                          child: Container(
-                              decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: ColorStyle.cardColor),
-                              child: const Icon(
-                                Icons.close,
-                                color: ColorStyle.secondaryTextColor,
-                              )),
-                        ),
-                      )
+                      _imagePaths != null &&
+                              _imagePaths!.isNotEmpty &&
+                              _imagePaths!.length != 1
+                          ? Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                  margin: const EdgeInsets.only(bottom: 10.0),
+                                  child: _buildPagerDotIndicator()))
+                          : Container(),
                     ],
                   ),
                 )
@@ -115,12 +211,32 @@ class _StepFiveContainerState extends State<StepFiveContainer> {
         ),
         const SizedBox(height: 30),
         CustomTextField(
-            controller: _capacityController,
+            controller: _nameController,
             hint: "Name",
             icon: null,
             keyboardType: TextInputType.name),
         const SizedBox(height: 30),
       ],
+    );
+  }
+
+  Widget _buildPagerDotIndicator() {
+    List<Widget> dotsWidget = [];
+    for (int i = 0; i < _imagePaths!.length; i++) {
+      dotsWidget.add(Container(
+        margin: const EdgeInsets.symmetric(horizontal: 1.0),
+        width: 6,
+        height: 6,
+        decoration: BoxDecoration(
+            color: i == currentPage
+                ? ColorStyle.primaryColor
+                : ColorStyle.secondaryTextColor,
+            shape: BoxShape.circle),
+      ));
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: dotsWidget,
     );
   }
 }

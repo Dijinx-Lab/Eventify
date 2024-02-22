@@ -1,5 +1,6 @@
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/screen_args/create_event_args.dart';
+import 'package:eventify/models/screen_args/detail_args.dart';
 import 'package:eventify/models/screen_args/main_args.dart';
 import 'package:eventify/models/screen_args/role_selection_args.dart';
 import 'package:eventify/models/screen_args/search_args.dart';
@@ -13,7 +14,7 @@ import 'package:eventify/ui/accounts/terms_and_conditions_screen.dart';
 import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_one_screen.dart';
 import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_three_screen.dart';
 import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_two_screen.dart';
-import 'package:eventify/ui/authentication/role_selection.dart';
+import 'package:eventify/ui/authentication/role_selection_screen.dart';
 import 'package:eventify/ui/authentication/signup_screen.dart';
 import 'package:eventify/ui/detail/detail_screen.dart';
 import 'package:eventify/ui/discover/search_screen.dart';
@@ -42,10 +43,10 @@ class CustomRoutes {
         return MaterialPageRoute(builder: (_) => const OnboardingScreenTwo());
       case onboardingThreeRoute:
         return MaterialPageRoute(builder: (_) => const OnboardingScreenThree());
-      case roleSelectionRoute:
-        return MaterialPageRoute(
-            builder: (_) => RoleSelectionScreen(
-                args: settings.arguments as RoleSelectionArgs));
+      // case roleSelectionRoute:
+      //   return MaterialPageRoute(
+      //       builder: (_) => RoleSelectionScreen(
+      //           args: settings.arguments as RoleSelectionArgs));
       case signupRoute:
         return MaterialPageRoute(
             builder: (_) =>
@@ -58,7 +59,9 @@ class CustomRoutes {
             builder: (_) =>
                 SearchScreen(args: settings.arguments as SearchArgs));
       case detailRoute:
-        return MaterialPageRoute(builder: (_) => const DetailScreen());
+        return MaterialPageRoute(
+            builder: (_) =>
+                DetailScreen(args: settings.arguments as DetailArgs));
       case profileRoute:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
       case resetpassRoute:

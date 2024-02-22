@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:eventify/api/user_manager.dart';
+import 'package:eventify/services/user_service.dart';
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/api_models/user_response/user_detail.dart';
 import 'package:eventify/models/api_models/user_response/user_response.dart';
@@ -45,7 +45,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final ImagePicker _picker = ImagePicker();
   bool isPhotoTaken = false;
   String? imagePath;
-  UserManager userManager = UserManager();
+  UserService userService = UserService();
 
   @override
   void initState() {
@@ -172,7 +172,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   _signInWithEmailOrPhone() {
     SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
-    userManager
+    userService
         .signIn(_emailController.text.trim(), _pwdController.text.trim())
         .then((value) {
       SmartDialog.dismiss();
@@ -208,7 +208,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   _signUp() {
     SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
-    userManager
+    userService
         .signUp(
             _firstNameController.text.trim(),
             _lastNameController.text.trim(),
@@ -263,6 +263,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     PrefUtils().setUserLastName = userDetail.userProfile!.userLastName ?? "";
     PrefUtils().setUserEmail = userDetail.userProfile!.userEmail ?? "";
     PrefUtils().setUserAge = userDetail.userProfile!.age?.toString() ?? "0";
+    PrefUtils().setUserPhone = userDetail.userProfile!.userPhoneNumber ?? "";
     PrefUtils().setUserToken = userDetail.token ?? "";
     PrefUtils().setIsUserLoggedIn = true;
   }
@@ -283,40 +284,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
               Stack(
                 children: [
                   SvgPicture.asset(
-                      PrefUtils().getIsAppTypeCustomer
-                          ? 'assets/svgs/login_ellipse.svg'
-                          : 'assets/svgs/login_ellipse_alt.svg',
+                      // PrefUtils().getIsAppTypeCustomer
+                      //     ? 'assets/svgs/login_ellipse.svg'
+                      //     :
+                      'assets/svgs/login_ellipse_alt.svg',
                       width: MediaQuery.of(context).size.width),
                   Padding(
                     padding: const EdgeInsets.only(top: 50),
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: SvgPicture.asset(
-                          PrefUtils().getIsAppTypeCustomer
-                              ? 'assets/svgs/ic_eventify_client_logo.svg'
-                              : 'assets/svgs/ic_eventify_seller_logo.svg',
+                          // PrefUtils().getIsAppTypeCustomer
+                          //     ? 'assets/svgs/ic_eventify_client_logo.svg'
+                          //     :
+                          'assets/svgs/ic_eventify_seller_logo.svg',
                           width: 160),
                     ),
                   ),
-                  Positioned(
-                    left: 15,
-                    top: 50,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Container(
-                        width: 45,
-                        height: 45,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                  Visibility(
+                    visible: Navigator.canPop(context),
+                    child: Positioned(
+                      left: 15,
+                      top: 50,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          width: 45,
+                          height: 45,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Center(
+                              child: Icon(
+                            Icons.arrow_back,
+                            color: ColorStyle.whiteColor,
+                            size: 30,
+                          )),
                         ),
-                        child: const Center(
-                            child: Icon(
-                          Icons.arrow_back,
-                          color: ColorStyle.whiteColor,
-                          size: 30,
-                        )),
                       ),
                     ),
                   ),
@@ -419,18 +425,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               icon: const Icon(Icons.phone_outlined),
                               keyboardType: TextInputType.phone),
                           const SizedBox(height: 10),
-                          Visibility(
-                            visible: PrefUtils().getIsAppTypeCustomer == false,
-                            child: CustomTextField(
-                                controller: _orgController,
-                                hint: "Organization Name",
-                                icon: const Icon(Icons.corporate_fare_outlined),
-                                keyboardType: TextInputType.name),
-                          ),
-                          Visibility(
-                            visible: PrefUtils().getIsAppTypeCustomer == false,
-                            child: const SizedBox(height: 10),
-                          )
+                          // Visibility(
+                          //   visible: PrefUtils().getIsAppTypeCustomer == false,
+                          //   child: CustomTextField(
+                          //       controller: _orgController,
+                          //       hint: "Organization Name",
+                          //       icon: const Icon(Icons.corporate_fare_outlined),
+                          //       keyboardType: TextInputType.name),
+                          // ),
+                          // Visibility(
+                          //   visible: PrefUtils().getIsAppTypeCustomer == false,
+                          //   child: const SizedBox(height: 10),
+                          // )
                         ],
                       ),
                     ),
@@ -562,7 +568,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(height: 15),
                     Center(
                       child: Visibility(
-                        visible: PrefUtils().getIsAppTypeCustomer,
+                        //visible: PrefUtils().getIsAppTypeCustomer,
                         child: Container(
                             width: 200,
                             height: 50,

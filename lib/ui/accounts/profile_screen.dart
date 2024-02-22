@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,10 +17,14 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _firstNameController =
+      TextEditingController(text: PrefUtils().getUserFirstName);
+  final TextEditingController _lastNameController =
+      TextEditingController(text: PrefUtils().getUserLastName);
+  final TextEditingController _emailController =
+      TextEditingController(text: PrefUtils().getUserEmail);
+  final TextEditingController _phoneController =
+      TextEditingController(text: PrefUtils().getUserPhone);
   final ImagePicker picker = ImagePicker();
   final ImagePicker _picker = ImagePicker();
   bool isPhotoTaken = false;
@@ -27,10 +32,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-    _firstNameController.text = "Moasfar";
-    _lastNameController.text = "Javed";
-    _emailController.text = "moasfarjaved@gmail.com";
-    _phoneController.text = "021321421313";
     super.initState();
   }
 
@@ -99,120 +100,133 @@ class _ProfileScreenState extends State<ProfileScreen> {
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
         },
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      _openOptionsSheet();
-                    },
-                    child: SizedBox(
-                      height: 70,
-                      width: 70,
-                      child: Stack(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(200),
-                            child: Center(
+                          Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                _openOptionsSheet();
+                              },
                               child: SizedBox(
-                                  height: 70,
-                                  width: 70,
-                                  child: Image.asset(
-                                    "assets/pngs/image_placeholder.png",
-                                    fit: BoxFit.cover,
-                                  )),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              height: 20,
-                              width: 20,
-                              decoration: BoxDecoration(
-                                  color: ColorStyle.primaryColor,
-                                  borderRadius: BorderRadius.circular(6)),
-                              child: const Icon(
-                                Icons.edit,
-                                color: ColorStyle.whiteColor,
-                                size: 12,
+                                height: 70,
+                                width: 70,
+                                child: Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(200),
+                                      child: Center(
+                                        child: SizedBox(
+                                            height: 70,
+                                            width: 70,
+                                            child: Image.asset(
+                                              "assets/pngs/image_placeholder.png",
+                                              fit: BoxFit.cover,
+                                            )),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Container(
+                                        height: 20,
+                                        width: 20,
+                                        decoration: BoxDecoration(
+                                            color: ColorStyle.primaryColor,
+                                            borderRadius:
+                                                BorderRadius.circular(6)),
+                                        child: const Icon(
+                                          Icons.edit,
+                                          color: ColorStyle.whiteColor,
+                                          size: 12,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
-                    ),
+                      const SizedBox(height: 40),
+                      const Text(
+                        "First name",
+                        style: TextStyle(color: ColorStyle.secondaryTextColor),
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextField(
+                        controller: _firstNameController,
+                        borderColor: ColorStyle.primaryTextColor,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Last name",
+                        style: TextStyle(color: ColorStyle.secondaryTextColor),
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextField(
+                        controller: _lastNameController,
+                        borderColor: ColorStyle.primaryTextColor,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Email",
+                        style: TextStyle(color: ColorStyle.secondaryTextColor),
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextField(
+                        controller: _emailController,
+                        borderColor: ColorStyle.primaryTextColor,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Phone",
+                        style: TextStyle(color: ColorStyle.secondaryTextColor),
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextField(
+                        controller: _phoneController,
+                        borderColor: ColorStyle.primaryTextColor,
+                      ),
+                      const SizedBox(height: 40),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 40),
-                const Text(
-                  "First name",
-                  style: TextStyle(color: ColorStyle.secondaryTextColor),
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: _firstNameController,
-                  borderColor: ColorStyle.primaryTextColor,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Last name",
-                  style: TextStyle(color: ColorStyle.secondaryTextColor),
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: _lastNameController,
-                  borderColor: ColorStyle.primaryTextColor,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Email",
-                  style: TextStyle(color: ColorStyle.secondaryTextColor),
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: _emailController,
-                  borderColor: ColorStyle.primaryTextColor,
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Phone",
-                  style: TextStyle(color: ColorStyle.secondaryTextColor),
-                ),
-                const SizedBox(height: 10),
-                CustomTextField(
-                  controller: _phoneController,
-                  borderColor: ColorStyle.primaryTextColor,
-                ),
-                const SizedBox(height: 40),
-                Container(
-                    width: double.maxFinite,
-                    height: 50,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                              offset: const Offset(0, 4),
-                              blurRadius: 4,
-                              color: ColorStyle.blackColor.withOpacity(0.25))
-                        ]),
-                    child: CustomRoundedButton(
-                      'Save',
-                      () {
-                        // PrefUtils().setIsUserLoggedIn = true;
-                        // Navigator.of(context).pushNamedAndRemoveUntil(
-                        //     mainRoute, arguments: MainArgs(0), (e) => false);
-                      },
-                      roundedCorners: 12,
-                      textWeight: FontWeight.bold,
-                    )),
-              ],
+              ),
             ),
-          ),
+            Container(
+              width: double.maxFinite,
+              height: 50,
+              margin: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                        offset: const Offset(0, 4),
+                        blurRadius: 4,
+                        color: ColorStyle.blackColor.withOpacity(0.25))
+                  ]),
+              child: CustomRoundedButton(
+                'Save',
+                () {
+                  // PrefUtils().setIsUserLoggedIn = true;
+                  // Navigator.of(context).pushNamedAndRemoveUntil(
+                  //     mainRoute, arguments: MainArgs(0), (e) => false);
+                },
+                roundedCorners: 12,
+                textWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
     );

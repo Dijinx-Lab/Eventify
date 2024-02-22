@@ -17,6 +17,7 @@ void main() async {
     navigatorObservers: [FlutterSmartDialog.observer],
     builder: FlutterSmartDialog.init(),
     theme: ThemeData(
+      useMaterial3: false,
       primaryColor: ColorStyle.primaryColor,
       fontFamily: "Lato",
       canvasColor: ColorStyle.whiteColor,

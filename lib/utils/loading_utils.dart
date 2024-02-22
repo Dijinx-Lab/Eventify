@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class LoadingUtil extends StatefulWidget {
-  const LoadingUtil({Key? key, this.type = 0}) : super(key: key);
-
+  const LoadingUtil({Key? key, this.type = 0, this.text}) : super(key: key);
+  final String? text;
   final int type;
 
   @override
@@ -42,6 +42,10 @@ class _LoadingUtilState extends State<LoadingUtil>
       Visibility(visible: widget.type == 2, child: _buildLoadingThree()),
 
       Visibility(visible: widget.type == 3, child: _buildLoadingFour()),
+
+      Visibility(
+          visible: widget.type == 4,
+          child: _buildLoadingFive(widget.text ?? "")),
     ]);
   }
 
@@ -77,7 +81,7 @@ class _LoadingUtilState extends State<LoadingUtil>
         height: 80,
         width: 80,
         //padding: EdgeInsets.all(5),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
           //  borderRadius: BorderRadius.circular(15),
@@ -99,6 +103,28 @@ class _LoadingUtilState extends State<LoadingUtil>
         ),
         alignment: Alignment.center,
         child: const CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  Widget _buildLoadingFive(String text) {
+    return Center(
+      child: Container(
+        height: 120,
+        width: 300,
+        margin: EdgeInsets.symmetric(horizontal: 30),
+        padding: EdgeInsets.symmetric(horizontal: 30),
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(12)),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(),
+            SizedBox(height: 20),
+            Text(text)
+          ],
+        ),
       ),
     );
   }

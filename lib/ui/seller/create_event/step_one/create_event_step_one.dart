@@ -1,19 +1,54 @@
+import 'package:eventify/models/api_models/event_list_response/event.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class StepOneContainer extends StatefulWidget {
-  const StepOneContainer({super.key});
+  final Event event;
+  final Function(Event, bool) onDataFilled;
+  const StepOneContainer(
+      {super.key, required this.event, required this.onDataFilled});
 
   @override
   State<StepOneContainer> createState() => _StepOneContainerState();
 }
 
 class _StepOneContainerState extends State<StepOneContainer> {
-  TextEditingController _dateValueController = TextEditingController();
-  TextEditingController _timeValueController = TextEditingController();
+  final TextEditingController _dateValueController = TextEditingController();
+  final TextEditingController _timeValueController = TextEditingController();
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
+  late Event event;
+
+  @override
+  void initState() {
+    super.initState();
+    event = widget.event;
+    _dateValueController.text = event.eventDate ?? "";
+    _timeValueController.text = event.eventTime ?? "";
+
+    Future.delayed(Duration(microseconds: 800)).then((value) {
+      _alertParentWidget();
+    });
+
+    _dateValueController.addListener(() {
+      _alertParentWidget();
+    });
+    _timeValueController.addListener(() {
+      _alertParentWidget();
+    });
+  }
+
+  _alertParentWidget() {
+    if (_dateValueController.text != "" && _timeValueController.text != "") {
+      event.eventDate = _dateValueController.text;
+      event.eventTime = _timeValueController.text;
+      widget.onDataFilled(event, true);
+    } else {
+      widget.onDataFilled(event, false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
