@@ -5,5 +5,7 @@ const String userToken = "user_token";
 const String userFirstName = "user_first_name";
 const String userLastName = "user_last_name";
 const String userEmail = "user_email";
+const String userCountryCode = "user_country_code";
 const String userPhone = "user_phone";
 const String userAge = "user_age";
+const String userCity = "user_city";

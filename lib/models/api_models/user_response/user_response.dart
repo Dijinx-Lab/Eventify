@@ -1,32 +1,52 @@
+// To parse this JSON data, do
+//
+//     final userResponse = userResponseFromJson(jsonString);
+
 import 'dart:convert';
 
 import 'package:eventify/models/api_models/user_response/user_detail.dart';
 
+UserResponse userResponseFromJson(String str) =>
+    UserResponse.fromJson(json.decode(str));
+
+String userResponseToJson(UserResponse data) => json.encode(data.toJson());
+
 class UserResponse {
-  bool? isSuccess;
-  String? message;
-  UserDetail? data;
+  final bool? success;
+  final Data? data;
+  final String? message;
 
   UserResponse({
-    this.isSuccess,
-    this.message,
+    this.success,
     this.data,
+    this.message,
   });
 
-  factory UserResponse.fromRawJson(String str) =>
-      UserResponse.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
-
   factory UserResponse.fromJson(Map<String, dynamic> json) => UserResponse(
-        isSuccess: json["isSuccess"],
+        success: json["success"],
+        data: json["data"] == null ? null : Data.fromJson(json["data"]),
         message: json["message"],
-        data: json["data"] == null ? null : UserDetail.fromJson(json["data"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "isSuccess": isSuccess,
-        "message": message,
+        "success": success,
         "data": data?.toJson(),
+        "message": message,
+      };
+}
+
+class Data {
+  final UserDetail? user;
+
+  Data({
+    this.user,
+  });
+
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
+        user: json["user"] == null ? null : UserDetail.fromJson(json["user"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "user": user?.toJson(),
       };
 }

@@ -17,14 +17,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final TextEditingController _firstNameController =
-      TextEditingController(text: PrefUtils().getUserFirstName);
-  final TextEditingController _lastNameController =
-      TextEditingController(text: PrefUtils().getUserLastName);
-  final TextEditingController _emailController =
-      TextEditingController(text: PrefUtils().getUserEmail);
-  final TextEditingController _phoneController =
-      TextEditingController(text: PrefUtils().getUserPhone);
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final ImagePicker picker = ImagePicker();
   final ImagePicker _picker = ImagePicker();
   bool isPhotoTaken = false;
@@ -32,6 +28,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
+    // _firstNameController.text = PrefUtils().getUserFirstName;
+    // _lastNameController.text = PrefUtils().getUserLastName;
+    // _emailController.text = PrefUtils().getUserEmail;
+    // _phoneController.text = PrefUtils().getUserPhone;
     super.initState();
   }
 

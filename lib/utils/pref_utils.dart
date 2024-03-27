@@ -32,41 +32,52 @@ class PrefUtils {
     _sharedPreferences!.setBool(userOnboarded, type);
   }
 
-  String get getUserEmail => _sharedPreferences!.getString(userEmail) ?? "";
+  String get getFirstName => _sharedPreferences!.getString(userFirstName) ?? '';
 
-  set setUserEmail(String value) {
-    _sharedPreferences!.setString(userEmail, value);
-  }
-
-  String get getUserFirstName =>
-      _sharedPreferences!.getString(userFirstName) ?? "";
-
-  set setUserFirstName(String value) {
+  set setFirstName(String value) {
     _sharedPreferences!.setString(userFirstName, value);
   }
 
-  String get getUserLastName =>
-      _sharedPreferences!.getString(userLastName) ?? "";
+  String get getLasttName => _sharedPreferences!.getString(userLastName) ?? '';
 
-  set setUserLastName(String value) {
+  set setLasttName(String value) {
     _sharedPreferences!.setString(userLastName, value);
   }
 
-  String get getUserPhone => _sharedPreferences!.getString(userPhone) ?? "";
+  int get getAge => _sharedPreferences!.getInt(userAge) ?? 0;
 
-  set setUserPhone(String value) {
+  set setAge(int value) {
+    _sharedPreferences!.setInt(userAge, value);
+  }
+
+  String get getEmail => _sharedPreferences!.getString(userEmail) ?? '';
+
+  set setEmail(String value) {
+    _sharedPreferences!.setString(userEmail, value);
+  }
+
+  String get getCountryCode =>
+      _sharedPreferences!.getString(userCountryCode) ?? '';
+
+  set setCountryCode(String value) {
+    _sharedPreferences!.setString(userCountryCode, value);
+  }
+
+  String get getPhone => _sharedPreferences!.getString(userPhone) ?? '';
+
+  set setPhone(String value) {
     _sharedPreferences!.setString(userPhone, value);
   }
 
-  String get getUserAge => _sharedPreferences!.getString(userAge) ?? "";
+  String get getToken => _sharedPreferences!.getString(userToken) ?? '';
 
-  set setUserAge(String value) {
-    _sharedPreferences!.setString(userAge, value);
+  set setToken(String value) {
+    _sharedPreferences!.setString(userToken, value);
   }
 
-  String get getUserToken => _sharedPreferences!.getString(userToken) ?? "";
+  String get getCity => _sharedPreferences!.getString(userCity) ?? '';
 
-  set setUserToken(String value) {
-    _sharedPreferences!.setString(userToken, value);
+  set setCity(String value) {
+    _sharedPreferences!.setString(userCity, value);
   }
 }

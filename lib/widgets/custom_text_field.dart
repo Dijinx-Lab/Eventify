@@ -39,15 +39,17 @@ class CustomTextField extends StatelessWidget {
       autofocus: autofocus,
       inputFormatters: inputFormatters,
       decoration: InputDecoration(
-          prefixIcon: icon,
-          suffixIcon: trailing,
-          hintText: hint,
-          fillColor: ColorStyle.whiteColor,
-          filled: true,
-          contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-          border: OutlineInputBorder(
-              borderSide: BorderSide(color: borderColor),
-              borderRadius: BorderRadius.circular(15))),
+        prefixIcon: icon,
+        suffixIcon: trailing,
+        hintText: hint,
+        fillColor: ColorStyle.whiteColor,
+        filled: true,
+        contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+        border: OutlineInputBorder(
+          borderSide: BorderSide(color: borderColor),
+          borderRadius: BorderRadius.circular(15),
+        ),
+      ),
     );
   }
 }

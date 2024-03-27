@@ -1,7 +1,7 @@
 import 'package:event_bus/event_bus.dart';
 import 'package:eventify/constants/route_keys.dart';
-import 'package:eventify/models/api_models/event_list_response/event.dart';
-import 'package:eventify/models/api_models/event_list_response/event_list_response.dart';
+import 'package:eventify/models/api_models/event_response/event.dart';
+import 'package:eventify/models/api_models/event_response/event_list_response.dart';
 import 'package:eventify/models/event_bus/refresh_my_events.dart';
 import 'package:eventify/models/screen_args/create_event_args.dart';
 import 'package:eventify/services/event_service.dart';
@@ -24,12 +24,12 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
   bool isFloatingShown = false;
   List<Event>? eventsList;
   bool isLoading = true;
-  EventService eventService = EventService();
+  // EventService eventService = EventService();
 
   @override
   void initState() {
     _showAfterDelay();
-    _getEventsList();
+    //_getEventsList();
     super.initState();
   }
 
@@ -41,46 +41,46 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
     });
 
     SellerHomeScreen.eventBus.on<RefreshMyEvents>().listen((event) {
-      _getEventsList();
+      // _getEventsList();
     });
   }
 
-  _getEventsList() {
-    setState(() {
-      isLoading = true;
-      eventsList = null;
-    });
-    eventService.getEventsByUser().then((value) async {
-      setState(() {
-        isLoading = false;
-      });
+  // _getEventsList() {
+  //   setState(() {
+  //     isLoading = true;
+  //     eventsList = null;
+  //   });
+  //   eventService.getEventsByUser().then((value) async {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
 
-      if (value.error == null) {
-        EventListResponse apiResponse = value.snapshot;
-        if (apiResponse.isSuccess ?? false) {
-          eventsList = apiResponse.data ?? [];
-        } else {
-          ToastUtils.showCustomSnackbar(
-            context: context,
-            contentText: apiResponse.message ?? "",
-            icon: const Icon(
-              Icons.cancel_outlined,
-              color: ColorStyle.whiteColor,
-            ),
-          );
-        }
-      } else {
-        ToastUtils.showCustomSnackbar(
-          context: context,
-          contentText: value.error ?? "",
-          icon: const Icon(
-            Icons.cancel_outlined,
-            color: ColorStyle.whiteColor,
-          ),
-        );
-      }
-    });
-  }
+  //     if (value.error == null) {
+  //       EventListResponse apiResponse = value.snapshot;
+  //       if (apiResponse.isSuccess ?? false) {
+  //         eventsList = apiResponse.data ?? [];
+  //       } else {
+  //         ToastUtils.showCustomSnackbar(
+  //           context: context,
+  //           contentText: apiResponse.message ?? "",
+  //           icon: const Icon(
+  //             Icons.cancel_outlined,
+  //             color: ColorStyle.whiteColor,
+  //           ),
+  //         );
+  //       }
+  //     } else {
+  //       ToastUtils.showCustomSnackbar(
+  //         context: context,
+  //         contentText: value.error ?? "",
+  //         icon: const Icon(
+  //           Icons.cancel_outlined,
+  //           color: ColorStyle.whiteColor,
+  //         ),
+  //       );
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -137,6 +137,7 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
                       itemBuilder: (context, index) {
                         return CustomEventContainer(
                           event: eventsList![index],
+                          onBookmarked: (eventId) {},
                         );
                       }),
     );
@@ -164,12 +165,12 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
                   TextStyle(fontSize: 16, color: ColorStyle.secondaryTextColor),
             ),
             const SizedBox(height: 25),
-            SizedBox(
-                width: 200,
-                height: 40,
-                child: CustomRoundedButton("Refresh", () {
-                  _getEventsList();
-                }))
+            // SizedBox(
+            //     width: 200,
+            //     height: 40,
+            //     child: CustomRoundedButton("Refresh", () {
+            //       _getEventsList();
+            //     }))
           ],
         ),
       ),
@@ -198,12 +199,12 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
                   TextStyle(fontSize: 16, color: ColorStyle.secondaryTextColor),
             ),
             const SizedBox(height: 25),
-            SizedBox(
-                width: 200,
-                height: 40,
-                child: CustomRoundedButton("Refresh", () {
-                  _getEventsList();
-                }))
+            // SizedBox(
+            //     width: 200,
+            //     height: 40,
+            //     child: CustomRoundedButton("Refresh", () {
+            //       _getEventsList();
+            //     }))
           ],
         ),
       ),

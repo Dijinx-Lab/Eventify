@@ -1,13 +1,16 @@
 class ApiConstants {
-  static const String baseUrl = "https://eventifywebapis.azurewebsites.net";
+  static const String baseUrl = "http://localhost:3000/api/v1/eventify";
 
-  static const String signIn = "$baseUrl/api/Authentication/LoginUser";
-  static const String signUp = "$baseUrl/api/Authentication/RegisterUser";
+  static const String signIn = "$baseUrl/user/sign-in";
+  static const String signUp = "$baseUrl/user/sign-up";
+  static const String verify = "$baseUrl/user/verify";
+  static const String sendOtp = "$baseUrl/user/verify/send";
 
-  static const String getEventsByCity =
-      "$baseUrl/api/Event/GetAllEventsByCity?City=";
-  static const String getEventsByUser =
-      "$baseUrl/api/Event/GetAllEventsByUser?UserEmail=";
+  static const String getCategories = "$baseUrl/category/list";
+
+  static const String getEvents = "$baseUrl/event/list";
+
+  static const String updateStats = "$baseUrl/stats/update";
 
   static const String getPopularCategories =
       "$baseUrl/api/Category/GetPopularCategories";

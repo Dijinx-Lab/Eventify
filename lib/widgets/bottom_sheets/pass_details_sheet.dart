@@ -1,10 +1,10 @@
-import 'package:eventify/models/api_models/event_list_response/pass_detail.dart';
+import 'package:eventify/models/api_models/pass_response/pass.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class PassDetailsSheet extends StatelessWidget {
-  final List<PassDetail> passDetails;
+  final List<Pass> passDetails;
   const PassDetailsSheet({super.key, required this.passDetails});
 
   @override
@@ -50,7 +50,7 @@ class PassDetailsSheet extends StatelessWidget {
                     child: Row(
                       children: [
                         Text(
-                          passDetails[index].passInfo ?? "",
+                          passDetails[index].name ?? "",
                           style: const TextStyle(
                               color: ColorStyle.primaryTextColor,
                               fontSize: 14,
@@ -69,10 +69,10 @@ class PassDetailsSheet extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  passDetails[index]
-                                          .dicountedPrice
-                                          ?.toString() ??
-                                      "",
+                                  // passDetails[index]
+                                  //         .discount!.discountedPrice!
+                                  //         .toString() ??
+                                  "",
                                   style: const TextStyle(
                                     color: ColorStyle.primaryTextColor,
                                     fontSize: 14,
@@ -80,7 +80,7 @@ class PassDetailsSheet extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  passDetails[index].passPrice?.toString() ??
+                                  passDetails[index].fullPrice?.toString() ??
                                       "",
                                   style: const TextStyle(
                                     decoration: TextDecoration.lineThrough,
@@ -102,7 +102,7 @@ class PassDetailsSheet extends StatelessWidget {
                                 const SizedBox(width: 8),
                                 Text(
                                   DateFormat('MMM d, y').format(
-                                      passDetails[index].discountEndDate!),
+                                      passDetails[index].discount!.lastDate!),
                                   style: const TextStyle(
                                     color: ColorStyle.primaryTextColor,
                                     fontSize: 14,

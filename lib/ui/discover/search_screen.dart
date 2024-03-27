@@ -1,13 +1,11 @@
 import 'dart:convert';
-
-import 'package:eventify/services/event_service.dart';
 import 'package:eventify/constants/city_list.dart';
-import 'package:eventify/models/api_models/event_list_response/event.dart';
-import 'package:eventify/models/api_models/event_list_response/event_list_response.dart';
+import 'package:eventify/models/api_models/event_response/event.dart';
 import 'package:eventify/models/misc_models/city.dart';
 import 'package:eventify/models/screen_args/search_args.dart';
 import 'package:eventify/styles/color_style.dart';
-import 'package:eventify/utils/toast_utils.dart';
+import 'package:eventify/utils/pref_utils.dart';
+import 'package:eventify/widgets/bottom_sheets/city_list_sheet.dart';
 import 'package:eventify/widgets/custom_event_container.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +25,7 @@ class _SearchScreenState extends State<SearchScreen> {
   List<Event>? originalEvents;
   bool isLoading = false;
   String? selectedCity;
-  EventService eventService = EventService();
+  // EventService eventService = EventService();
   late List<City> cityList;
 
   @override
@@ -38,52 +36,11 @@ class _SearchScreenState extends State<SearchScreen> {
     cityList = (json.decode(jsonCityList) as List)
         .map((data) => City.fromJson(data))
         .toList();
-    selectedCity = widget.args.selectedCity;
+    _searchController.addListener(() => _searchEventsList());
     super.initState();
   }
 
-  _getEventsList() {
-    setState(() {
-      isLoading = true;
-      searchEvents = null;
-    });
-    eventService.getEventsByCity(selectedCity ?? "").then((value) async {
-      setState(() {
-        isLoading = false;
-      });
-
-      if (value.error == null) {
-        EventListResponse apiResponse = value.snapshot;
-        if (apiResponse.isSuccess ?? false) {
-          originalEvents = apiResponse.data ?? [];
-          _searchEventsList();
-        } else {
-          ToastUtils.showCustomSnackbar(
-            context: context,
-            contentText: apiResponse.message ?? "",
-            icon: const Icon(
-              Icons.cancel_outlined,
-              color: ColorStyle.whiteColor,
-            ),
-          );
-        }
-      } else {
-        ToastUtils.showCustomSnackbar(
-          context: context,
-          contentText: value.error ?? "",
-          icon: const Icon(
-            Icons.cancel_outlined,
-            color: ColorStyle.whiteColor,
-          ),
-        );
-      }
-    });
-  }
-
   _searchEventsList() {
-    setState(() {
-      isLoading = true;
-    });
     String searchText = _searchController.text.trim();
 
     if (searchText == "") {
@@ -93,29 +50,42 @@ class _SearchScreenState extends State<SearchScreen> {
     } else {
       List<Event> filteredEvents = originalEvents!
           .where((event) =>
-              event.eventName!.toLowerCase().contains(searchText.toLowerCase()))
+              event.name!.toLowerCase().contains(searchText.toLowerCase()))
+          .toList();
+      searchEvents = filteredEvents;
+      if (selectedCity != null) {
+        _applyCityAsFilter();
+      } else {
+        setState(() {});
+      }
+    }
+  }
+
+  _applyCityAsFilter() {
+    if (selectedCity != null) {
+      List<Event> filteredEvents = searchEvents!
+          .where((event) =>
+              event.city!.toLowerCase().contains(selectedCity!.toLowerCase()))
           .toList();
       setState(() {
         searchEvents = filteredEvents;
       });
     }
-    setState(() {
-      isLoading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-        },
-        child: Scaffold(
-          resizeToAvoidBottomInset: true,
-          body: Column(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: SafeArea(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 50),
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -163,10 +133,29 @@ class _SearchScreenState extends State<SearchScreen> {
                         child: TextField(
                           controller: _searchController,
                           textInputAction: TextInputAction.search,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                               prefixIcon: Icon(
                                 Icons.search,
-                                color: ColorStyle.primaryColor,
+                              ),
+                              suffixIcon: IconButton(
+                                splashColor: Colors.transparent,
+                                onPressed: () {
+                                  if (selectedCity != null) {
+                                    setState(() {
+                                      selectedCity = null;
+                                    });
+                                    _searchEventsList();
+                                  } else {
+                                    selectedCity = PrefUtils().getCity;
+                                    _searchEventsList();
+                                  }
+                                },
+                                icon: Icon(
+                                  Icons.my_location_outlined,
+                                  color: selectedCity == PrefUtils().getCity
+                                      ? ColorStyle.primaryColor
+                                      : ColorStyle.secondaryTextColor,
+                                ),
                               ),
                               hintStyle: TextStyle(fontSize: 13),
                               hintText: "Search for an event",
@@ -186,9 +175,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: Row(
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        _openBottomSheet(context);
-                      },
+                      onTap: () => _openCityBottomSheet(context),
                       child: Container(
                         // width: 130,
                         height: 30,
@@ -209,7 +196,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             const SizedBox(width: 3),
                             Flexible(
                               child: Text(
-                                selectedCity ?? "",
+                                selectedCity ?? "Select City...",
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   color: ColorStyle.primaryTextColor,
@@ -267,12 +254,16 @@ class _SearchScreenState extends State<SearchScreen> {
                                 itemBuilder: (context, index) {
                                   return CustomEventContainer(
                                     event: searchEvents![index],
+                                    onBookmarked: (eventId) {},
                                   );
-                                }),
+                                },
+                              ),
               )
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   _emptyCaseCard() {
@@ -290,19 +281,14 @@ class _SearchScreenState extends State<SearchScreen> {
                 fit: BoxFit.contain,
               ),
             ),
-            const Text(
-              "Currently there are no events to show",
+            Text(
+              selectedCity == null
+                  ? "No events found by the name \"${_searchController.text}\""
+                  : "No events found by the name \"${_searchController.text}\" in ${selectedCity ?? ""}",
               textAlign: TextAlign.center,
               style:
                   TextStyle(fontSize: 16, color: ColorStyle.secondaryTextColor),
             ),
-            const SizedBox(height: 25),
-            SizedBox(
-                width: 200,
-                height: 40,
-                child: CustomRoundedButton("Refresh", () {
-                  _getEventsList();
-                }))
           ],
         ),
       ),
@@ -335,7 +321,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 width: 200,
                 height: 40,
                 child: CustomRoundedButton("Refresh", () {
-                  _getEventsList();
+                  // _getEventsList();
                 }))
           ],
         ),
@@ -343,52 +329,21 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  void _openBottomSheet(BuildContext context) {
-    showModalBottomSheet(
+  void _openCityBottomSheet(BuildContext context) async {
+    String? city = await showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
           top: Radius.circular(30.0),
         ),
       ),
-      builder: (BuildContext context) {
-        return Container(
-            height: 600,
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 18),
-            child: Column(
-              children: [
-                Container(
-                  height: 5,
-                  width: 50,
-                  decoration: BoxDecoration(
-                      color: ColorStyle.secondaryTextColor,
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                const SizedBox(height: 15),
-                Expanded(
-                  child: ListView.separated(
-                      itemBuilder: (context, index) => TextButton(
-                          style: const ButtonStyle(
-                              alignment: Alignment.centerLeft),
-                          onPressed: () {
-                            setState(() {
-                              selectedCity = cityList[index].name;
-                            });
-                            _getEventsList();
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            cityList[index].name ?? "",
-                            style: const TextStyle(
-                                color: ColorStyle.primaryTextColor,
-                                fontWeight: FontWeight.w600),
-                          )),
-                      separatorBuilder: (context, index) => const Divider(),
-                      itemCount: cityList.length),
-                ),
-              ],
-            ));
-      },
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (BuildContext context) => CityListSheet(cityList: cityList),
     );
+    if (city != null) {
+      selectedCity = city;
+      _searchEventsList();
+    }
   }
 }

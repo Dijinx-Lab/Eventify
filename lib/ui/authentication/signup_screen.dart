@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:eventify/models/api_models/generic_response/generic_response.dart';
 import 'package:eventify/services/user_service.dart';
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/api_models/user_response/user_detail.dart';
@@ -12,12 +11,13 @@ import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:pinput/pinput.dart';
 
 class SignUpScreen extends StatefulWidget {
   final SignupArgs args;
@@ -32,20 +32,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _confPwdController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _orgController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _otpController = TextEditingController();
+  //final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  String initialCountry = 'PK';
+  PhoneNumber _phoneNumber = PhoneNumber(isoCode: 'PK');
 
   bool isPwdVisible = false;
   bool isSignupSeleted = true;
   bool isTermsChecked = false;
+  bool isErrorEnforced = false;
 
   final ImagePicker picker = ImagePicker();
-  final ImagePicker _picker = ImagePicker();
   bool isPhotoTaken = false;
   String? imagePath;
   UserService userService = UserService();
+
+  final FocusNode focusNode = FocusNode();
+  final defaultPinTheme = const PinTheme(
+    width: 50,
+    height: 50,
+    textStyle: TextStyle(
+        color: Color.fromRGBO(70, 69, 66, 1),
+        fontSize: 30,
+        fontWeight: FontWeight.w400),
+  );
+  final cursor = Align(
+    alignment: Alignment.bottomCenter,
+    child: Container(
+      width: 21,
+      height: 1,
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(137, 146, 160, 1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+    ),
+  );
 
   @override
   void initState() {
@@ -57,8 +82,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() {
       _emailController.text = "";
       _pwdController.text = "";
+      _confPwdController.text = "";
+      _ageController.text = "";
+      _phoneNumber = PhoneNumber(isoCode: 'PK');
       _phoneController.text = "";
-      _orgController.text = "";
+      _otpController.text = "";
       _firstNameController.text = "";
       _lastNameController.text = "";
       isSignupSeleted = !isSignupSeleted;
@@ -170,7 +198,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return isValid;
   }
 
-  _signInWithEmailOrPhone() {
+  Future<String?> _getFcmToken() async {
+    // await _firebaseMessaging.requestPermission();
+    // return await _firebaseMessaging.getToken();
+    return 'xyz';
+  }
+
+  _signIn() async {
     SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
     userService
         .signIn(_emailController.text.trim(), _pwdController.text.trim())
@@ -178,11 +212,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       SmartDialog.dismiss();
       if (value.error == null) {
         UserResponse apiResponse = value.snapshot;
-        if (apiResponse.isSuccess ?? false) {
-          _saveUserData(apiResponse.data!);
+        if (apiResponse.success ?? false) {
+          _saveUserData(apiResponse.data!.user!);
           _navigatorFunction();
-
-          //Navigator.of(context).pushReplacementNamed(signuSuccessFullRoute);
         } else {
           ToastUtils.showCustomSnackbar(
             context: context,
@@ -193,6 +225,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
           );
         }
+      } else if (value.error == '403') {
+        _showCodeSentDialog();
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
@@ -206,35 +240,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  _signUp() {
+  _signUp() async {
+    String? token = await _getFcmToken();
     SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
     userService
         .signUp(
-            _firstNameController.text.trim(),
-            _lastNameController.text.trim(),
-            _emailController.text.trim(),
-            _pwdController.text.trim(),
-            _confPwdController.text.trim(),
-            int.parse(_ageController.text.trim()),
-            _phoneController.text.trim(),
-            !PrefUtils().getIsAppTypeCustomer)
+      _firstNameController.text.trim(),
+      _lastNameController.text.trim(),
+      _emailController.text.trim(),
+      _pwdController.text.trim(),
+      _confPwdController.text.trim(),
+      int.parse(_ageController.text.trim()),
+      _phoneNumber.dialCode ?? '+92',
+      _phoneController.text.trim().replaceAll(' ', ''),
+      token,
+    )
         .then((value) async {
       SmartDialog.dismiss();
       if (value.error == null) {
         UserResponse apiResponse = value.snapshot;
-        if (apiResponse.isSuccess ?? false) {
-          _saveUserData(apiResponse.data!);
-
-          // bool selectImage = await SmartDialog.show(
-          //     animationType: SmartAnimationType.fade,
-          //     builder: (context) => _customDialog(context));
-
-          // if (selectImage) {
-          //   _openOptionsSheet();
-          // } else {
-          _navigatorFunction();
-          // }
-          //Navigator.of(context).pushReplacementNamed(signuSuccessFullRoute);
+        if (apiResponse.success ?? false) {
+          _saveUserData(apiResponse.data!.user!, loggedIn: false);
+          _showCodeSentDialog();
+          //_navigatorFunction();
         } else {
           ToastUtils.showCustomSnackbar(
             context: context,
@@ -258,14 +286,51 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  _saveUserData(UserDetail userDetail) {
-    PrefUtils().setUserFirstName = userDetail.userProfile!.userFirstName ?? "";
-    PrefUtils().setUserLastName = userDetail.userProfile!.userLastName ?? "";
-    PrefUtils().setUserEmail = userDetail.userProfile!.userEmail ?? "";
-    PrefUtils().setUserAge = userDetail.userProfile!.age?.toString() ?? "0";
-    PrefUtils().setUserPhone = userDetail.userProfile!.userPhoneNumber ?? "";
-    PrefUtils().setUserToken = userDetail.token ?? "";
-    PrefUtils().setIsUserLoggedIn = true;
+  _validateOtp() async {
+    SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
+    userService
+        .verifyOtp(
+            'email', _otpController.text.trim(), _emailController.text.trim())
+        .then((value) {
+      SmartDialog.dismiss();
+      if (value.error == null) {
+        UserResponse apiResponse = value.snapshot;
+        if (apiResponse.success ?? false) {
+          Navigator.of(context).pop();
+          _saveUserData(apiResponse.data!.user!);
+          _navigatorFunction();
+        } else {
+          _otpController.text = '';
+          setState(() {
+            isErrorEnforced = true;
+          });
+        }
+      } else {}
+    });
+  }
+
+  _sendOtp() async {
+    _otpController.text = "";
+    isErrorEnforced = false;
+    setState(() {});
+    SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
+    userService.sendOtp('email', _emailController.text.trim()).then((value) {
+      SmartDialog.dismiss();
+      if (value.error == null) {
+        GenericResponse apiResponse = value.snapshot;
+      } else {}
+    });
+  }
+
+  _saveUserData(UserDetail userDetail, {bool loggedIn = true}) {
+    PrefUtils().setFirstName = userDetail.firstName ?? "";
+    PrefUtils().setLasttName = userDetail.lastName ?? "";
+    PrefUtils().setAge = int.tryParse(userDetail.age ?? '0') ?? 0;
+    PrefUtils().setCountryCode = userDetail.countryCode ?? "";
+    PrefUtils().setPhone = userDetail.phone ?? "";
+    PrefUtils().setEmail = userDetail.email ?? "";
+    PrefUtils().setToken = userDetail.authToken ?? "";
+    PrefUtils().setIsUserLoggedIn = loggedIn;
   }
 
   @override
@@ -283,20 +348,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: [
               Stack(
                 children: [
-                  SvgPicture.asset(
-                      // PrefUtils().getIsAppTypeCustomer
-                      //     ? 'assets/svgs/login_ellipse.svg'
-                      //     :
-                      'assets/svgs/login_ellipse_alt.svg',
+                  SvgPicture.asset('assets/svgs/login_ellipse_alt.svg',
                       width: MediaQuery.of(context).size.width),
                   Padding(
                     padding: const EdgeInsets.only(top: 50),
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: SvgPicture.asset(
-                          // PrefUtils().getIsAppTypeCustomer
-                          //     ? 'assets/svgs/ic_eventify_client_logo.svg'
-                          //     :
                           'assets/svgs/ic_eventify_seller_logo.svg',
                           width: 160),
                     ),
@@ -419,11 +477,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               icon: const Icon(Icons.today_outlined),
                               keyboardType: TextInputType.number),
                           const SizedBox(height: 10),
-                          CustomTextField(
-                              controller: _phoneController,
-                              hint: "Phone",
-                              icon: const Icon(Icons.phone_outlined),
-                              keyboardType: TextInputType.phone),
+
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                    color: ColorStyle.secondaryTextColor)),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.phone_outlined,
+                                  color: ColorStyle.secondaryTextColor
+                                      .withOpacity(0.8),
+                                  size: 25,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: InternationalPhoneNumberInput(
+                                    onInputChanged: (PhoneNumber number) {
+                                      setState(() {
+                                        _phoneNumber = number;
+                                      });
+                                    },
+                                    onInputValidated: (bool value) {},
+                                    selectorConfig: const SelectorConfig(
+                                      selectorType:
+                                          PhoneInputSelectorType.DIALOG,
+                                      useBottomSheetSafeArea: true,
+                                    ),
+                                    spaceBetweenSelectorAndTextField: 0,
+                                    ignoreBlank: false,
+                                    hintText: "Phone",
+                                    initialValue: _phoneNumber,
+                                    textFieldController: _phoneController,
+                                    inputDecoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                    ),
+                                    formatInput: true,
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                           const SizedBox(height: 10),
                           // Visibility(
                           //   visible: PrefUtils().getIsAppTypeCustomer == false,
@@ -442,7 +541,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     CustomTextField(
                         controller: _emailController,
-                        hint: isSignupSeleted ? "Email" : "Email/Phone",
+                        hint: "Email",
                         icon: Icon(isSignupSeleted
                             ? Icons.email_outlined
                             : Icons.person_outline),
@@ -466,7 +565,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(height: 10),
                     Visibility(
                       visible: isSignupSeleted,
-                      child: CustomTextField(
+                      child: 
+                      CustomTextField(
                           controller: _confPwdController,
                           hint: "Confirm Password",
                           icon: const Icon(Icons.lock_outline),
@@ -557,9 +657,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               }
                             } else {
                               if (_frontendValidation()) {
-                                _signInWithEmailOrPhone();
+                                _signIn();
                               }
-                              //_navigatorFunction();
                             }
                           },
                           roundedCorners: 12,
@@ -627,24 +726,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Container(
-                            height: 60,
-                            width: 60,
-                            decoration: BoxDecoration(
-                                color: ColorStyle.whiteColor,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                      offset: const Offset(0, 4),
-                                      blurRadius: 4,
-                                      color: ColorStyle.blackColor
-                                          .withOpacity(0.25))
-                                ]),
-                            child: const Icon(
-                              Icons.phone_outlined,
-                              color: ColorStyle.secondaryTextColor,
-                              size: 30,
-                            )),
+                        GestureDetector(
+                          onTap: () => _showCodeSentDialog(),
+                          child: Container(
+                              height: 60,
+                              width: 60,
+                              decoration: BoxDecoration(
+                                  color: ColorStyle.whiteColor,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                        offset: const Offset(0, 4),
+                                        blurRadius: 4,
+                                        color: ColorStyle.blackColor
+                                            .withOpacity(0.25))
+                                  ]),
+                              child: const Icon(
+                                Icons.phone_outlined,
+                                color: ColorStyle.secondaryTextColor,
+                                size: 30,
+                              )),
+                        ),
                         Container(
                           height: 60,
                           width: 60,
@@ -704,133 +806,238 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  _customDialog(context) {
-    return Container(
-      width: MediaQuery.of(context).size.width - 45,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-          color: ColorStyle.whiteColor,
-          borderRadius: BorderRadius.circular(12)),
-      child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Profile Picture",
-              style: TextStyle(
-                  fontSize: 20,
-                  color: ColorStyle.primaryColor,
-                  fontWeight: FontWeight.w900),
-            ),
-            const SizedBox(height: 15),
-            const Text(
-              "Do you want to upload a profile picture?",
-              style: TextStyle(color: ColorStyle.primaryTextColor),
-            ),
-            const SizedBox(
-              height: 40,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: CustomRoundedButton(
-                      "Skip",
-                      () {
-                        SmartDialog.dismiss(result: false);
-                      },
-                      //roundedCorners: 18,
-                      textSize: 14,
-                      textWeight: FontWeight.w500,
-                      buttonBackgroundColor: ColorStyle.whiteColor,
-                      borderColor: ColorStyle.secondaryTextColor,
-                      textColor: ColorStyle.secondaryTextColor,
-                    ),
+  _showCodeSentDialog() {
+    _otpController.text = '';
+    isErrorEnforced = false;
+    showDialog(
+        context: context,
+        builder: (BuildContext context) =>
+            StatefulBuilder(builder: (context, setState) {
+              return Dialog(
+                insetPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+                elevation: 2.0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 25, vertical: 25.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            "Verification",
+                            style: TextStyle(
+                              color: ColorStyle.primaryColor,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            "We've sent you an email on ${_emailController.text.trim()} to verify it's really you, please check your inbox and enter the code",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                color: ColorStyle.primaryTextColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          const Text(
+                            "(Don't miss the spam folder)",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: ColorStyle.secondaryTextColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Pinput(
+                            length: 6,
+                            controller: _otpController,
+                            focusNode: focusNode,
+                            defaultPinTheme: defaultPinTheme.copyWith(
+                                decoration: BoxDecoration(
+                              color: ColorStyle.greyColor,
+                              borderRadius: BorderRadius.circular(300),
+                            )),
+                            separatorBuilder: (index) {
+                              return const SizedBox(width: 12);
+                            },
+                            focusedPinTheme: defaultPinTheme.copyWith(
+                                decoration: BoxDecoration(
+                                  color: ColorStyle.primaryColorExtraLight,
+                                  borderRadius: BorderRadius.circular(300),
+                                ),
+                                textStyle: const TextStyle(
+                                    color: ColorStyle.primaryColor,
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.w600)),
+                            submittedPinTheme: defaultPinTheme.copyWith(
+                                decoration: BoxDecoration(
+                                  color: ColorStyle.primaryColorExtraLight,
+                                  borderRadius: BorderRadius.circular(300),
+                                ),
+                                textStyle: const TextStyle(
+                                    color: ColorStyle.primaryColor,
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.w600)),
+                            errorPinTheme: defaultPinTheme.copyWith(
+                                decoration: BoxDecoration(
+                                  color: ColorStyle.primaryColorExtraLight,
+                                  borderRadius: BorderRadius.circular(300),
+                                ),
+                                textStyle: const TextStyle(
+                                    color: ColorStyle.primaryColor,
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.w600)),
+                            showCursor: true,
+                            cursor: cursor,
+                            forceErrorState: isErrorEnforced,
+                            errorText: 'Invalid Code',
+                            errorBuilder: (errorText, pin) {
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: Text(
+                                      errorText!,
+                                      textAlign: TextAlign.end,
+                                      style: TextStyle(
+                                          color: ColorStyle.primaryColorLight,
+                                          fontWeight: FontWeight.w800),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Did not get a code?",
+                                style: TextStyle(
+                                    color: ColorStyle.primaryTextColor,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              GestureDetector(
+                                onTap: () => _sendOtp(),
+                                child: const Text(
+                                  "Resend",
+                                  style: TextStyle(
+                                      color: ColorStyle.primaryColor,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            width: double.maxFinite,
+                            height: 45,
+                            child: CustomRoundedButton(
+                              "Verify",
+                              () => _validateOtp(),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                      )
+                    ],
                   ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: CustomRoundedButton(
-                      "Upload",
-                      () {
-                        SmartDialog.dismiss(result: true);
-                      },
-                      //roundedCorners: 18,
-                      textSize: 14,
-                      textWeight: FontWeight.w500,
-                      // buttonBackgroundColor: ColorStyle.whiteColor,
-                      // borderColor: ColorStyle.secondaryTextColor,
-                      // textColor: ColorStyle.secondaryTextColor,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ]),
-    );
+                ),
+              );
+            }),
+        barrierColor: const Color(0x59000000));
   }
 
-  // _openOptionsSheet() {
-  //   showCupertinoModalPopup(
-  //       context: context,
-  //       builder: (BuildContext context) => Padding(
-  //             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-  //             child: CupertinoActionSheet(
-  //               actions: [
-  //                 GestureDetector(
-  //                   onTap: () async {
-  //                     Navigator.of(context).pop();
-  //                     await openCamera();
-  //                   },
-  //                   child: Container(
-  //                       height: 60,
-  //                       color: Colors.white,
-  //                       child: Container(
-  //                         // margin: const EdgeInsets.only(left: 25),
-  //                         child: const Center(
-  //                           child: Text("Camera",
-  //                               style: TextStyle(
-  //                                   fontSize: 16,
-  //                                   fontWeight: FontWeight.w600,
-  //                                   color: ColorStyle.primaryTextColor)),
-  //                         ),
-  //                       )),
+  // _customDialog(context) {
+  //   return Container(
+  //     width: MediaQuery.of(context).size.width - 45,
+  //     padding: const EdgeInsets.all(20),
+  //     decoration: BoxDecoration(
+  //         color: ColorStyle.whiteColor,
+  //         borderRadius: BorderRadius.circular(12)),
+  //     child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           const Text(
+  //             "Profile Picture",
+  //             style: TextStyle(
+  //                 fontSize: 20,
+  //                 color: ColorStyle.primaryColor,
+  //                 fontWeight: FontWeight.w900),
+  //           ),
+  //           const SizedBox(height: 15),
+  //           const Text(
+  //             "Do you want to upload a profile picture?",
+  //             style: TextStyle(color: ColorStyle.primaryTextColor),
+  //           ),
+  //           const SizedBox(
+  //             height: 40,
+  //           ),
+  //           Padding(
+  //             padding: const EdgeInsets.symmetric(horizontal: 20),
+  //             child: Row(
+  //               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //               children: [
+  //                 Expanded(
+  //                   child: CustomRoundedButton(
+  //                     "Skip",
+  //                     () {
+  //                       SmartDialog.dismiss(result: false);
+  //                     },
+  //                     //roundedCorners: 18,
+  //                     textSize: 14,
+  //                     textWeight: FontWeight.w500,
+  //                     buttonBackgroundColor: ColorStyle.whiteColor,
+  //                     borderColor: ColorStyle.secondaryTextColor,
+  //                     textColor: ColorStyle.secondaryTextColor,
+  //                   ),
   //                 ),
-  //                 GestureDetector(
-  //                   onTap: () async {
-  //                     Navigator.of(context).pop();
-  //                     await openImages();
-  //                   },
-  //                   child: Container(
-  //                       height: 60,
-  //                       color: Colors.white,
-  //                       child: const Center(
-  //                         child: Text("Gallery",
-  //                             style: TextStyle(
-  //                                 fontSize: 16,
-  //                                 fontWeight: FontWeight.w600,
-  //                                 color: ColorStyle.primaryTextColor)),
-  //                       )),
+  //                 const SizedBox(width: 20),
+  //                 Expanded(
+  //                   child: CustomRoundedButton(
+  //                     "Upload",
+  //                     () {
+  //                       SmartDialog.dismiss(result: true);
+  //                     },
+  //                     //roundedCorners: 18,
+  //                     textSize: 14,
+  //                     textWeight: FontWeight.w500,
+  //                     // buttonBackgroundColor: ColorStyle.whiteColor,
+  //                     // borderColor: ColorStyle.secondaryTextColor,
+  //                     // textColor: ColorStyle.secondaryTextColor,
+  //                   ),
   //                 ),
   //               ],
-  //               cancelButton: GestureDetector(
-  //                   onTap: () {
-  //                     Navigator.of(context).pop();
-  //                   },
-  //                   child: Container(
-  //                       height: 60,
-  //                       decoration: BoxDecoration(
-  //                           color: ColorStyle.primaryColor,
-  //                           borderRadius: BorderRadius.circular(12)),
-  //                       child: const Center(
-  //                         child: Text("Cancel",
-  //                             style: TextStyle(
-  //                                 fontSize: 16,
-  //                                 fontWeight: FontWeight.w600,
-  //                                 color: ColorStyle.whiteColor)),
-  //                       ))),
   //             ),
-  //           ));
+  //           )
+  //         ]),
+  //   );
   // }
 }

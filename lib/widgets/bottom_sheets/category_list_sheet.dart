@@ -1,5 +1,5 @@
 import 'package:eventify/models/api_models/category_response/category.dart';
-import 'package:eventify/models/api_models/category_response/category_response.dart';
+import 'package:eventify/models/api_models/category_response/category_list_response.dart';
 import 'package:eventify/models/misc_models/city.dart';
 import 'package:eventify/services/category_service.dart';
 import 'package:eventify/styles/color_style.dart';
@@ -7,53 +7,21 @@ import 'package:eventify/utils/toast_utils.dart';
 import 'package:flutter/material.dart';
 
 class CategoryListSheet extends StatefulWidget {
-  const CategoryListSheet({super.key});
+  final List<Category> categoryList;
+  const CategoryListSheet({super.key, required this.categoryList});
 
   @override
   State<CategoryListSheet> createState() => _CategoryListSheetState();
 }
 
 class _CategoryListSheetState extends State<CategoryListSheet> {
-  CategoryService categoryService = CategoryService();
-  List<Category>? categoryList;
+  late List<Category> categoryList;
   bool isLoading = true;
 
   @override
   initState() {
-    _getCategories(isForAll: true);
+    categoryList = widget.categoryList;
     super.initState();
-  }
-
-  _getCategories({bool isForAll = false}) {
-    categoryService.getCategories(isForAll: isForAll).then((value) async {
-      setState(() {
-        isLoading = false;
-      });
-      if (value.error == null) {
-        CategoryResponse apiResponse = value.snapshot;
-        if (apiResponse.isSuccess ?? false) {
-          categoryList = apiResponse.data;
-        } else {
-          ToastUtils.showCustomSnackbar(
-            context: context,
-            contentText: apiResponse.message ?? "",
-            icon: const Icon(
-              Icons.cancel_outlined,
-              color: ColorStyle.whiteColor,
-            ),
-          );
-        }
-      } else {
-        ToastUtils.showCustomSnackbar(
-          context: context,
-          contentText: value.error ?? "",
-          icon: const Icon(
-            Icons.cancel_outlined,
-            color: ColorStyle.whiteColor,
-          ),
-        );
-      }
-    });
   }
 
   @override
@@ -75,14 +43,10 @@ class _CategoryListSheetState extends State<CategoryListSheet> {
                         style:
                             const ButtonStyle(alignment: Alignment.centerLeft),
                         onPressed: () {
-                          // setState(() {
-                          //   selectedCity = cityList[index].name;
-                          // });
-                          // _getEventsList();
-                          Navigator.of(context).pop(categoryList![index]);
+                          Navigator.of(context).pop(categoryList[index]);
                         },
                         child: Text(
-                          categoryList![index].categoryName ?? "",
+                          categoryList![index].name ?? "",
                           style: const TextStyle(
                               color: ColorStyle.primaryTextColor,
                               fontWeight: FontWeight.w600),

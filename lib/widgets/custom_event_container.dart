@@ -1,13 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eventify/constants/route_keys.dart';
-import 'package:eventify/models/api_models/event_list_response/event.dart';
+import 'package:eventify/models/api_models/event_response/event.dart';
 import 'package:eventify/models/screen_args/detail_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:flutter/material.dart';
 
 class CustomEventContainer extends StatelessWidget {
   final Event event;
-  const CustomEventContainer({super.key, required this.event});
+  final Function(String eventId) onBookmarked;
+  const CustomEventContainer(
+      {super.key, required this.event, required this.onBookmarked});
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +31,11 @@ class CustomEventContainer extends StatelessWidget {
                     width: double.maxFinite,
                     height: 160,
                     child: CachedNetworkImage(
-                        imageUrl: event.eventImages?.first.imagePath ?? "",
-                      
+                        imageUrl: event.images?.first ?? "",
                         errorWidget: (context, url, error) {
                           return Container(
                             color: ColorStyle.secondaryTextColor,
-                            child: Center(
+                            child: const Center(
                                 child: Icon(
                               Icons.error_outline,
                               color: ColorStyle.whiteColor,
@@ -83,7 +84,7 @@ class CustomEventContainer extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              event.eventName ?? "",
+              event.name ?? "",
               style: const TextStyle(
                   color: ColorStyle.primaryTextColor,
                   fontSize: 16,
@@ -111,7 +112,7 @@ class CustomEventContainer extends StatelessWidget {
             width: 3,
           ),
           Text(
-            event.organizeBy ?? "",
+            event.contact?.name ?? "",
             style: const TextStyle(
                 color: ColorStyle.whiteColor,
                 fontSize: 10,
@@ -137,9 +138,9 @@ class CustomEventContainer extends StatelessWidget {
             width: 3,
           ),
           Text(
-            event.priceStartFrom == 0 && event.priceGoesUpto == 0
+            event.priceStartsFrom == 0 && event.priceGoesUpto == 0
                 ? "Free"
-                : "Starts From Rs ${event.priceStartFrom ?? 0}",
+                : "Starts From Rs ${event.priceStartsFrom ?? 0}",
             style: const TextStyle(
                 color: ColorStyle.accentColor,
                 fontSize: 10,
@@ -151,14 +152,21 @@ class CustomEventContainer extends StatelessWidget {
   }
 
   _buildSaveCard() {
-    return Container(
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: ColorStyle.primaryColor.withOpacity(0.70),
-        shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: () => onBookmarked(event.id!),
+      child: Container(
+        padding: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: ColorStyle.primaryColor.withOpacity(0.70),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+            (event.preference?.bookmarked ?? false)
+                ? Icons.bookmark
+                : Icons.bookmark_outline,
+            color: ColorStyle.accentColor,
+            size: 18),
       ),
-      child: const Icon(Icons.bookmark_outline,
-          color: ColorStyle.accentColor, size: 18),
     );
   }
 
@@ -180,7 +188,7 @@ class CustomEventContainer extends StatelessWidget {
                 width: 3,
               ),
               Text(
-                event.eventDate ?? "",
+                event.dateTime ?? "",
                 style: const TextStyle(
                     color: ColorStyle.whiteColor,
                     fontSize: 10,
@@ -198,7 +206,7 @@ class CustomEventContainer extends StatelessWidget {
                 width: 3,
               ),
               Text(
-                event.eventTime ?? "",
+                event.dateTime ?? "",
                 style: const TextStyle(
                     color: ColorStyle.whiteColor,
                     fontSize: 10,

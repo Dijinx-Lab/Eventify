@@ -34,14 +34,15 @@ class _AccountsScreenState extends State<AccountsScreen> {
   }
 
   _signOut() {
-    PrefUtils().setUserAge = "0";
-    PrefUtils().setUserEmail = "";
-    PrefUtils().setUserFirstName = "";
-    PrefUtils().setUserLastName = "";
-    PrefUtils().setUserPhone = "";
-    PrefUtils().setUserToken = "";
+    PrefUtils().setFirstName = "";
+    PrefUtils().setLasttName = "";
+    PrefUtils().setAge = 0;
+    PrefUtils().setCountryCode = "";
+    PrefUtils().setPhone = "";
+    PrefUtils().setEmail = "";
+    PrefUtils().setToken = "";
     PrefUtils().setIsUserLoggedIn = false;
-    Navigator.of(context).pushNamed(signupRoute,
+    Navigator.of(context).pushNamedAndRemoveUntil(signupRoute, (e) => false,
         arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, false));
     // Navigator.of(context).pushNamedAndRemoveUntil(
     //   roleSelectionRoute,
@@ -57,7 +58,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
         backgroundColor: ColorStyle.whiteColor,
         foregroundColor: ColorStyle.secondaryTextColor,
         elevation: 0.5,
-        leading: PrefUtils().getIsAppTypeCustomer
+        leading: !PrefUtils().getIsAppTypeCustomer
             ? null
             : IconButton(
                 onPressed: () {
@@ -95,7 +96,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
               ),
               const SizedBox(height: 10),
               Text(
-                "${PrefUtils().getUserFirstName} ${PrefUtils().getUserLastName}",
+                "", // "${PrefUtils().getUserFirstName} ${PrefUtils().getUserLastName}",
                 style: const TextStyle(
                     color: ColorStyle.primaryTextColor,
                     fontWeight: FontWeight.w600,
@@ -335,13 +336,17 @@ class _AccountsScreenState extends State<AccountsScreen> {
                         width: 2,
                         color: ColorStyle.secondaryTextColor.withOpacity(0.2),
                       )),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Sign Out",
+                        PrefUtils().getIsUserLoggedIn
+                            ? "Sign Out"
+                            : "Sign In to Eventify",
                         style: TextStyle(
-                            color: ColorStyle.primaryColorLight,
+                            color: PrefUtils().getIsUserLoggedIn
+                                ? ColorStyle.primaryColorLight
+                                : ColorStyle.primaryTextColor,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
                       ),

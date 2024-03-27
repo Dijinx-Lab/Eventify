@@ -75,10 +75,10 @@ class CustomRoutes {
         return MaterialPageRoute(builder: (_) => const SellerHomeScreen());
       case accountsRoute:
         return MaterialPageRoute(builder: (_) => const AccountsScreen());
-      case createEventRoute:
-        return MaterialPageRoute(
-            builder: (_) => CreateEventScreen(
-                args: settings.arguments as CreateEventsArgs));
+      // case createEventRoute:
+      //   return MaterialPageRoute(
+      //       builder: (_) => CreateEventScreen(
+      //           args: settings.arguments as CreateEventsArgs));
       case forgotPassOneRoute:
         return MaterialPageRoute(
             builder: (_) => const ForgotPasswordOneScreen());
