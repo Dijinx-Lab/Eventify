@@ -22,9 +22,7 @@ class ToastUtils {
       content: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          icon != null
-              ? icon
-              : Container(
+          icon ?? const SizedBox(
                   width: 0,
                   height: 0,
                 ),
@@ -32,7 +30,7 @@ class ToastUtils {
               ? const SizedBox(
                   width: 10,
                 )
-              : Container(
+              : const SizedBox(
                   width: 0,
                   height: 0,
                 ),

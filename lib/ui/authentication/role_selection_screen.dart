@@ -1,14 +1,17 @@
 import 'package:eventify/constants/route_keys.dart';
-import 'package:eventify/models/screen_args/role_selection_args.dart';
+import 'package:eventify/models/api_models/user_response/user_response.dart';
+import 'package:eventify/models/screen_args/main_args.dart';
 import 'package:eventify/models/screen_args/signup_args.dart';
+import 'package:eventify/services/user_service.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/utils/loading_utils.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
-  final RoleSelectionArgs? args;
-  const RoleSelectionScreen({super.key, this.args});
+  const RoleSelectionScreen({super.key});
 
   @override
   State<RoleSelectionScreen> createState() => _RoleSelectionScreenState();
@@ -17,12 +20,46 @@ class RoleSelectionScreen extends StatefulWidget {
 class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
   @override
   void initState() {
-    if (widget.args != null && widget.args!.nextRoute != null) {
-      Future.delayed(const Duration(milliseconds: 10)).then((value) =>
-          Navigator.of(context).pushNamed(widget.args!.nextRoute!,
-              arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, false)));
-    }
     super.initState();
+  }
+
+  _updateProfile(pref) async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
+    UserService()
+        .updateProfile(null, null, null, null, null, null, pref)
+        .then((value) {
+      SmartDialog.dismiss();
+      if (value.error == null) {
+        UserResponse apiResponse = value.snapshot;
+        if (apiResponse.success ?? false) {
+          PrefUtils().setAppPreference =
+              apiResponse.data?.user?.appSidePreference ?? "new";
+          ToastUtils.showCustomSnackbar(
+            context: context,
+            contentText: "Welcome to Event Bazaar",
+            icon: const Icon(
+              Icons.celebration_outlined,
+              color: ColorStyle.whiteColor,
+            ),
+          );
+          _navigatorFunction();
+        } else {}
+      } else {}
+    });
+  }
+
+  _navigatorFunction() {
+    if (PrefUtils().getAppPreference == "new") {
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil(roleSelectionRoute, (e) => false);
+    } else if (PrefUtils().getAppPreference == "viewer") {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          mainRoute, arguments: MainArgs(0), (e) => false);
+    } else {
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil(sellerHomeRoute, (e) => false);
+    }
   }
 
   @override
@@ -44,11 +81,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               ),
               const SizedBox(height: 30),
               GestureDetector(
-                onTap: () {
-                  PrefUtils().setIsAppTypeCustomer = true;
-                  Navigator.of(context).pushNamed(signupRoute,
-                      arguments: SignupArgs(true, true));
-                },
+                onTap: () => _updateProfile('viewer'),
                 child: Container(
                   height: 120,
                   padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -82,13 +115,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               ),
               const SizedBox(height: 20),
               GestureDetector(
-                onTap: () {
-                  PrefUtils().setIsAppTypeCustomer = false;
-                  Navigator.of(context).pushNamed(
-                    signupRoute,
-                    arguments: SignupArgs(false, true),
-                  );
-                },
+                onTap: () => _updateProfile('lister'),
                 child: Container(
                   height: 120,
                   padding: const EdgeInsets.symmetric(horizontal: 15),

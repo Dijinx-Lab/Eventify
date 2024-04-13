@@ -1,8 +1,8 @@
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/screen_args/create_event_args.dart';
 import 'package:eventify/models/screen_args/detail_args.dart';
+import 'package:eventify/models/screen_args/forgot_pass_args.dart';
 import 'package:eventify/models/screen_args/main_args.dart';
-import 'package:eventify/models/screen_args/role_selection_args.dart';
 import 'package:eventify/models/screen_args/search_args.dart';
 import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/models/screen_args/splash_args.dart';
@@ -25,6 +25,7 @@ import 'package:eventify/ui/onboarding/onboarding_screen_two.dart';
 import 'package:eventify/ui/seller/create_event/create_event_screen.dart';
 import 'package:eventify/ui/seller/home/seller_home_screen.dart';
 import 'package:eventify/ui/splash/splash_screen.dart';
+import 'package:eventify/ui/unloggedin/unloggedin_screen.dart';
 import 'package:flutter/material.dart';
 
 class CustomRoutes {
@@ -43,10 +44,8 @@ class CustomRoutes {
         return MaterialPageRoute(builder: (_) => const OnboardingScreenTwo());
       case onboardingThreeRoute:
         return MaterialPageRoute(builder: (_) => const OnboardingScreenThree());
-      // case roleSelectionRoute:
-      //   return MaterialPageRoute(
-      //       builder: (_) => RoleSelectionScreen(
-      //           args: settings.arguments as RoleSelectionArgs));
+      case roleSelectionRoute:
+        return MaterialPageRoute(builder: (_) => const RoleSelectionScreen());
       case signupRoute:
         return MaterialPageRoute(
             builder: (_) =>
@@ -75,19 +74,25 @@ class CustomRoutes {
         return MaterialPageRoute(builder: (_) => const SellerHomeScreen());
       case accountsRoute:
         return MaterialPageRoute(builder: (_) => const AccountsScreen());
-      // case createEventRoute:
-      //   return MaterialPageRoute(
-      //       builder: (_) => CreateEventScreen(
-      //           args: settings.arguments as CreateEventsArgs));
+      case createEventRoute:
+        return MaterialPageRoute(
+            builder: (_) => CreateEventScreen(
+                args: settings.arguments as CreateEventsArgs));
       case forgotPassOneRoute:
         return MaterialPageRoute(
             builder: (_) => const ForgotPasswordOneScreen());
       case forgotPassTwoRoute:
         return MaterialPageRoute(
-            builder: (_) => const ForgotPasswordTwoScreen());
+            builder: (_) => ForgotPasswordTwoScreen(
+                  arguments: settings.arguments as ForgotPassArgs,
+                ));
       case forgotPassThreeRoute:
         return MaterialPageRoute(
-            builder: (_) => const ForgotPasswordThreeScreen());
+            builder: (_) => ForgotPasswordThreeScreen(
+                  arguments: settings.arguments as ForgotPassArgs,
+                ));
+      case notLoggedInRoute:
+        return MaterialPageRoute(builder: (_) => const UnLoggedInScreen());
       default:
         return MaterialPageRoute(
             builder: (_) =>

@@ -112,17 +112,19 @@ class _LoadingUtilState extends State<LoadingUtil>
       child: Container(
         height: 120,
         width: 300,
-        margin: EdgeInsets.symmetric(horizontal: 30),
-        padding: EdgeInsets.symmetric(horizontal: 30),
+        margin: const EdgeInsets.symmetric(horizontal: 30),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         decoration: BoxDecoration(
             color: Colors.white, borderRadius: BorderRadius.circular(12)),
         alignment: Alignment.center,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircularProgressIndicator(),
-            SizedBox(height: 20),
-            Text(text)
+            Text(text),
+            const SizedBox(height: 20),
+            LinearProgressIndicator(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ],
         ),
       ),

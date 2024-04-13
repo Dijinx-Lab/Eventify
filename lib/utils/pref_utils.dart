@@ -75,9 +75,29 @@ class PrefUtils {
     _sharedPreferences!.setString(userToken, value);
   }
 
+  bool get getNotificationsEnabled =>
+      _sharedPreferences!.getBool(notificationsEnabled) ?? true;
+
+  set setNotificationsEnabled(bool type) {
+    _sharedPreferences!.setBool(notificationsEnabled, type);
+  }
+
+  String get getSignInMethod =>
+      _sharedPreferences!.getString(signInMethod) ?? "";
+
+  set setSignInMethod(String type) {
+    _sharedPreferences!.setString(signInMethod, type);
+  }
+
   String get getCity => _sharedPreferences!.getString(userCity) ?? '';
 
   set setCity(String value) {
     _sharedPreferences!.setString(userCity, value);
+  }
+
+  String get getAppPreference => _sharedPreferences!.getString(appSide) ?? '';
+
+  set setAppPreference(String value) {
+    _sharedPreferences!.setString(appSide, value);
   }
 }

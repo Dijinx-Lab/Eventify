@@ -9,3 +9,6 @@ const String userCountryCode = "user_country_code";
 const String userPhone = "user_phone";
 const String userAge = "user_age";
 const String userCity = "user_city";
+const String appSide = "app_side";
+const String notificationsEnabled = "notifications_enabled";
+const String signInMethod = "sign_in_method";

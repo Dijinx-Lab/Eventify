@@ -1,7 +1,12 @@
+import 'package:eventify/models/api_models/user_response/user_response.dart';
+import 'package:eventify/services/user_service.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/utils/loading_utils.dart';
+import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class ResetPassScreen extends StatefulWidget {
   const ResetPassScreen({super.key});
@@ -11,13 +16,60 @@ class ResetPassScreen extends StatefulWidget {
 }
 
 class _ResetPassScreenState extends State<ResetPassScreen> {
-  TextEditingController _passController = TextEditingController();
-  TextEditingController _cpassController = TextEditingController();
-  TextEditingController _currentPassController = TextEditingController();
+  final TextEditingController _cpassController = TextEditingController();
+  final TextEditingController _passController = TextEditingController();
+  final TextEditingController _currentPassController = TextEditingController();
+
+  _updateProfile() async {
+    FocusManager.instance.primaryFocus?.unfocus();
+    SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
+    UserService()
+        .changePassword(
+      _currentPassController.text.trim(),
+      _passController.text.trim(),
+      _cpassController.text.trim(),
+    )
+        .then((value) {
+      SmartDialog.dismiss();
+      if (value.error == null) {
+        UserResponse apiResponse = value.snapshot;
+        if (apiResponse.success ?? false) {
+          ToastUtils.showCustomSnackbar(
+            context: context,
+            contentText: "Password updated",
+            icon: const Icon(
+              Icons.celebration_outlined,
+              color: ColorStyle.whiteColor,
+            ),
+          );
+        } else {
+          ToastUtils.showCustomSnackbar(
+            context: context,
+            contentText: apiResponse.message ?? "",
+            icon: const Icon(
+              Icons.cancel_outlined,
+              color: ColorStyle.whiteColor,
+            ),
+          );
+        }
+      } else {
+        ToastUtils.showCustomSnackbar(
+          context: context,
+          contentText: value.error ?? "",
+          icon: const Icon(
+            Icons.cancel_outlined,
+            color: ColorStyle.whiteColor,
+          ),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: ColorStyle.whiteColor,
         foregroundColor: ColorStyle.secondaryTextColor,
         elevation: 0.5,
@@ -49,36 +101,36 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   "Current password",
                   style: TextStyle(color: ColorStyle.secondaryTextColor),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 CustomTextField(
                   controller: _currentPassController,
                   borderColor: ColorStyle.primaryTextColor,
                 ),
-                SizedBox(height: 20),
-                Text(
+                const SizedBox(height: 20),
+                const Text(
                   "New password",
                   style: TextStyle(color: ColorStyle.secondaryTextColor),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 CustomTextField(
                   controller: _passController,
                   borderColor: ColorStyle.primaryTextColor,
                 ),
-                SizedBox(height: 20),
-                Text(
+                const SizedBox(height: 20),
+                const Text(
                   "Confirm password",
                   style: TextStyle(color: ColorStyle.secondaryTextColor),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 CustomTextField(
                   controller: _cpassController,
                   borderColor: ColorStyle.primaryTextColor,
                 ),
-                Spacer(),
+                const Spacer(),
                 Container(
                     width: double.maxFinite,
                     height: 50,
@@ -92,11 +144,7 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
                         ]),
                     child: CustomRoundedButton(
                       'Reset',
-                      () {
-                        // PrefUtils().setIsUserLoggedIn = true;
-                        // Navigator.of(context).pushNamedAndRemoveUntil(
-                        //     mainRoute, arguments: MainArgs(0), (e) => false);
-                      },
+                      () => _updateProfile(),
                       roundedCorners: 12,
                       textWeight: FontWeight.bold,
                     )),

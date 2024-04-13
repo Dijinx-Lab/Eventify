@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBQSWSOGGk28O9PbWNBQKAhNfm7XyuOBWg',
-    appId: '1:669949797318:android:1f6f65e5046273efdcc8c7',
+    appId: '1:669949797318:android:eafa67cc6190129ddcc8c7',
     messagingSenderId: '669949797318',
     projectId: 'eventify-64e98',
     storageBucket: 'eventify-64e98.appspot.com',
@@ -59,10 +59,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBfTvAnaq40xmQCv-SlmaY_4TgBPddaSqw',
-    appId: '1:669949797318:ios:2152fb9182719dc7dcc8c7',
+    appId: '1:669949797318:ios:620a20ebb91cc44bdcc8c7',
     messagingSenderId: '669949797318',
     projectId: 'eventify-64e98',
     storageBucket: 'eventify-64e98.appspot.com',
-    iosBundleId: 'com.dijinx.eventify',
+    iosBundleId: 'com.dijinx.eventbazaar',
   );
 }

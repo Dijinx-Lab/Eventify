@@ -56,6 +56,10 @@ dependencies:
   firebase_core: ^2.27.0
   firebase_messaging: ^14.7.19
   flutter_local_notifications: ^17.0.0
+  firebase_auth: ^4.17.8
+  google_sign_in: ^6.2.1
+  lazy_load_indexed_stack: ^1.1.0
+  animate_gradient: ^0.0.2+1
 
 dev_dependencies:
   flutter_test:

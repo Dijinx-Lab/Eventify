@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:event_bus/event_bus.dart';
 import 'package:eventify/models/api_models/category_response/category.dart';
 import 'package:eventify/models/api_models/category_response/category_list_response.dart';
+import 'package:eventify/models/event_bus/refresh_discover_event.dart';
+import 'package:eventify/models/event_bus/refresh_saved_events.dart';
 import 'package:eventify/models/event_bus/update_event_preference.dart';
 import 'package:eventify/services/category_service.dart';
 import 'package:eventify/services/event_service.dart';
@@ -13,8 +15,10 @@ import 'package:eventify/models/api_models/event_response/event_list_response.da
 import 'package:eventify/models/misc_models/city.dart';
 import 'package:eventify/models/screen_args/search_args.dart';
 import 'package:eventify/services/stats_service.dart';
+import 'package:eventify/services/user_service.dart';
 import 'package:eventify/styles/color_style.dart';
-import 'package:eventify/utils/loading_utils.dart';
+import 'package:eventify/ui/alerts/alerts_screen.dart';
+import 'package:eventify/ui/saved/saved_screen.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/bottom_sheets/category_list_sheet.dart';
@@ -23,11 +27,9 @@ import 'package:eventify/widgets/custom_event_container.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class DiscoverScreen extends StatefulWidget {
   static final eventBus = EventBus();
@@ -62,28 +64,25 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     _checkLocationPermission();
     _getCategories();
 
-    DiscoverScreen.eventBus.on<UpdateEventPreference>().listen((ev) {
-      int index = eventsList!.indexWhere((event) => event.id == ev.id);
-      if (index != -1) {
-        eventsList![index].preference!.bookmarked = ev.bookmarked;
-        eventsList![index].preference!.preference = ev.preference;
-        _applyCategoryAsFilter();
-        setState(() {});
-      }
+    DiscoverScreen.eventBus.on<RefreshDiscoverEvents>().listen((ev) {
+      _getEventsListWithoutLoading();
     });
+
     super.initState();
   }
 
   _saveEventPrefs(Event event) async {
     await StatsService().updateStats(
         event.preference!.preference, event.preference!.bookmarked, event.id!);
+
+    SavedScreen.eventBus.fire(RefreshSavedEvents());
   }
 
   _setCityAndGetList(String city) {
     setState(() {
       selectedCity = city;
     });
-    PrefUtils().setCity = city;
+
     _getEventsList();
   }
 
@@ -92,10 +91,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       filteredEventsList = eventsList;
     } else {
       filteredEventsList = eventsList!.where((element) {
-        print(selectedCategory!.id);
-        print(element.id);
-        print(element.id == selectedCategory!.id);
-        return element.id == selectedCategory!.id;
+        return element.category?.id == selectedCategory!.id;
       }).toList();
     }
     setState(() {});
@@ -128,18 +124,24 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   }
 
   Future<void> _getCurrentCity() async {
+    String city = "Karachi";
     try {
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
-      if (placemarks != null && placemarks.isNotEmpty) {
+      if (placemarks.isNotEmpty) {
         Placemark mostLikelyPlace = placemarks[0];
-
-        _setCityAndGetList(mostLikelyPlace.locality ?? 'Karachi');
+        city = mostLikelyPlace.locality ?? 'Karachi';
       }
     } catch (e) {
-      _setCityAndGetList('Karachi');
+      city = "Karachi";
+    }
+    PrefUtils().setCity = city;
+    _setCityAndGetList(city);
+    if (PrefUtils().getIsUserLoggedIn) {
+      await UserService()
+          .updateProfile(null, null, null, null, city, null, null);
     }
   }
 
@@ -156,6 +158,37 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       if (value.error == null) {
         EventListResponse apiResponse = value.snapshot;
         if (apiResponse.success ?? false) {
+          eventsList = apiResponse.data?.events ?? [];
+          _applyCategoryAsFilter();
+        } else {
+          ToastUtils.showCustomSnackbar(
+            context: context,
+            contentText: apiResponse.message ?? "",
+            icon: const Icon(
+              Icons.cancel_outlined,
+              color: ColorStyle.whiteColor,
+            ),
+          );
+        }
+      } else {
+        ToastUtils.showCustomSnackbar(
+          context: context,
+          contentText: value.error ?? "",
+          icon: const Icon(
+            Icons.cancel_outlined,
+            color: ColorStyle.whiteColor,
+          ),
+        );
+      }
+    });
+  }
+
+  _getEventsListWithoutLoading() {
+    eventService.getEvents(selectedCity ?? "").then((value) async {
+      if (value.error == null) {
+        EventListResponse apiResponse = value.snapshot;
+        if (apiResponse.success ?? false) {
+          eventsList = null;
           eventsList = apiResponse.data?.events ?? [];
           _applyCategoryAsFilter();
         } else {
@@ -267,6 +300,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       Navigator.of(context).pushNamed(searchRoute,
           arguments: SearchArgs(
               searchText, filteredEvents, allEventsList!, selectedCity!));
+      _searchController.text = "";
     }
   }
 
@@ -427,10 +461,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                             Visibility(
                                                 visible: selectedCategory ==
                                                     popularCategoryList![index],
-                                                child: Padding(
+                                                child: const Padding(
                                                   padding:
-                                                      const EdgeInsets.only(
-                                                          left: 8),
+                                                      EdgeInsets.only(left: 8),
                                                   child: Icon(
                                                       Icons.cancel_outlined,
                                                       color:

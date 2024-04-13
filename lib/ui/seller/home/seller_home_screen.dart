@@ -1,14 +1,22 @@
+import 'dart:async';
+
 import 'package:event_bus/event_bus.dart';
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/api_models/event_response/event.dart';
 import 'package:eventify/models/api_models/event_response/event_list_response.dart';
+import 'package:eventify/models/event_bus/refresh_discover_event.dart';
 import 'package:eventify/models/event_bus/refresh_my_events.dart';
 import 'package:eventify/models/screen_args/create_event_args.dart';
+import 'package:eventify/models/screen_args/main_args.dart';
+import 'package:eventify/models/screen_args/splash_args.dart';
 import 'package:eventify/services/event_service.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/utils/notification_utils.dart';
+import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/custom_event_container.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -24,13 +32,67 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
   bool isFloatingShown = false;
   List<Event>? eventsList;
   bool isLoading = true;
-  // EventService eventService = EventService();
+  EventService eventService = EventService();
+  StreamSubscription<RemoteMessage>? remoteMessageStream;
+  StreamSubscription<RemoteMessage>? onMessageOpenedStream;
 
   @override
   void initState() {
     _showAfterDelay();
-    //_getEventsList();
+    _getEventsList();
     super.initState();
+
+    NotificationUtils.initializeFirebase();
+
+    remoteMessageStream = FirebaseMessaging.onMessage.listen((message) {
+      RemoteNotification? notification = message.notification;
+      Map<String, dynamic> notificationData = message.data;
+
+      if (notification != null) {
+        if (notificationData["action"] == "open_lister_events" ||
+            notificationData["action"] == "open_alerts") {
+          _performNotificationTap(
+              message.data["action"], message.data["id"].toString());
+        }
+
+        NotificationUtils.showNotification(message);
+      }
+    });
+
+    onMessageOpenedStream =
+        FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      // NotificationUtils.showNotification(message);
+      RemoteNotification? notification = message.notification;
+      if (notification != null) {
+        _performNotificationTap(
+            message.data["action"], message.data["id"].toString());
+      }
+    });
+
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message != null) {
+        RemoteNotification? notification = message.notification;
+        if (notification != null) {
+          _performNotificationTap(
+              message.data["action"], message.data["id"].toString());
+        }
+      }
+    });
+
+    SellerHomeScreen.eventBus.on<RefreshDiscoverEvents>().listen((ev) {
+      _getEventsList();
+    });
+  }
+
+  @override
+  dispose() {
+    super.dispose();
+    if (remoteMessageStream != null) {
+      remoteMessageStream!.cancel();
+    }
+    if (onMessageOpenedStream != null) {
+      onMessageOpenedStream!.cancel();
+    }
   }
 
   _showAfterDelay() {
@@ -41,51 +103,68 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
     });
 
     SellerHomeScreen.eventBus.on<RefreshMyEvents>().listen((event) {
-      // _getEventsList();
+      _getEventsList();
     });
   }
 
-  // _getEventsList() {
-  //   setState(() {
-  //     isLoading = true;
-  //     eventsList = null;
-  //   });
-  //   eventService.getEventsByUser().then((value) async {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
+  _getEventsList() {
+    setState(() {
+      isLoading = true;
+      eventsList = null;
+    });
+    eventService.getEvents("user").then((value) async {
+      setState(() {
+        isLoading = false;
+      });
 
-  //     if (value.error == null) {
-  //       EventListResponse apiResponse = value.snapshot;
-  //       if (apiResponse.isSuccess ?? false) {
-  //         eventsList = apiResponse.data ?? [];
-  //       } else {
-  //         ToastUtils.showCustomSnackbar(
-  //           context: context,
-  //           contentText: apiResponse.message ?? "",
-  //           icon: const Icon(
-  //             Icons.cancel_outlined,
-  //             color: ColorStyle.whiteColor,
-  //           ),
-  //         );
-  //       }
-  //     } else {
-  //       ToastUtils.showCustomSnackbar(
-  //         context: context,
-  //         contentText: value.error ?? "",
-  //         icon: const Icon(
-  //           Icons.cancel_outlined,
-  //           color: ColorStyle.whiteColor,
-  //         ),
-  //       );
-  //     }
-  //   });
-  // }
+      if (value.error == null) {
+        EventListResponse apiResponse = value.snapshot;
+        if (apiResponse.success ?? false) {
+          setState(() {
+            eventsList = apiResponse.data?.events ?? [];
+          });
+        } else {
+          ToastUtils.showCustomSnackbar(
+            context: context,
+            contentText: apiResponse.message ?? "",
+            icon: const Icon(
+              Icons.cancel_outlined,
+              color: ColorStyle.whiteColor,
+            ),
+          );
+        }
+      } else {
+        ToastUtils.showCustomSnackbar(
+          context: context,
+          contentText: value.error ?? "",
+          icon: const Icon(
+            Icons.cancel_outlined,
+            color: ColorStyle.whiteColor,
+          ),
+        );
+      }
+    });
+  }
+
+  void _performNotificationTap(String action, String id) {
+    Future.delayed(const Duration(milliseconds: 500)).then((value) {
+      if (action == "open_lister_events") {
+        print('refreshed');
+        _getEventsList();
+      } else if (action == "open_alerts") {
+        PrefUtils().setIsAppTypeCustomer = true;
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            initialRoute, (e) => false,
+            arguments: SplashArgs(true, MainArgs(2, action: action, id: id)));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: ColorStyle.whiteColor,
         foregroundColor: ColorStyle.secondaryTextColor,
         elevation: 0.5,
@@ -159,18 +238,18 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
               ),
             ),
             const Text(
-              "Currently there are no events to show",
+              "You haven't posted any events yet",
               textAlign: TextAlign.center,
               style:
                   TextStyle(fontSize: 16, color: ColorStyle.secondaryTextColor),
             ),
             const SizedBox(height: 25),
-            // SizedBox(
-            //     width: 200,
-            //     height: 40,
-            //     child: CustomRoundedButton("Refresh", () {
-            //       _getEventsList();
-            //     }))
+            SizedBox(
+                width: 200,
+                height: 40,
+                child: CustomRoundedButton("Refresh", () {
+                  _getEventsList();
+                }))
           ],
         ),
       ),
@@ -199,12 +278,12 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
                   TextStyle(fontSize: 16, color: ColorStyle.secondaryTextColor),
             ),
             const SizedBox(height: 25),
-            // SizedBox(
-            //     width: 200,
-            //     height: 40,
-            //     child: CustomRoundedButton("Refresh", () {
-            //       _getEventsList();
-            //     }))
+            SizedBox(
+                width: 200,
+                height: 40,
+                child: CustomRoundedButton("Refresh", () {
+                  _getEventsList();
+                }))
           ],
         ),
       ),

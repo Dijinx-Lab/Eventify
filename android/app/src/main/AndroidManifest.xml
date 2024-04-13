@@ -7,26 +7,30 @@
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 <queries>
-  <intent>
-    <action android:name="android.intent.action.VIEW" />
-    <data android:scheme="sms" />
-  </intent>
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <data android:scheme="https" />
-        </intent>
-  <intent>
-    <action android:name="android.intent.action.VIEW" />
-    <data android:scheme="tel" />
-  </intent>
-  <intent>
-    <action android:name="android.support.customtabs.action.CustomTabsService" />
-  </intent>
-  
+    <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="sms" />
+    </intent>
+    <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="https" />
+    </intent>
+    <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <data android:scheme="tel" />
+    </intent>
+    <intent>
+        <action android:name="android.intent.action.SEND" /> 
+        <data android:mimeType="*/*"/>
+    </intent>
+    <intent>
+        <action android:name="android.support.customtabs.action.CustomTabsService" />
+    </intent>
 </queries>
     <application
-        android:label="eventify"
+        android:label="Event Bazaar"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
@@ -64,5 +68,18 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDjpIILOlFeed05Z6OksQR9SHhmVLbUFpQ" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/ic_launch_background" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="EventBazaar" />
     </application>
 </manifest>

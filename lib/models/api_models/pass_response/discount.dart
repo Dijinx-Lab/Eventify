@@ -1,6 +1,6 @@
 class Discount {
   final int? discountedPrice;
-  final double? percentage;
+  final int? percentage;
   final DateTime? lastDate;
 
   Discount({
@@ -11,7 +11,7 @@ class Discount {
 
   factory Discount.fromJson(Map<String, dynamic> json) => Discount(
         discountedPrice: json["discounted_price"],
-        percentage: json["percentage"].toDouble(),
+        percentage: json["percentage"],
         lastDate: json["last_date"] == null
             ? null
             : DateTime.parse(json["last_date"]),

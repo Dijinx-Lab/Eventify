@@ -43,7 +43,7 @@ class PassDetailsSheet extends StatelessWidget {
                     decoration: BoxDecoration(
                         border: index == passDetails.length - 1
                             ? null
-                            : Border(
+                            : const Border(
                                 bottom: BorderSide(
                                     color: ColorStyle.secondaryTextColor,
                                     width: 0.5))),
@@ -58,58 +58,87 @@ class PassDetailsSheet extends StatelessWidget {
                         ),
                         const Spacer(),
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.sell_outlined,
-                                  size: 15,
-                                  color: ColorStyle.primaryColorLight,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  // passDetails[index]
-                                  //         .discount!.discountedPrice!
-                                  //         .toString() ??
-                                  "",
-                                  style: const TextStyle(
-                                    color: ColorStyle.primaryTextColor,
-                                    fontSize: 14,
+                            passDetails[index].discount == null
+                                ? Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.sell_outlined,
+                                        size: 15,
+                                        color: ColorStyle.primaryColorLight,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        passDetails[index]
+                                                .fullPrice
+                                                ?.toString() ??
+                                            "",
+                                        style: const TextStyle(
+                                          color: ColorStyle.primaryTextColor,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      const Icon(
+                                        Icons.sell_outlined,
+                                        size: 15,
+                                        color: ColorStyle.primaryColorLight,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        passDetails[index]
+                                            .discount!
+                                            .discountedPrice!
+                                            .toString(),
+                                        style: const TextStyle(
+                                          color: ColorStyle.primaryTextColor,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        passDetails[index]
+                                                .fullPrice
+                                                ?.toString() ??
+                                            "",
+                                        style: const TextStyle(
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                          color: ColorStyle.secondaryTextColor,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  passDetails[index].fullPrice?.toString() ??
-                                      "",
-                                  style: const TextStyle(
-                                    decoration: TextDecoration.lineThrough,
-                                    color: ColorStyle.secondaryTextColor,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
                             const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                const Icon(
-                                  Icons.history_toggle_off_outlined,
-                                  size: 15,
-                                  color: ColorStyle.primaryColorLight,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  DateFormat('MMM d, y').format(
-                                      passDetails[index].discount!.lastDate!),
-                                  style: const TextStyle(
-                                    color: ColorStyle.primaryTextColor,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            )
+                            passDetails[index].discount == null
+                                ? Container()
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      const Icon(
+                                        Icons.history_toggle_off_outlined,
+                                        size: 15,
+                                        color: ColorStyle.primaryColorLight,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        DateFormat('MMM d, y').format(
+                                            passDetails[index]
+                                                .discount!
+                                                .lastDate!),
+                                        style: const TextStyle(
+                                          color: ColorStyle.primaryTextColor,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  )
                           ],
                         )
                       ],

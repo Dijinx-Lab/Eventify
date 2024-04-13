@@ -4,9 +4,17 @@ import 'package:eventify/routes/custom_routes.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage? message) async {
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp();
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +25,7 @@ void main() async {
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(MaterialApp(
-    title: 'Eventify',
+    title: 'Event Bazaar',
     debugShowCheckedModeBanner: false,
     navigatorObservers: [FlutterSmartDialog.observer],
     builder: FlutterSmartDialog.init(),

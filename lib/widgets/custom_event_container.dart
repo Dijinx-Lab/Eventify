@@ -3,7 +3,9 @@ import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/api_models/event_response/event.dart';
 import 'package:eventify/models/screen_args/detail_args.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/utils/pref_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CustomEventContainer extends StatelessWidget {
   final Event event;
@@ -17,8 +19,12 @@ class CustomEventContainer extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: GestureDetector(
         onTap: () {
-          Navigator.of(context)
-              .pushNamed(detailRoute, arguments: DetailArgs(event));
+          if (!PrefUtils().getIsUserLoggedIn) {
+            Navigator.of(context).pushNamed(notLoggedInRoute);
+          } else {
+            Navigator.of(context)
+                .pushNamed(detailRoute, arguments: DetailArgs(event));
+          }
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,20 +159,52 @@ class CustomEventContainer extends StatelessWidget {
 
   _buildSaveCard() {
     return GestureDetector(
-      onTap: () => onBookmarked(event.id!),
-      child: Container(
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          color: ColorStyle.primaryColor.withOpacity(0.70),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-            (event.preference?.bookmarked ?? false)
-                ? Icons.bookmark
-                : Icons.bookmark_outline,
-            color: ColorStyle.accentColor,
-            size: 18),
-      ),
+      onTap: () {
+        if (event.myEvent!) {
+          onBookmarked(event.id!);
+        }
+      },
+      child: event.approvedOn == null
+          ? Container(
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: ColorStyle.accentColor.withOpacity(0.70),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.warning_amber_outlined,
+                      color: ColorStyle.primaryColor, size: 18),
+                  SizedBox(
+                    width: 4,
+                  ),
+                  Text(
+                    "Pending Approval",
+                    style: TextStyle(
+                        color: ColorStyle.primaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            )
+          : Container(
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: ColorStyle.primaryColor.withOpacity(0.70),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                  event.myEvent!
+                      ? event.listingVisible!
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined
+                      : (event.preference?.bookmarked ?? false)
+                          ? Icons.bookmark
+                          : Icons.bookmark_outline,
+                  color: ColorStyle.accentColor,
+                  size: 18),
+            ),
     );
   }
 
@@ -188,7 +226,7 @@ class CustomEventContainer extends StatelessWidget {
                 width: 3,
               ),
               Text(
-                event.dateTime ?? "",
+                DateFormat('MMM d, y').format(DateTime.parse(event.dateTime!)),
                 style: const TextStyle(
                     color: ColorStyle.whiteColor,
                     fontSize: 10,
@@ -206,7 +244,7 @@ class CustomEventContainer extends StatelessWidget {
                 width: 3,
               ),
               Text(
-                event.dateTime ?? "",
+                DateFormat('h:mm a').format(DateTime.parse(event.dateTime!)),
                 style: const TextStyle(
                     color: ColorStyle.whiteColor,
                     fontSize: 10,

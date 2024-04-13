@@ -7,28 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:669949797318:android:1f6f65e5046273efdcc8c7",
+        "mobilesdk_app_id": "1:669949797318:android:eafa67cc6190129ddcc8c7",
         "android_client_info": {
-          "package_name": "ccom.dijinx.eventify"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBQSWSOGGk28O9PbWNBQKAhNfm7XyuOBWg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:669949797318:android:76c51add663b519adcc8c7",
-        "android_client_info": {
-          "package_name": "com.example.eventify"
+          "package_name": "com.dijinx.eventbazaar"
         }
       },
       "oauth_client": [],

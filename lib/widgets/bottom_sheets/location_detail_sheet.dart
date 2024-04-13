@@ -85,14 +85,14 @@ class _LocationDetailSheetState extends State<LocationDetailSheet> {
                       fontWeight: FontWeight.w500),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 30,
               ),
               IconButton(
                 onPressed: () {
                   _openMaps();
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.open_in_new,
                   color: ColorStyle.secondaryTextColor,
                   size: 16,

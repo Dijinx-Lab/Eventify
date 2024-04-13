@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:convert';
 import 'package:eventify/models/api_models/base_response/base_response.dart';
 import 'package:eventify/models/api_models/cloudinary_response/cloudinary_upload_response.dart';
@@ -17,7 +16,7 @@ class CloudinaryService {
       request.fields["api_key"] = "334784716684813";
       request.fields["upload_preset"] = "ynkswnyt";
       var value = await request.send();
-      print(value.statusCode);
+
       if (value.statusCode == 200) {
         final response = await http.Response.fromStream(value);
         var responseBody = json.decode(response.body);
@@ -27,7 +26,7 @@ class CloudinaryService {
         return BaseResponse(apiResponse, null);
       } else {
         final response = await http.Response.fromStream(value);
-        print(response.body);
+
         return BaseResponse(null, response.body);
       }
     } catch (ex) {

@@ -1,14 +1,18 @@
 import 'package:eventify/constants/route_keys.dart';
+import 'package:eventify/models/api_models/generic_response/generic_response.dart';
+import 'package:eventify/models/screen_args/forgot_pass_args.dart';
+import 'package:eventify/services/user_service.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/utils/loading_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
-import 'package:eventify/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:pinput/pinput.dart';
 
 class ForgotPasswordTwoScreen extends StatefulWidget {
-  const ForgotPasswordTwoScreen({super.key});
+  final ForgotPassArgs arguments;
+  const ForgotPasswordTwoScreen({super.key, required this.arguments});
 
   @override
   State<ForgotPasswordTwoScreen> createState() =>
@@ -16,11 +20,71 @@ class ForgotPasswordTwoScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordTwoScreenState extends State<ForgotPasswordTwoScreen> {
-  TextEditingController _otpController = TextEditingController();
+  final TextEditingController _otpController = TextEditingController();
+
+  _validateOtp() async {
+    SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
+    UserService()
+        .verifyOtp(
+            'password', _otpController.text.trim(), widget.arguments.email)
+        .then((value) {
+      SmartDialog.dismiss();
+      if (value.error == null) {
+        GenericResponse apiResponse = value.snapshot;
+        if (apiResponse.success ?? false) {
+          Future.delayed(const Duration(milliseconds: 200)).then((value) {
+            Navigator.of(context)
+                .pushNamed(forgotPassThreeRoute, arguments: widget.arguments);
+          });
+        } else {
+          ToastUtils.showCustomSnackbar(
+            context: context,
+            contentText: apiResponse.message ?? "",
+            icon: const Icon(
+              Icons.cancel_outlined,
+              color: ColorStyle.whiteColor,
+            ),
+          );
+        }
+      } else {
+        ToastUtils.showCustomSnackbar(
+          context: context,
+          contentText: value.error ?? "",
+          icon: const Icon(
+            Icons.cancel_outlined,
+            color: ColorStyle.whiteColor,
+          ),
+        );
+      }
+    });
+  }
+
+  _sendOtp() async {
+    _otpController.text = "";
+    setState(() {});
+    SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
+    UserService().sendOtp('password', widget.arguments.email).then((value) {
+      SmartDialog.dismiss();
+      if (value.error == null) {
+        GenericResponse apiResponse = value.snapshot;
+        if (apiResponse.success ?? false) {
+          ToastUtils.showCustomSnackbar(
+              context: context,
+              icon: const Icon(
+                Icons.task_alt_outlined,
+                color: ColorStyle.whiteColor,
+              ),
+              contentText: "Verification code has been resent");
+        }
+      } else {}
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           backgroundColor: ColorStyle.whiteColor,
           foregroundColor: ColorStyle.secondaryTextColor,
           elevation: 0,
@@ -83,7 +147,7 @@ class _ForgotPasswordTwoScreenState extends State<ForgotPasswordTwoScreen> {
                 ),
                 const SizedBox(height: 35),
                 Pinput(
-                  length: 5,
+                  length: 6,
                   autofocus: true,
                   controller: _otpController,
                   defaultPinTheme: defaultPinTheme.copyWith(
@@ -120,15 +184,7 @@ class _ForgotPasswordTwoScreenState extends State<ForgotPasswordTwoScreen> {
                 Align(
                     alignment: Alignment.center,
                     child: TextButton(
-                        onPressed: () {
-                          ToastUtils.showCustomSnackbar(
-                              context: context,
-                              icon: Icon(
-                                Icons.task_alt_outlined,
-                                color: ColorStyle.whiteColor,
-                              ),
-                              contentText: "Verification code has been resent");
-                        },
+                        onPressed: () => _sendOtp(),
                         child: const Text(
                           "Resend Code",
                           style:
@@ -140,11 +196,7 @@ class _ForgotPasswordTwoScreenState extends State<ForgotPasswordTwoScreen> {
                   width: double.maxFinite,
                   child: CustomRoundedButton(
                     "Verify",
-                    () {
-                      if (_otpController.text.length == 5) {
-                        Navigator.of(context).pushNamed(forgotPassThreeRoute);
-                      }
-                    },
+                    () => _validateOtp(),
                     roundedCorners: 12,
                     textWeight: FontWeight.bold,
                   ),

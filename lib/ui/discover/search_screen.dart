@@ -134,7 +134,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           controller: _searchController,
                           textInputAction: TextInputAction.search,
                           decoration: InputDecoration(
-                              prefixIcon: Icon(
+                              prefixIcon: const Icon(
                                 Icons.search,
                               ),
                               suffixIcon: IconButton(
@@ -157,7 +157,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       : ColorStyle.secondaryTextColor,
                                 ),
                               ),
-                              hintStyle: TextStyle(fontSize: 13),
+                              hintStyle: const TextStyle(fontSize: 13),
                               hintText: "Search for an event",
                               border: InputBorder.none),
                           onSubmitted: (value) {
@@ -287,7 +287,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   : "No events found by the name \"${_searchController.text}\" in ${selectedCity ?? ""}",
               textAlign: TextAlign.center,
               style:
-                  TextStyle(fontSize: 16, color: ColorStyle.secondaryTextColor),
+                  const TextStyle(fontSize: 16, color: ColorStyle.secondaryTextColor),
             ),
           ],
         ),

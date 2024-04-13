@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:eventify/models/api_models/generic_response/generic_response.dart';
 import 'package:eventify/services/user_service.dart';
 import 'package:eventify/constants/route_keys.dart';
@@ -6,6 +8,7 @@ import 'package:eventify/models/api_models/user_response/user_response.dart';
 import 'package:eventify/models/screen_args/main_args.dart';
 import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/utils/auth_util.dart';
 import 'package:eventify/utils/loading_utils.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
@@ -28,6 +31,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final ScrollController _scrollControlller = ScrollController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pwdController = TextEditingController();
   final TextEditingController _confPwdController = TextEditingController();
@@ -36,9 +40,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _otpController = TextEditingController();
-  //final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final TextEditingController _phoneSignInPhoneController =
+      TextEditingController();
+  final TextEditingController _phoneSignInPwdController =
+      TextEditingController();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   String initialCountry = 'PK';
   PhoneNumber _phoneNumber = PhoneNumber(isoCode: 'PK');
+  PhoneNumber _phoneSignInNumber = PhoneNumber(isoCode: 'PK');
 
   bool isPwdVisible = false;
   bool isSignupSeleted = true;
@@ -94,7 +103,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   _navigatorFunction() {
-    if (PrefUtils().getIsAppTypeCustomer) {
+    if (PrefUtils().getAppPreference == "new") {
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil(roleSelectionRoute, (e) => false);
+    } else if (PrefUtils().getAppPreference == "viewer") {
       Navigator.of(context).pushNamedAndRemoveUntil(
           mainRoute, arguments: MainArgs(0), (e) => false);
     } else {
@@ -199,15 +211,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<String?> _getFcmToken() async {
-    // await _firebaseMessaging.requestPermission();
-    // return await _firebaseMessaging.getToken();
-    return 'xyz';
+    await _firebaseMessaging.requestPermission();
+    return await _firebaseMessaging.getToken();
   }
 
   _signIn() async {
+    String? token = await _getFcmToken();
     SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
     userService
-        .signIn(_emailController.text.trim(), _pwdController.text.trim())
+        .signIn(_emailController.text.trim(), _pwdController.text.trim(), token)
         .then((value) {
       SmartDialog.dismiss();
       if (value.error == null) {
@@ -240,19 +252,76 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
+  _ssoGoogle() async {
+    String? token = await _getFcmToken();
+    SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
+    AuthUtil.signInWithGoogle().then((userCredential) {
+      if (userCredential != null) {
+        String? email = userCredential.user?.email;
+        String? name = userCredential.user?.displayName ??
+            userCredential.user?.providerData[0].displayName;
+        String googleId = userCredential.user!.uid;
+        userService
+            .sso(
+          email,
+          name,
+          googleId,
+          null,
+          token,
+        )
+            .then((value) async {
+          SmartDialog.dismiss();
+          if (value.error == null) {
+            UserResponse apiResponse = value.snapshot;
+            if (apiResponse.success ?? false) {
+              _saveUserData(apiResponse.data!.user!);
+              _navigatorFunction();
+            } else {
+              ToastUtils.showCustomSnackbar(
+                context: context,
+                contentText: apiResponse.message ?? "",
+                icon: const Icon(
+                  Icons.cancel_outlined,
+                  color: ColorStyle.whiteColor,
+                ),
+              );
+            }
+          } else {
+            ToastUtils.showCustomSnackbar(
+              context: context,
+              contentText: value.error ?? "",
+              icon: const Icon(
+                Icons.cancel_outlined,
+                color: ColorStyle.whiteColor,
+              ),
+            );
+          }
+        });
+      }
+    });
+  }
+
   _signUp() async {
     String? token = await _getFcmToken();
+    String fname = _firstNameController.text.trim();
+    String lname = _lastNameController.text.trim();
+    String email = _emailController.text.trim();
+    String pwd = _pwdController.text.trim();
+    String cPwd = _confPwdController.text.trim();
+    int age = int.parse(_ageController.text.trim());
+    String countryCode = _phoneNumber.dialCode ?? '+92';
+    String phone = _phoneController.text.trim().replaceAll(' ', '');
     SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
     userService
         .signUp(
-      _firstNameController.text.trim(),
-      _lastNameController.text.trim(),
-      _emailController.text.trim(),
-      _pwdController.text.trim(),
-      _confPwdController.text.trim(),
-      int.parse(_ageController.text.trim()),
-      _phoneNumber.dialCode ?? '+92',
-      _phoneController.text.trim().replaceAll(' ', ''),
+      fname,
+      lname,
+      email,
+      pwd,
+      cPwd,
+      age,
+      countryCode,
+      phone,
       token,
     )
         .then((value) async {
@@ -286,26 +355,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  _validateOtp() async {
+  _signInWithPhone() async {
+    String? token = await _getFcmToken();
+    if (mounted) Navigator.of(context).pop();
     SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
     userService
-        .verifyOtp(
-            'email', _otpController.text.trim(), _emailController.text.trim())
-        .then((value) {
+        .signInWithPhone(
+      _phoneSignInNumber.dialCode ?? '+92',
+      _phoneSignInPhoneController.text.trim().replaceAll(' ', ''),
+      _phoneSignInPwdController.text.trim(),
+      token,
+    )
+        .then((value) async {
       SmartDialog.dismiss();
       if (value.error == null) {
         UserResponse apiResponse = value.snapshot;
         if (apiResponse.success ?? false) {
-          Navigator.of(context).pop();
           _saveUserData(apiResponse.data!.user!);
+
           _navigatorFunction();
         } else {
-          _otpController.text = '';
-          setState(() {
-            isErrorEnforced = true;
-          });
+          ToastUtils.showCustomSnackbar(
+            context: context,
+            contentText: apiResponse.message ?? "",
+            icon: const Icon(
+              Icons.cancel_outlined,
+              color: ColorStyle.whiteColor,
+            ),
+          );
         }
-      } else {}
+      } else {
+        ToastUtils.showCustomSnackbar(
+          context: context,
+          contentText: value.error ?? "",
+          icon: const Icon(
+            Icons.cancel_outlined,
+            color: ColorStyle.whiteColor,
+          ),
+        );
+      }
     });
   }
 
@@ -330,7 +418,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     PrefUtils().setPhone = userDetail.phone ?? "";
     PrefUtils().setEmail = userDetail.email ?? "";
     PrefUtils().setToken = userDetail.authToken ?? "";
+    PrefUtils().setSignInMethod = userDetail.loginMethod ?? "";
     PrefUtils().setIsUserLoggedIn = loggedIn;
+    PrefUtils().setAppPreference = userDetail.appSidePreference ?? "new";
+    PrefUtils().setNotificationsEnabled =
+        userDetail.notificationsEnabled ?? false;
   }
 
   @override
@@ -343,6 +435,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         resizeToAvoidBottomInset: true,
         body: SafeArea(
             child: SingleChildScrollView(
+          controller: _scrollControlller,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -351,12 +444,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   SvgPicture.asset('assets/svgs/login_ellipse_alt.svg',
                       width: MediaQuery.of(context).size.width),
                   Padding(
-                    padding: const EdgeInsets.only(top: 50),
+                    padding: const EdgeInsets.only(top: 80),
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: SvgPicture.asset(
                           'assets/svgs/ic_eventify_seller_logo.svg',
-                          width: 160),
+                          width: 200),
                     ),
                   ),
                   Visibility(
@@ -513,6 +606,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     initialValue: _phoneNumber,
                                     textFieldController: _phoneController,
                                     inputDecoration: const InputDecoration(
+                                      contentPadding:
+                                          EdgeInsets.symmetric(vertical: 15),
                                       border: InputBorder.none,
                                     ),
                                     formatInput: true,
@@ -565,8 +660,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const SizedBox(height: 10),
                     Visibility(
                       visible: isSignupSeleted,
-                      child: 
-                      CustomTextField(
+                      child: CustomTextField(
                           controller: _confPwdController,
                           hint: "Confirm Password",
                           icon: const Icon(Icons.lock_outline),
@@ -699,103 +793,118 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 1,
-                          width: 100,
-                          color: ColorStyle.secondaryTextColor,
-                        ),
-                        const SizedBox(width: 5),
-                        const Text(
-                          'or sign in with',
-                          style: TextStyle(
-                              color: ColorStyle.secondaryTextColor,
-                              fontSize: 10),
-                        ),
-                        const SizedBox(width: 5),
-                        Container(
-                          height: 1,
-                          width: 100,
-                          color: ColorStyle.secondaryTextColor,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        GestureDetector(
-                          onTap: () => _showCodeSentDialog(),
-                          child: Container(
-                              height: 60,
-                              width: 60,
-                              decoration: BoxDecoration(
-                                  color: ColorStyle.whiteColor,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                        offset: const Offset(0, 4),
-                                        blurRadius: 4,
-                                        color: ColorStyle.blackColor
-                                            .withOpacity(0.25))
-                                  ]),
-                              child: const Icon(
-                                Icons.phone_outlined,
+                    Visibility(
+                      visible: !isSignupSeleted,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                height: 1,
+                                width: 100,
                                 color: ColorStyle.secondaryTextColor,
-                                size: 30,
-                              )),
-                        ),
-                        Container(
-                          height: 60,
-                          width: 60,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: ColorStyle.whiteColor,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                    offset: const Offset(0, 4),
-                                    blurRadius: 4,
-                                    color:
-                                        ColorStyle.blackColor.withOpacity(0.25))
-                              ]),
-                          child: SizedBox(
-                            height: 10,
-                            width: 10,
-                            child: Image.asset(
-                              'assets/pngs/google_logo.png',
-                              fit: BoxFit.contain,
-                            ),
+                              ),
+                              const SizedBox(width: 5),
+                              const Text(
+                                'or sign in with',
+                                style: TextStyle(
+                                    color: ColorStyle.secondaryTextColor,
+                                    fontSize: 10),
+                              ),
+                              const SizedBox(width: 5),
+                              Container(
+                                height: 1,
+                                width: 100,
+                                color: ColorStyle.secondaryTextColor,
+                              ),
+                            ],
                           ),
-                        ),
-                        Container(
-                          height: 60,
-                          width: 60,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: ColorStyle.whiteColor,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                    offset: const Offset(0, 4),
-                                    blurRadius: 4,
-                                    color: ColorStyle.blackColor
-                                        .withOpacity(0.25)),
-                              ]),
-                          child: Image.asset(
-                            'assets/pngs/apple_logo.png',
-                            // height: 50,
-                            // width: 50,
-                            fit: BoxFit.fitWidth,
+                          const SizedBox(height: 30),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                onTap: () => _showPhoneDialog(),
+                                child: Container(
+                                    height: 60,
+                                    width: 60,
+                                    margin: const EdgeInsets.only(right: 30),
+                                    decoration: BoxDecoration(
+                                        color: ColorStyle.whiteColor,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                              offset: const Offset(0, 4),
+                                              blurRadius: 4,
+                                              color: ColorStyle.blackColor
+                                                  .withOpacity(0.25))
+                                        ]),
+                                    child: const Icon(
+                                      Icons.phone_outlined,
+                                      color: ColorStyle.secondaryTextColor,
+                                      size: 30,
+                                    )),
+                              ),
+                              GestureDetector(
+                                onTap: () => _ssoGoogle(),
+                                child: Container(
+                                  height: 60,
+                                  width: 60,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      color: ColorStyle.whiteColor,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                            offset: const Offset(0, 4),
+                                            blurRadius: 4,
+                                            color: ColorStyle.blackColor
+                                                .withOpacity(0.25))
+                                      ]),
+                                  child: SizedBox(
+                                    height: 10,
+                                    width: 10,
+                                    child: Image.asset(
+                                      'assets/pngs/google_logo.png',
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Visibility(
+                                visible: Platform.isIOS,
+                                child: Container(
+                                  height: 60,
+                                  width: 60,
+                                  margin: const EdgeInsets.only(left: 30),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      color: ColorStyle.whiteColor,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                            offset: const Offset(0, 4),
+                                            blurRadius: 4,
+                                            color: ColorStyle.blackColor
+                                                .withOpacity(0.25)),
+                                      ]),
+                                  child: Image.asset(
+                                    'assets/pngs/apple_logo.png',
+                                    // height: 50,
+                                    // width: 50,
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
@@ -806,6 +915,128 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
+  _showPhoneDialog() {
+    _phoneSignInPhoneController.text = '';
+    _phoneSignInPwdController.text = '';
+    _phoneSignInNumber = PhoneNumber(isoCode: 'PK');
+    showDialog(
+        context: context,
+        builder: (BuildContext context) =>
+            StatefulBuilder(builder: (context, setState) {
+              return Dialog(
+                insetPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+                elevation: 2.0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 25, vertical: 25.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            "Sign In With Phone",
+                            style: TextStyle(
+                              color: ColorStyle.secondaryTextColor,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                    color: ColorStyle.secondaryTextColor)),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.phone_outlined,
+                                  color: ColorStyle.secondaryTextColor
+                                      .withOpacity(0.8),
+                                  size: 25,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: InternationalPhoneNumberInput(
+                                    onInputChanged: (PhoneNumber number) {
+                                      setState(() {
+                                        _phoneSignInNumber = number;
+                                      });
+                                    },
+                                    onInputValidated: (bool value) {},
+                                    selectorConfig: const SelectorConfig(
+                                      selectorType:
+                                          PhoneInputSelectorType.DIALOG,
+                                      useBottomSheetSafeArea: true,
+                                    ),
+                                    spaceBetweenSelectorAndTextField: 0,
+                                    ignoreBlank: false,
+                                    hintText: "Phone",
+                                    initialValue: _phoneSignInNumber,
+                                    textFieldController:
+                                        _phoneSignInPhoneController,
+                                    inputDecoration: const InputDecoration(
+                                      contentPadding:
+                                          EdgeInsets.symmetric(vertical: 15),
+                                      border: InputBorder.none,
+                                    ),
+                                    formatInput: true,
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          CustomTextField(
+                              controller: _phoneSignInPwdController,
+                              hint: "Password",
+                              icon: const Icon(Icons.lock_outline),
+                              obscuretext: !isPwdVisible,
+                              trailing: IconButton(
+                                  splashColor: Colors.transparent,
+                                  onPressed: () {
+                                    setState(() {
+                                      isPwdVisible = !isPwdVisible;
+                                    });
+                                  },
+                                  icon: Icon(isPwdVisible
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined))),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            width: double.maxFinite,
+                            height: 45,
+                            child: CustomRoundedButton(
+                              "Sign In",
+                              () => _signInWithPhone(),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              );
+            }),
+        barrierColor: const Color(0x59000000));
+  }
+
   _showCodeSentDialog() {
     _otpController.text = '';
     isErrorEnforced = false;
@@ -813,6 +1044,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
         context: context,
         builder: (BuildContext context) =>
             StatefulBuilder(builder: (context, setState) {
+              _validateOtp() async {
+                SmartDialog.showLoading(
+                    builder: (_) => const LoadingUtil(type: 2));
+                userService
+                    .verifyOtp('email', _otpController.text.trim(),
+                        _emailController.text.trim())
+                    .then((value) {
+                  SmartDialog.dismiss();
+                  if (value.error == null) {
+                    UserResponse apiResponse = value.snapshot;
+                    if (apiResponse.success ?? false) {
+                      Navigator.of(context).pop();
+                      _saveUserData(apiResponse.data!.user!);
+                      _navigatorFunction();
+                    } else {
+                      _otpController.text = '';
+                      setState(() {
+                        isErrorEnforced = true;
+                      });
+                    }
+                  } else {}
+                });
+              }
+
               return Dialog(
                 insetPadding: const EdgeInsets.symmetric(horizontal: 20.0),
                 elevation: 2.0,
@@ -913,7 +1168,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     child: Text(
                                       errorText!,
                                       textAlign: TextAlign.end,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           color: ColorStyle.primaryColorLight,
                                           fontWeight: FontWeight.w800),
                                     ),

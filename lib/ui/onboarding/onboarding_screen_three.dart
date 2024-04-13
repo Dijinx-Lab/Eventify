@@ -1,5 +1,4 @@
 import 'package:eventify/constants/route_keys.dart';
-import 'package:eventify/models/screen_args/role_selection_args.dart';
 import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/pref_utils.dart';

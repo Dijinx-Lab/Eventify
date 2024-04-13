@@ -1,10 +1,18 @@
 import 'package:eventify/constants/route_keys.dart';
-import 'package:eventify/models/screen_args/role_selection_args.dart';
+import 'package:eventify/models/api_models/generic_response/generic_response.dart';
+import 'package:eventify/models/screen_args/main_args.dart';
 import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/models/screen_args/splash_args.dart';
+import 'package:eventify/services/user_service.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/utils/auth_util.dart';
+import 'package:eventify/utils/loading_utils.dart';
 import 'package:eventify/utils/pref_utils.dart';
+import 'package:eventify/utils/toast_utils.dart';
+import 'package:eventify/widgets/avatars/name_avatar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 
 class AccountsScreen extends StatefulWidget {
@@ -17,6 +25,18 @@ class AccountsScreen extends StatefulWidget {
 class _AccountsScreenState extends State<AccountsScreen> {
   bool sellerMode = false;
   bool notificationAllowed = false;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
+  @override
+  initState() {
+    notificationAllowed = PrefUtils().getNotificationsEnabled;
+    super.initState();
+  }
+
+  Future<String?> _getFcmToken() async {
+    await _firebaseMessaging.requestPermission();
+    return await _firebaseMessaging.getToken();
+  }
 
   _switchApps() {
     setState(() {
@@ -28,12 +48,45 @@ class _AccountsScreenState extends State<AccountsScreen> {
 
         Navigator.of(context).pushNamedAndRemoveUntil(
             initialRoute, (e) => false,
-            arguments: SplashArgs(true));
+            arguments: SplashArgs(true, MainArgs(0)));
       },
     );
   }
 
-  _signOut() {
+  _signOutOfServer() {
+    SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
+    UserService().signOut().then((value) async {
+      if (value.error == null) {
+        GenericResponse apiResponse = value.snapshot;
+        if (apiResponse.success ?? false) {
+          await _signOut();
+        } else {
+          SmartDialog.dismiss();
+          ToastUtils.showCustomSnackbar(
+            context: context,
+            contentText: apiResponse.message ?? "",
+            icon: const Icon(
+              Icons.cancel_outlined,
+              color: ColorStyle.whiteColor,
+            ),
+          );
+        }
+      } else {
+        SmartDialog.dismiss();
+        ToastUtils.showCustomSnackbar(
+          context: context,
+          contentText: value.error ?? "",
+          icon: const Icon(
+            Icons.cancel_outlined,
+            color: ColorStyle.whiteColor,
+          ),
+        );
+      }
+    });
+  }
+
+  _signOut() async {
+    await AuthUtil.signOut();
     PrefUtils().setFirstName = "";
     PrefUtils().setLasttName = "";
     PrefUtils().setAge = 0;
@@ -42,23 +95,39 @@ class _AccountsScreenState extends State<AccountsScreen> {
     PrefUtils().setEmail = "";
     PrefUtils().setToken = "";
     PrefUtils().setIsUserLoggedIn = false;
-    Navigator.of(context).pushNamedAndRemoveUntil(signupRoute, (e) => false,
-        arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, false));
-    // Navigator.of(context).pushNamedAndRemoveUntil(
-    //   roleSelectionRoute,
-    //   arguments: RoleSelectionArgs(null),
-    //   (e) => false,
-    // );
+    PrefUtils().setIsAppTypeCustomer = true;
+    SmartDialog.dismiss();
+    if (mounted) {
+      Navigator.of(context).pushNamedAndRemoveUntil(signupRoute, (e) => false,
+          arguments: SignupArgs(PrefUtils().getIsAppTypeCustomer, false));
+    }
+  }
+
+  _updateNotificationSettings() async {
+    if (notificationAllowed) {
+      await UserService()
+          .updateProfile(null, null, null, null, null, "x", null);
+      PrefUtils().setNotificationsEnabled = false;
+    } else {
+      String? token = await _getFcmToken();
+      await UserService()
+          .updateProfile(null, null, null, null, null, token, null);
+      PrefUtils().setNotificationsEnabled = true;
+    }
+    setState(() {
+      notificationAllowed = !notificationAllowed;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: ColorStyle.whiteColor,
         foregroundColor: ColorStyle.secondaryTextColor,
         elevation: 0.5,
-        leading: !PrefUtils().getIsAppTypeCustomer
+        leading: PrefUtils().getIsAppTypeCustomer
             ? null
             : IconButton(
                 onPressed: () {
@@ -82,22 +151,25 @@ class _AccountsScreenState extends State<AccountsScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(200),
-                child: Center(
-                  child: Container(
-                      height: 70,
-                      width: 70,
-                      child: Image.asset(
-                        "assets/pngs/image_placeholder.png",
-                        fit: BoxFit.cover,
-                      )),
-                ),
-              ),
+              NameAvatar(
+                  firstName: PrefUtils().getFirstName,
+                  lastName: PrefUtils().getLasttName),
+              // ClipRRect(
+              //   borderRadius: BorderRadius.circular(200),
+              //   child: Center(
+              //     child: SizedBox(
+              //         height: 70,
+              //         width: 70,
+              //         child: Image.asset(
+              //           "assets/pngs/image_placeholder.png",
+              //           fit: BoxFit.cover,
+              //         )),
+              //   ),
+              // ),
               const SizedBox(height: 10),
-              Text(
+              const Text(
                 "", // "${PrefUtils().getUserFirstName} ${PrefUtils().getUserLastName}",
-                style: const TextStyle(
+                style: TextStyle(
                     color: ColorStyle.primaryTextColor,
                     fontWeight: FontWeight.w600,
                     fontSize: 12),
@@ -121,8 +193,8 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     children: [
                       Text(
                         !PrefUtils().getIsAppTypeCustomer
-                            ? "Switch to buyer mode"
-                            : "Switch to seller mode",
+                            ? "Switch to viewer mode"
+                            : "Switch to lister mode",
                         style: const TextStyle(
                             color: ColorStyle.primaryTextColor,
                             fontSize: 14,
@@ -181,40 +253,42 @@ class _AccountsScreenState extends State<AccountsScreen> {
                 onTap: () {
                   Navigator.of(context).pushNamed(resetpassRoute);
                 },
-                child: Container(
-                  height: 55,
-                  width: double.infinity,
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        width: 2,
-                        color: ColorStyle.secondaryTextColor.withOpacity(0.2),
-                      )),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Change Password",
-                        style: TextStyle(
-                            color: ColorStyle.primaryTextColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500),
-                      ),
-                      Icon(
-                        Icons.arrow_forward,
-                        color: ColorStyle.secondaryTextColor,
-                      )
-                    ],
+                child: Visibility(
+                  visible: PrefUtils().getSignInMethod == "email" ||
+                      PrefUtils().getSignInMethod == "phone",
+                  child: Container(
+                    height: 55,
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          width: 2,
+                          color: ColorStyle.secondaryTextColor.withOpacity(0.2),
+                        )),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Change Password",
+                          style: TextStyle(
+                              color: ColorStyle.primaryTextColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: ColorStyle.secondaryTextColor,
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
               GestureDetector(
                 onTap: () {
-                  setState(() {
-                    notificationAllowed = !notificationAllowed;
-                  });
+                  _updateNotificationSettings();
                 },
                 child: Container(
                   height: 55,
@@ -247,9 +321,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                           activeColor: ColorStyle.primaryColor,
                           inactiveColor: ColorStyle.secondaryTextColor,
                           onToggle: (val) {
-                            setState(() {
-                              notificationAllowed = val;
-                            });
+                            _updateNotificationSettings();
                           })
                     ],
                   ),
@@ -323,7 +395,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
               ),
               GestureDetector(
                 onTap: () {
-                  _signOut();
+                  _signOutOfServer();
                 },
                 child: Container(
                   height: 55,
@@ -350,7 +422,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
                       ),
-                      Icon(
+                      const Icon(
                         Icons.logout,
                         color: ColorStyle.primaryColorLight,
                         size: 19,

@@ -1,4 +1,4 @@
-package com.dijinx.eventify
+package com.dijinx.eventbazaar
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,9 +1,5 @@
 import 'package:eventify/models/api_models/category_response/category.dart';
-import 'package:eventify/models/api_models/category_response/category_list_response.dart';
-import 'package:eventify/models/misc_models/city.dart';
-import 'package:eventify/services/category_service.dart';
 import 'package:eventify/styles/color_style.dart';
-import 'package:eventify/utils/toast_utils.dart';
 import 'package:flutter/material.dart';
 
 class CategoryListSheet extends StatefulWidget {
@@ -46,13 +42,13 @@ class _CategoryListSheetState extends State<CategoryListSheet> {
                           Navigator.of(context).pop(categoryList[index]);
                         },
                         child: Text(
-                          categoryList![index].name ?? "",
+                          categoryList[index].name ?? "",
                           style: const TextStyle(
                               color: ColorStyle.primaryTextColor,
                               fontWeight: FontWeight.w600),
                         )),
                     separatorBuilder: (context, index) => const Divider(),
-                    itemCount: categoryList!.length),
+                    itemCount: categoryList.length),
           ),
         ],
       ),
