@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eventify/constants/route_keys.dart';
@@ -11,11 +10,9 @@ import 'package:eventify/models/event_bus/refresh_my_events.dart';
 import 'package:eventify/models/event_bus/update_event_preference.dart';
 import 'package:eventify/models/screen_args/create_event_args.dart';
 import 'package:eventify/models/screen_args/detail_args.dart';
-import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/services/event_service.dart';
 import 'package:eventify/services/stats_service.dart';
 import 'package:eventify/styles/color_style.dart';
-import 'package:eventify/ui/discover/discover_screen.dart';
 import 'package:eventify/ui/main/main_screen.dart';
 import 'package:eventify/ui/seller/home/seller_home_screen.dart';
 import 'package:eventify/utils/loading_utils.dart';

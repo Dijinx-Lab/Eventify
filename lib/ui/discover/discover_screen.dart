@@ -5,7 +5,6 @@ import 'package:eventify/models/api_models/category_response/category.dart';
 import 'package:eventify/models/api_models/category_response/category_list_response.dart';
 import 'package:eventify/models/event_bus/refresh_discover_event.dart';
 import 'package:eventify/models/event_bus/refresh_saved_events.dart';
-import 'package:eventify/models/event_bus/update_event_preference.dart';
 import 'package:eventify/services/category_service.dart';
 import 'package:eventify/services/event_service.dart';
 import 'package:eventify/constants/city_list.dart';
@@ -17,7 +16,6 @@ import 'package:eventify/models/screen_args/search_args.dart';
 import 'package:eventify/services/stats_service.dart';
 import 'package:eventify/services/user_service.dart';
 import 'package:eventify/styles/color_style.dart';
-import 'package:eventify/ui/alerts/alerts_screen.dart';
 import 'package:eventify/ui/saved/saved_screen.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
@@ -141,7 +139,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     _setCityAndGetList(city);
     if (PrefUtils().getIsUserLoggedIn) {
       await UserService()
-          .updateProfile(null, null, null, null, city, null, null);
+          .updateProfile(null, null, null, null, city, null, null, null);
     }
   }
 

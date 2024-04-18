@@ -44,7 +44,7 @@ class _ForgotPasswordThreeScreenState extends State<ForgotPasswordThreeScreen> {
               color: ColorStyle.whiteColor,
             ),
             contentText:
-                "Congratulations! Your password has been reset successfully.",
+                "Congratulations! Your password has been updated successfully.",
           );
           _saveUserData(apiResponse.data!.user!);
           Future.delayed(const Duration(milliseconds: 600)).then(

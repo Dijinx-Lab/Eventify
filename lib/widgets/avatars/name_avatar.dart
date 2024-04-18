@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:eventify/styles/color_style.dart';
 import 'package:flutter/material.dart';
 

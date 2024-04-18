@@ -53,6 +53,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool isSignupSeleted = true;
   bool isTermsChecked = false;
   bool isErrorEnforced = false;
+  bool isCodeResent = false;
 
   final ImagePicker picker = ImagePicker();
   bool isPhotoTaken = false;
@@ -394,19 +395,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         );
       }
-    });
-  }
-
-  _sendOtp() async {
-    _otpController.text = "";
-    isErrorEnforced = false;
-    setState(() {});
-    SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
-    userService.sendOtp('email', _emailController.text.trim()).then((value) {
-      SmartDialog.dismiss();
-      if (value.error == null) {
-        GenericResponse apiResponse = value.snapshot;
-      } else {}
     });
   }
 
@@ -1040,11 +1028,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   _showCodeSentDialog() {
     _otpController.text = '';
     isErrorEnforced = false;
+    isCodeResent = false;
     showDialog(
         context: context,
         builder: (BuildContext context) =>
             StatefulBuilder(builder: (context, setState) {
-              _validateOtp() async {
+              validateOtp() async {
                 SmartDialog.showLoading(
                     builder: (_) => const LoadingUtil(type: 2));
                 userService
@@ -1180,31 +1169,79 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           const SizedBox(
                             height: 20,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                "Did not get a code?",
-                                style: TextStyle(
-                                    color: ColorStyle.primaryTextColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              GestureDetector(
-                                onTap: () => _sendOtp(),
-                                child: const Text(
-                                  "Resend",
-                                  style: TextStyle(
+                          isCodeResent
+                              ? const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Code Resent",
+                                      style: TextStyle(
+                                          color: ColorStyle.primaryColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Icon(
+                                      Icons.check_circle_outline,
                                       color: ColorStyle.primaryColor,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400),
+                                      size: 15,
+                                    )
+                                  ],
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      "Did not get a code?",
+                                      style: TextStyle(
+                                          color: ColorStyle.primaryTextColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        _otpController.text = "";
+                                        isErrorEnforced = false;
+                                        setState(() {});
+                                        SmartDialog.showLoading(
+                                            builder: (_) =>
+                                                const LoadingUtil(type: 2));
+                                        userService
+                                            .sendOtp('email',
+                                                _emailController.text.trim())
+                                            .then((value) {
+                                          SmartDialog.dismiss();
+                                          if (value.error == null) {
+                                            GenericResponse apiResponse =
+                                                value.snapshot;
+                                            if (apiResponse.success ?? false) {
+                                              setState(() {
+                                                isCodeResent = true;
+                                              });
+                                              Future.delayed(const Duration(
+                                                      milliseconds: 2000))
+                                                  .then((value) {
+                                                setState(() {
+                                                  isCodeResent = false;
+                                                });
+                                              });
+                                            }
+                                          } else {}
+                                        });
+                                      },
+                                      child: const Text(
+                                        "Resend",
+                                        style: TextStyle(
+                                            color: ColorStyle.primaryColor,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
                           const SizedBox(
                             height: 20,
                           ),
@@ -1213,7 +1250,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             height: 45,
                             child: CustomRoundedButton(
                               "Verify",
-                              () => _validateOtp(),
+                              () => validateOtp(),
                             ),
                           ),
                           const SizedBox(

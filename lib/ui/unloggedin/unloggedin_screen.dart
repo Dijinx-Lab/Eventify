@@ -19,7 +19,7 @@ class _UnLoggedInScreenState extends State<UnLoggedInScreen> {
     return Scaffold(
       body: Stack(children: [
         AnimateGradient(
-          duration: Duration(seconds: 6),
+          duration: const Duration(seconds: 6),
           primaryBegin: Alignment.topRight,
           primaryEnd: Alignment.centerLeft,
           secondaryBegin: Alignment.centerLeft,
@@ -142,10 +142,10 @@ class _UnLoggedInScreenState extends State<UnLoggedInScreen> {
                               Navigator.of(context).pushNamed(signupRoute,
                                   arguments: SignupArgs(true, true));
                             },
-                            child: Padding(
+                            child: const Padding(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 25),
-                              child: const Text("Create a free account",
+                                  EdgeInsets.symmetric(horizontal: 25),
+                              child: Text("Create a free account",
                                   style: TextStyle(
                                       color: ColorStyle.primaryColor,
                                       fontSize: 18,

@@ -19,6 +19,8 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
   final TextEditingController _cpassController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   final TextEditingController _currentPassController = TextEditingController();
+  bool isOldPwdVisible = false;
+  bool isNewPwdVisible = false;
 
   _updateProfile() async {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -42,6 +44,7 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
               color: ColorStyle.whiteColor,
             ),
           );
+          Navigator.of(context).pop();
         } else {
           ToastUtils.showCustomSnackbar(
             context: context,
@@ -109,6 +112,18 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
                 CustomTextField(
                   controller: _currentPassController,
                   borderColor: ColorStyle.primaryTextColor,
+                  obscuretext: !isOldPwdVisible,
+                  trailing: IconButton(
+                    splashColor: Colors.transparent,
+                    onPressed: () {
+                      setState(() {
+                        isOldPwdVisible = !isOldPwdVisible;
+                      });
+                    },
+                    icon: Icon(isOldPwdVisible
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 const Text(
@@ -119,6 +134,18 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
                 CustomTextField(
                   controller: _passController,
                   borderColor: ColorStyle.primaryTextColor,
+                  obscuretext: !isNewPwdVisible,
+                  trailing: IconButton(
+                    splashColor: Colors.transparent,
+                    onPressed: () {
+                      setState(() {
+                        isNewPwdVisible = !isNewPwdVisible;
+                      });
+                    },
+                    icon: Icon(isNewPwdVisible
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 const Text(
@@ -129,6 +156,18 @@ class _ResetPassScreenState extends State<ResetPassScreen> {
                 CustomTextField(
                   controller: _cpassController,
                   borderColor: ColorStyle.primaryTextColor,
+                  obscuretext: !isNewPwdVisible,
+                  trailing: IconButton(
+                    splashColor: Colors.transparent,
+                    onPressed: () {
+                      setState(() {
+                        isNewPwdVisible = !isNewPwdVisible;
+                      });
+                    },
+                    icon: Icon(isNewPwdVisible
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined),
+                  ),
                 ),
                 const Spacer(),
                 Container(

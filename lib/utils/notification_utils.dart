@@ -6,7 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationUtils {
   static AndroidNotificationChannel channel = const AndroidNotificationChannel(
-      'Event Bazaar', 'EventBazaar',
+      'EventBazaar', 'EventBazaar',
       importance: Importance.max, playSound: true);
 
   static FlutterLocalNotificationsPlugin plugin =

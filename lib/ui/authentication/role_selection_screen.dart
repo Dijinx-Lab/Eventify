@@ -1,7 +1,6 @@
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/api_models/user_response/user_response.dart';
 import 'package:eventify/models/screen_args/main_args.dart';
-import 'package:eventify/models/screen_args/signup_args.dart';
 import 'package:eventify/services/user_service.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/loading_utils.dart';
@@ -27,7 +26,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
     FocusManager.instance.primaryFocus?.unfocus();
     SmartDialog.showLoading(builder: (_) => const LoadingUtil(type: 2));
     UserService()
-        .updateProfile(null, null, null, null, null, null, pref)
+        .updateProfile(null, null, null, null, null, null, pref, null)
         .then((value) {
       SmartDialog.dismiss();
       if (value.error == null) {

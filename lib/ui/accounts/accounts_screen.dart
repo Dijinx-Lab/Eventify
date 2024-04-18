@@ -106,12 +106,12 @@ class _AccountsScreenState extends State<AccountsScreen> {
   _updateNotificationSettings() async {
     if (notificationAllowed) {
       await UserService()
-          .updateProfile(null, null, null, null, null, "x", null);
+          .updateProfile(null, null, null, null, null, "x", null, null);
       PrefUtils().setNotificationsEnabled = false;
     } else {
       String? token = await _getFcmToken();
       await UserService()
-          .updateProfile(null, null, null, null, null, token, null);
+          .updateProfile(null, null, null, null, null, token, null, null);
       PrefUtils().setNotificationsEnabled = true;
     }
     setState(() {

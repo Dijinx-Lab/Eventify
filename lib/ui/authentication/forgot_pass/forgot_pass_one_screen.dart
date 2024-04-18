@@ -38,7 +38,7 @@ class _ForgotPasswordOneScreenState extends State<ForgotPasswordOneScreen> {
               color: ColorStyle.whiteColor,
             ),
             contentText:
-                "Great! We've sent a verification code to your email. Please check your inbox and enter the code below to reset your password.",
+                "Great! We've sent a verification code to your email. Please check your inbox and enter the code below to update your password.",
           );
           Future.delayed(const Duration(milliseconds: 200)).then((value) {
             Navigator.of(context).pushNamed(forgotPassTwoRoute,
@@ -110,7 +110,7 @@ class _ForgotPasswordOneScreenState extends State<ForgotPasswordOneScreen> {
                 ),
                 const SizedBox(height: 15),
                 const Text(
-                  "Please enter the email address associated with your account. We'll send you a verification code to reset your password",
+                  "Please enter the email address associated with your account. We'll send you a verification code to update your password",
                   style: TextStyle(
                     color: ColorStyle.secondaryTextColor,
                     fontSize: 14,

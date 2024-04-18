@@ -189,28 +189,28 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
                       eventsList?[index].name ?? "",
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: ColorStyle.primaryTextColor,
                         fontSize: 14,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.assignment_ind_outlined,
+                        const Icon(Icons.assignment_ind_outlined,
                             color: ColorStyle.secondaryTextColor, size: 14),
-                        SizedBox(
+                        const SizedBox(
                           width: 3,
                         ),
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
                           eventsList?[index].contact?.name ?? "",
-                          style: TextStyle(
+                          style: const TextStyle(
                               color: ColorStyle.secondaryTextColor,
                               fontSize: 10,
                               fontWeight: FontWeight.w600),
@@ -230,9 +230,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Icon(Icons.schedule,
+                      const Icon(Icons.schedule,
                           color: ColorStyle.primaryColor, size: 14),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
                       Text(
@@ -240,7 +240,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                             DateTime.parse(eventsList![index].dateTime!)),
 
                         //"9:30 PM",
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: ColorStyle.primaryColor,
                           fontSize: 12,
                         ),
@@ -250,15 +250,15 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Icon(Icons.today_outlined,
+                      const Icon(Icons.today_outlined,
                           color: ColorStyle.primaryColor, size: 14),
-                      SizedBox(
+                      const SizedBox(
                         width: 5,
                       ),
                       Text(
                         DateFormat('MMM d, y').format(
                             DateTime.parse(eventsList![index].dateTime!)),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: ColorStyle.primaryColor,
                           fontSize: 12,
                         ),

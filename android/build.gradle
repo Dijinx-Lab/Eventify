@@ -6,18 +6,28 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.2'
-        // START: FlutterFire Configuration
+        classpath 'com.android.tools.build:gradle:8.3.2'
         classpath 'com.google.gms:google-services:4.3.10'
-        // END: FlutterFire Configuration
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
+
 allprojects {
     repositories {
-        mavenCentral()
         google()
+        mavenCentral()
+    }
+    subprojects {
+        afterEvaluate { project ->
+            if (project.hasProperty('android')) {
+                project.android {
+                    if (namespace == null) {
+                        namespace project.group
+                    }
+                }
+            }
+        }
     }
 }
 

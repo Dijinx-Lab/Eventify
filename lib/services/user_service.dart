@@ -163,7 +163,6 @@ class UserService {
 
   Future<BaseResponse> getDetails() async {
     try {
-      
       var url = Uri.parse(ApiConstants.userDetails);
 
       http.Response response = await http.get(url, headers: {
@@ -247,9 +246,12 @@ class UserService {
       String? lastName,
       String? phone,
       String? countryCode,
+      
       String? lastCity,
       String? fcmToken,
-      String? appSidePreference) async {
+      String? appSidePreference,
+      String? age,
+  ) async {
     try {
       var url = Uri.parse(ApiConstants.updateProfile);
 
@@ -260,8 +262,10 @@ class UserService {
       if (countryCode != null) params["phone"] = phone;
       if (lastCity != null) params["last_city"] = lastCity;
       if (fcmToken != null) params["fcm_token"] = fcmToken;
-      if (appSidePreference != null)
+      if (age != null) params["age"] = int.tryParse(age);
+      if (appSidePreference != null) {
         params["app_side_preference"] = appSidePreference;
+      }
 
       print(params);
 

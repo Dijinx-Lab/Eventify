@@ -184,7 +184,8 @@ class _StepTwoContainerState extends State<StepTwoContainer> {
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
           child: SizedBox(
             height: 60,
-            child: GooglePlaceAutoCompleteTextField(
+            child: 
+            GooglePlaceAutoCompleteTextField(
               textEditingController: _locationValueController,
               googleAPIKey: "AIzaSyDjpIILOlFeed05Z6OksQR9SHhmVLbUFpQ",
               inputDecoration: InputDecoration(

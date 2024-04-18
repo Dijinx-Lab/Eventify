@@ -24,6 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
 
   late PhoneNumber _phoneNumber;
   // final ImagePicker _picker = ImagePicker();
@@ -36,6 +37,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _lastNameController.text = PrefUtils().getLasttName;
     _emailController.text = PrefUtils().getEmail;
     _phoneController.text = PrefUtils().getPhone;
+    _ageController.text = PrefUtils().getAge.toString() == "0"
+        ? ""
+        : PrefUtils().getAge.toString();
     print(PrefUtils().getCountryCode);
     if (PrefUtils().getCountryCode != '') {
       _phoneNumber = PhoneNumber(
@@ -47,6 +51,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     super.initState();
+  }
+
+  bool _frontendValidation() {
+    bool isValid = false;
+    String errorText = "";
+
+    if (_firstNameController.text.isEmpty) {
+      errorText = "First name is required";
+
+      isValid = false;
+    } else if (_lastNameController.text.isEmpty) {
+      errorText = "Last name is required";
+
+      isValid = false;
+    } else if (_ageController.text.isEmpty) {
+      errorText = "Age is required";
+      isValid = false;
+    } else if (_emailController.text.isEmpty) {
+      errorText = "Email is required";
+      isValid = false;
+    } else if (_phoneController.text.isEmpty) {
+      errorText = "Phone number is required";
+
+      isValid = false;
+    } else {
+      isValid = true;
+    }
+
+    if (!isValid) {
+      ToastUtils.showCustomSnackbar(
+        context: context,
+        icon: const Icon(
+          Icons.cancel_outlined,
+          color: ColorStyle.whiteColor,
+        ),
+        contentText: errorText,
+      );
+    }
+    return isValid;
   }
 
   // Future<void> openCamera() async {
@@ -97,7 +140,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _phoneNumber.dialCode ?? '+92',
             null,
             null,
-            null)
+            null,
+            _ageController.text.trim()
+            )
         .then((value) {
       SmartDialog.dismiss();
       if (value.error == null) {
@@ -112,6 +157,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: ColorStyle.whiteColor,
             ),
           );
+          Navigator.of(context).pop();
         } else {
           ToastUtils.showCustomSnackbar(
             context: context,
@@ -258,6 +304,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
+                        "Age",
+                      ),
+                      const SizedBox(height: 10),
+                      CustomTextField(
+                          controller: _ageController,
+                          keyboardType: TextInputType.number),
+                      const SizedBox(height: 20),
+                      const Text(
                         "Email",
                         style: TextStyle(color: ColorStyle.secondaryTextColor),
                       ),
@@ -327,18 +381,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: CustomRoundedButton(
                 'Save',
                 () {
-                  bool isFirstNameChanged =
-                      PrefUtils().getFirstName != _firstNameController.text;
-                  bool isLastNameChanged =
-                      PrefUtils().getLasttName != _lastNameController.text;
-                  bool isPhoneChanged = PrefUtils().getPhone !=
-                      _phoneController.text.trim().replaceAll(' ', '');
-                  bool isCountryCodeChanged = PrefUtils().getCountryCode !=
-                      (_phoneNumber.dialCode ?? '+92');
-                  if (isFirstNameChanged ||
-                      isLastNameChanged ||
-                      isPhoneChanged ||
-                      isCountryCodeChanged) {
+                  // bool isFirstNameChanged =
+                  //     PrefUtils().getFirstName != _firstNameController.text;
+                  // bool isLastNameChanged =
+                  //     PrefUtils().getLasttName != _lastNameController.text;
+                  // bool isPhoneChanged = PrefUtils().getPhone !=
+                  //     _phoneController.text.trim().replaceAll(' ', '');
+                  // bool isCountryCodeChanged = PrefUtils().getCountryCode !=
+                  //     (_phoneNumber.dialCode ?? '+92');
+                  if (_frontendValidation()) {
                     _updateProfile();
                   }
                 },

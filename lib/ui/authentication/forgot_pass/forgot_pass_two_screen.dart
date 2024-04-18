@@ -174,9 +174,7 @@ class _ForgotPasswordTwoScreenState extends State<ForgotPasswordTwoScreen> {
                           color: ColorStyle.whiteColor,
                           fontSize: 30,
                           fontWeight: FontWeight.w600)),
-                  onClipboardFound: (value) {
-                    _otpController.setText(value);
-                  },
+                  onClipboardFound: (value) {},
                   showCursor: true,
                   cursor: cursor,
                 ),
