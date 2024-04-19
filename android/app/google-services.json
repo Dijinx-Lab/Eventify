@@ -12,7 +12,28 @@
           "package_name": "com.dijinx.eventbazaar"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "669949797318-124r29rdhm91doradmi6q14jv9h2ls3r.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dijinx.eventbazaar",
+            "certificate_hash": "7132cfc32b37a5fa348f76bb72d9c32e756981fa"
+          }
+        },
+        {
+          "client_id": "669949797318-2n5hh6g1r6mfvl1gvul74sb2gkl18se4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dijinx.eventbazaar",
+            "certificate_hash": "dd7fb07e0e5d5758a34d1fb7f8bf3c18df3c6ffe"
+          }
+        },
+        {
+          "client_id": "669949797318-ofsu3qf8577ptstavkq5nd5573u0mjc7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBQSWSOGGk28O9PbWNBQKAhNfm7XyuOBWg"
@@ -20,7 +41,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "669949797318-ofsu3qf8577ptstavkq5nd5573u0mjc7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "669949797318-dair28kn53kp8ajmrbvkpgd1ra84r2qe.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dijinx.eventbazaar"
+              }
+            }
+          ]
         }
       }
     }

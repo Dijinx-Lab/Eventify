@@ -149,7 +149,7 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
   void _performNotificationTap(String action, String id) {
     Future.delayed(const Duration(milliseconds: 500)).then((value) {
       if (action == "open_lister_events") {
-        print('refreshed');
+        //print('refreshed');
         _getEventsList();
       } else if (action == "open_alerts") {
         PrefUtils().setIsAppTypeCustomer = true;

@@ -20,7 +20,7 @@ class EventService {
         "Authorization": "Bearer ${PrefUtils().getToken}",
       });
 
-      //print(response.body);
+      ////print(response.body);
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
@@ -46,8 +46,8 @@ class EventService {
         "Authorization": "Bearer ${PrefUtils().getToken}",
         "content-type": "application/json"
       });
-      print(params);
-      print(response.body);
+      //print(params);
+      //print(response.body);
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
@@ -57,7 +57,7 @@ class EventService {
         return BaseResponse(null, response.body);
       }
     } catch (ex) {
-      print(ex.toString());
+      //print(ex.toString());
       return BaseResponse(null, ex.toString());
     }
   }
@@ -103,7 +103,7 @@ class EventService {
         "content-type": "application/json"
       });
 
-      print(params);
+      //print(params);
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
@@ -113,7 +113,7 @@ class EventService {
         return BaseResponse(null, response.body);
       }
     } catch (ex) {
-      print(ex.toString());
+      //print(ex.toString());
       return BaseResponse(null, ex.toString());
     }
   }
@@ -139,7 +139,7 @@ class EventService {
         return BaseResponse(null, response.body);
       }
     } catch (ex) {
-      print(ex.toString());
+      //print(ex.toString());
       return BaseResponse(null, ex.toString());
     }
   }
@@ -153,7 +153,7 @@ class EventService {
         "content-type": "application/json"
       });
 
-      print(response.body);
+      //print(response.body);
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);

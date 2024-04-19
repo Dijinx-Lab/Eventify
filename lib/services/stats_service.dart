@@ -26,9 +26,9 @@ class StatsService {
         "Authorization": "Bearer ${PrefUtils().getToken}",
         "content-type": "application/json"
       });
-      print(url);
-      print(params);
-      print(response.body);
+      //print(url);
+      //print(params);
+      //print(response.body);
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
         GenericResponse apiResponse = GenericResponse.fromJson(responseBody);

@@ -33,7 +33,7 @@ class PassService {
         return BaseResponse(null, response.body);
       }
     } catch (ex) {
-      print(ex.toString());
+      //print(ex.toString());
       return BaseResponse(null, ex.toString());
     }
   }
@@ -47,7 +47,7 @@ class PassService {
         "content-type": "application/json"
       });
 
-      print(response.body);
+      //print(response.body);
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);

@@ -80,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   _saveUserData(UserDetail userDetail, {bool loggedIn = true}) {
-    print(userDetail.authToken);
+    //print(userDetail.authToken);
     PrefUtils().setFirstName = userDetail.firstName ?? "";
     PrefUtils().setLasttName = userDetail.lastName ?? "";
     PrefUtils().setAge = int.tryParse(userDetail.age ?? '0') ?? 0;

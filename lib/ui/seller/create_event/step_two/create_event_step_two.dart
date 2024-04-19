@@ -78,13 +78,13 @@ class _StepTwoContainerState extends State<StepTwoContainer> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        print('Location permissions are denied');
+        //print('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      print(
-          'Location permissions are permanently denied, we cannot request permissions.');
+      //print(
+      // 'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     return await Geolocator.getCurrentPosition();
@@ -142,7 +142,7 @@ class _StepTwoContainerState extends State<StepTwoContainer> {
         await _getCity(latitude, longitude);
       }
     } catch (e) {
-      print("Error getting address: $e");
+      //print("Error getting address: $e");
     }
   }
 
@@ -182,49 +182,55 @@ class _StepTwoContainerState extends State<StepTwoContainer> {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 30),
-          child: SizedBox(
-            height: 60,
-            child: 
-            GooglePlaceAutoCompleteTextField(
-              textEditingController: _locationValueController,
-              googleAPIKey: "AIzaSyDjpIILOlFeed05Z6OksQR9SHhmVLbUFpQ",
-              inputDecoration: InputDecoration(
-                prefixIcon: const Icon(Icons.location_on),
-                hintText: "Location",
-                fillColor: ColorStyle.whiteColor,
-                filled: true,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                border: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: ColorStyle.secondaryTextColor),
-                  borderRadius: BorderRadius.circular(10),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 60,
+                child: GooglePlaceAutoCompleteTextField(
+                  textEditingController: _locationValueController,
+                  googleAPIKey: "AIzaSyDjpIILOlFeed05Z6OksQR9SHhmVLbUFpQ",
+                  inputDecoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.location_on),
+                    hintText: "Location",
+                    fillColor: ColorStyle.whiteColor,
+                    filled: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 20),
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                          color: ColorStyle.secondaryTextColor),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  debounceTime: 600,
+                  countries: const ["pk"],
+                  isLatLngRequired: true,
+                  getPlaceDetailWithLatLng: (Prediction prediction) async {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    animateMapCamera(CameraPosition(
+                      target: LatLng(double.parse(prediction.lat!),
+                          double.parse(prediction.lng!)),
+                      zoom: 17,
+                    ));
+                    await _getCity(double.parse(prediction.lat!),
+                        double.parse(prediction.lng!));
+                    setState(() {
+                      _center = LatLng(double.parse(prediction.lat!),
+                          double.parse(prediction.lng!));
+                    });
+                  },
+                  itemClick: (Prediction prediction) {
+                    _locationValueController.text =
+                        prediction.description ?? "";
+                    _locationValueController.selection =
+                        TextSelection.fromPosition(TextPosition(
+                            offset: prediction.description?.length ?? 0));
+                  },
+                  seperatedBuilder: const Divider(),
+                  isCrossBtnShown: false,
                 ),
               ),
-              debounceTime: 600,
-              countries: const ["pk"],
-              isLatLngRequired: true,
-              getPlaceDetailWithLatLng: (Prediction prediction) async {
-                animateMapCamera(CameraPosition(
-                  target: LatLng(double.parse(prediction.lat!),
-                      double.parse(prediction.lng!)),
-                  zoom: 17,
-                ));
-                await _getCity(double.parse(prediction.lat!),
-                    double.parse(prediction.lng!));
-                setState(() {
-                  _center = LatLng(double.parse(prediction.lat!),
-                      double.parse(prediction.lng!));
-                });
-              },
-              itemClick: (Prediction prediction) {
-                _locationValueController.text = prediction.description ?? "";
-                _locationValueController.selection = TextSelection.fromPosition(
-                    TextPosition(offset: prediction.description?.length ?? 0));
-              },
-              seperatedBuilder: const Divider(),
-              isCrossBtnShown: false,
-            ),
+            ],
           ),
         ),
       ],

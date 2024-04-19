@@ -140,7 +140,7 @@ class _DetailScreenState extends State<DetailScreen>
     if (await canLaunch(emailLaunchUri.toString())) {
       await launch(emailLaunchUri.toString());
     } else {
-      print('Could not launch $emailLaunchUri');
+      //print('Could not launch $emailLaunchUri');
     }
   }
 
@@ -329,7 +329,8 @@ class _DetailScreenState extends State<DetailScreen>
                                 children: [
                                   Container(
                                     width: double.maxFinite,
-                                    margin: const EdgeInsets.all(10),
+                                    margin: const EdgeInsets.only(
+                                        right: 10, top: 10),
                                     padding: const EdgeInsets.only(
                                         top: 15, bottom: 15, left: 10),
                                     decoration: BoxDecoration(
@@ -344,6 +345,8 @@ class _DetailScreenState extends State<DetailScreen>
                                         ]),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         const Icon(
                                           Icons.visibility_outlined,
@@ -378,7 +381,8 @@ class _DetailScreenState extends State<DetailScreen>
                                   ),
                                   Container(
                                     width: double.maxFinite,
-                                    margin: const EdgeInsets.all(10),
+                                    margin: const EdgeInsets.only(
+                                        left: 10, top: 10),
                                     padding: const EdgeInsets.only(
                                         top: 15, bottom: 15, left: 10),
                                     decoration: BoxDecoration(
@@ -393,6 +397,8 @@ class _DetailScreenState extends State<DetailScreen>
                                         ]),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         const Icon(
                                           Icons.bookmark_add_outlined,
@@ -427,7 +433,8 @@ class _DetailScreenState extends State<DetailScreen>
                                   ),
                                   Container(
                                     width: double.maxFinite,
-                                    margin: const EdgeInsets.all(10),
+                                    margin: const EdgeInsets.only(
+                                        right: 10, top: 10),
                                     padding: const EdgeInsets.only(
                                         top: 15, bottom: 15, left: 10),
                                     decoration: BoxDecoration(
@@ -442,6 +449,8 @@ class _DetailScreenState extends State<DetailScreen>
                                         ]),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         const Icon(
                                           Icons.lightbulb_circle_outlined,
@@ -476,7 +485,8 @@ class _DetailScreenState extends State<DetailScreen>
                                   ),
                                   Container(
                                     width: double.maxFinite,
-                                    margin: const EdgeInsets.all(10),
+                                    margin: const EdgeInsets.only(
+                                        left: 10, top: 10),
                                     padding: const EdgeInsets.only(
                                         top: 15, bottom: 15, left: 10),
                                     decoration: BoxDecoration(
@@ -491,6 +501,8 @@ class _DetailScreenState extends State<DetailScreen>
                                         ]),
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         const Icon(
                                           Icons.done_all_outlined,
@@ -775,7 +787,7 @@ class _DetailScreenState extends State<DetailScreen>
                               Expanded(
                                 child: Container(
                                   //height: 45,
-                                  // width: 160,
+                                  height: 85,
                                   padding: const EdgeInsets.only(
                                       top: 15, bottom: 15, left: 10),
                                   decoration: BoxDecoration(
@@ -843,7 +855,7 @@ class _DetailScreenState extends State<DetailScreen>
                               const SizedBox(width: 20),
                               Expanded(
                                 child: Container(
-                                  // width: 160,
+                                  height: 85,
                                   padding: const EdgeInsets.only(
                                       top: 15, bottom: 15, left: 10),
                                   decoration: BoxDecoration(
@@ -871,7 +883,9 @@ class _DetailScreenState extends State<DetailScreen>
                                             width: 10,
                                           ),
                                           Text(
-                                            "Starts from ${event.priceStartsFrom ?? 0}",
+                                            event.priceType == "free"
+                                                ? "Free"
+                                                : "Starts from ${event.priceStartsFrom ?? 0}",
                                             style: const TextStyle(
                                                 color:
                                                     ColorStyle.primaryTextColor,
@@ -892,7 +906,9 @@ class _DetailScreenState extends State<DetailScreen>
                                             width: 10,
                                           ),
                                           Text(
-                                            "Goes up to ${event.priceGoesUpto ?? 0}",
+                                            event.priceType == "free"
+                                                ? "Public Event"
+                                                : "Goes up to ${event.priceGoesUpto ?? 0}",
                                             style: const TextStyle(
                                               color:
                                                   ColorStyle.primaryTextColor,
@@ -914,13 +930,15 @@ class _DetailScreenState extends State<DetailScreen>
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
+                                    if (event.priceType == "free") return;
+
                                     _openBottomSheet(
                                         context,
                                         PassDetailsSheet(
                                             passDetails: event.passes ?? []));
                                   },
                                   child: Container(
-                                    //height: 45,
+                                    height: 85,
                                     // width: 160,
                                     padding: const EdgeInsets.only(
                                         top: 15, bottom: 15, left: 10),
@@ -962,24 +980,29 @@ class _DetailScreenState extends State<DetailScreen>
                                           ],
                                         ),
                                         const SizedBox(height: 15),
-                                        const Row(
+                                        Row(
                                           mainAxisSize: MainAxisSize.min,
                                           // crossAxisAlignment:
                                           //     CrossAxisAlignment.start,
                                           children: [
-                                            Icon(Icons.badge_outlined,
+                                            const Icon(Icons.badge_outlined,
                                                 color: ColorStyle
                                                     .primaryColorLight,
                                                 size: 20),
-                                            SizedBox(
+                                            const SizedBox(
                                               width: 10,
                                             ),
                                             Expanded(
                                               child: Text(
-                                                "View Passes",
+                                                event.priceType == "free"
+                                                    ? "Free Entry"
+                                                    : "View Passes",
                                                 style: TextStyle(
                                                   decoration:
-                                                      TextDecoration.underline,
+                                                      event.priceType == "free"
+                                                          ? null
+                                                          : TextDecoration
+                                                              .underline,
                                                   color: ColorStyle
                                                       .primaryColorLight,
                                                   fontSize: 12,
@@ -1007,6 +1030,7 @@ class _DetailScreenState extends State<DetailScreen>
                                   },
                                   child: Container(
                                     width: 160,
+                                    height: 85,
                                     constraints:
                                         const BoxConstraints(minHeight: 85),
                                     padding: const EdgeInsets.only(
@@ -1046,6 +1070,8 @@ class _DetailScreenState extends State<DetailScreen>
                                             Expanded(
                                               child: Text(
                                                 event.address ?? "",
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
                                                 style: const TextStyle(
                                                     color: ColorStyle
                                                         .primaryTextColor,
@@ -1054,7 +1080,7 @@ class _DetailScreenState extends State<DetailScreen>
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 15),
+                                        const SizedBox(height: 7),
                                         const Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [

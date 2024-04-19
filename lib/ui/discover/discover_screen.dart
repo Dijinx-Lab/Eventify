@@ -108,14 +108,14 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         _setCityAndGetList('Karachi');
-        print('Location permissions are denied');
+        //print('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
       _setCityAndGetList('Karachi');
-      print(
-          'Location permissions are permanently denied, we cannot request permissions.');
+      //print(
+          // 'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     _getCurrentCity();
@@ -289,15 +289,21 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
   _searchEventsList() {
     String searchText = _searchController.text.trim();
 
-    if (searchText != "" && allEventsList != null) {
-      List<Event> filteredEvents = allEventsList!
-          .where((event) =>
-              event.name!.toLowerCase().contains(searchText.toLowerCase()))
-          .toList();
+    if (allEventsList != null) {
+      if (searchText == "") {
+        Navigator.of(context).pushNamed(searchRoute,
+            arguments: SearchArgs(
+                searchText, allEventsList!, allEventsList!, selectedCity!));
+      } else {
+        List<Event> filteredEvents = allEventsList!
+            .where((event) =>
+                event.name!.toLowerCase().contains(searchText.toLowerCase()))
+            .toList();
+        Navigator.of(context).pushNamed(searchRoute,
+            arguments: SearchArgs(
+                searchText, filteredEvents, allEventsList!, selectedCity!));
+      }
 
-      Navigator.of(context).pushNamed(searchRoute,
-          arguments: SearchArgs(
-              searchText, filteredEvents, allEventsList!, selectedCity!));
       _searchController.text = "";
     }
   }

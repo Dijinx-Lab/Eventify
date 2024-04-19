@@ -40,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _ageController.text = PrefUtils().getAge.toString() == "0"
         ? ""
         : PrefUtils().getAge.toString();
-    print(PrefUtils().getCountryCode);
+    //print(PrefUtils().getCountryCode);
     if (PrefUtils().getCountryCode != '') {
       _phoneNumber = PhoneNumber(
           isoCode: 'PK',
@@ -141,8 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             null,
             null,
             null,
-            _ageController.text.trim()
-            )
+            _ageController.text.trim())
         .then((value) {
       SmartDialog.dismiss();
       if (value.error == null) {

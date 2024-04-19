@@ -69,7 +69,7 @@ class UserService {
       params["password"] = password;
       if (fcmToken != null) params["fcm_token"] = fcmToken;
 
-      print(params);
+      //print(params);
 
       http.Response response = await http.post(url,
           body: json.encode(params),
@@ -143,7 +143,7 @@ class UserService {
       params["confirm_password"] = confirmPassword;
       params["fcm_token"] = fcmToken;
 
-      print(params);
+      //print(params);
 
       http.Response response = await http.post(url,
           body: json.encode(params),
@@ -170,7 +170,7 @@ class UserService {
         "content-type": "application/json"
       });
 
-      print(response.body);
+      //print(response.body);
 
       if (response.statusCode == 401) {
         return BaseResponse(null, response.statusCode.toString());
@@ -198,7 +198,7 @@ class UserService {
       http.Response response = await http.post(url,
           body: json.encode(params),
           headers: {"content-type": "application/json"});
-      print(response.body);
+      //print(response.body);
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
         dynamic apiResponse;
@@ -242,15 +242,14 @@ class UserService {
   }
 
   Future<BaseResponse> updateProfile(
-      String? firstName,
-      String? lastName,
-      String? phone,
-      String? countryCode,
-      
-      String? lastCity,
-      String? fcmToken,
-      String? appSidePreference,
-      String? age,
+    String? firstName,
+    String? lastName,
+    String? phone,
+    String? countryCode,
+    String? lastCity,
+    String? fcmToken,
+    String? appSidePreference,
+    String? age,
   ) async {
     try {
       var url = Uri.parse(ApiConstants.updateProfile);
@@ -267,7 +266,7 @@ class UserService {
         params["app_side_preference"] = appSidePreference;
       }
 
-      print(params);
+      //print(params);
 
       http.Response response =
           await http.put(url, body: json.encode(params), headers: {
@@ -275,7 +274,7 @@ class UserService {
         "content-type": "application/json"
       });
 
-      print(response.body);
+      //print(response.body);
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
@@ -360,7 +359,7 @@ class UserService {
       http.Response response =
           await http.get(url, headers: {"content-type": "application/json"});
 
-      print(response.body);
+      //print(response.body);
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);

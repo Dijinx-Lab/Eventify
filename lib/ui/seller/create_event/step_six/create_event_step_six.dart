@@ -28,8 +28,8 @@ class _StepSixContainerState extends State<StepSixContainer> {
   @override
   void initState() {
     eventArgs = widget.event;
-    print(eventArgs.description);
-    print(eventArgs.categoryId);
+    //print(eventArgs.description);
+    //print(eventArgs.categoryId);
     if (eventArgs.description != null && eventArgs.categoryId != null) {
       _descriptionController.text = eventArgs.description ?? "";
       selectedCategory = eventArgs.categoryId ?? "";

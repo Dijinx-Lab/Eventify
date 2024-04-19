@@ -3,6 +3,7 @@ import 'package:eventify/services/user_service.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class PrivacyPolicyScreen extends StatefulWidget {
   const PrivacyPolicyScreen({super.key});
@@ -58,35 +59,38 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-              color: ColorStyle.secondaryTextColor,
-            ),
-          ),
-          backgroundColor: ColorStyle.whiteColor,
-          foregroundColor: ColorStyle.secondaryTextColor,
-          elevation: 0.5,
-          title: const Text(
-            "Privacy Policy",
-            style: TextStyle(
-                color: ColorStyle.primaryTextColor,
-                fontSize: 16,
-                fontWeight: FontWeight.bold),
+      appBar: AppBar(
+        centerTitle: true,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: ColorStyle.secondaryTextColor,
           ),
         ),
-        body: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Text(text ?? ''),
+        backgroundColor: ColorStyle.whiteColor,
+        foregroundColor: ColorStyle.secondaryTextColor,
+        elevation: 0.5,
+        title: const Text(
+          "Privacy Policy",
+          style: TextStyle(
+              color: ColorStyle.primaryTextColor,
+              fontSize: 16,
+              fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Html(
+                  data: text,
                 ),
-              ));
+              ),
+            ),
+    );
   }
 }

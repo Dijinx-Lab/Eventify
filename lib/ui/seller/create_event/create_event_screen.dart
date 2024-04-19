@@ -238,8 +238,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                   isValidToProceed = false;
                                 });
                               } else {
-                                //_showPublishPreferanceDialog();
-                                //_getPassIds();
+                                FocusManager.instance.primaryFocus?.unfocus();
                                 bool areImagesUpload =
                                     await _getImageInternetUrls();
                                 if (areImagesUpload) {
@@ -249,12 +248,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                   } else {
                                     _showPublishPreferanceDialog();
                                   }
-                                  //_uploadEventToServer();
-                                  // event.eventId != null
-                                  //     ? _editUploadedEvent()
-                                  //     : _uploadEventToServer();
                                 }
-                                // Navigator.of(context).pop();
                               }
                             },
                             roundedCorners: 12,
@@ -321,10 +315,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   _getPassIds() async {
+    await Future.delayed(const Duration(milliseconds: 500));
     SmartDialog.showLoading(
         builder: (_) => const LoadingUtil(
               type: 4,
-              text: "Creating your passes...",
+              text: "Please wait...",
             ));
 
     if (eventArgs.eventId != null) {

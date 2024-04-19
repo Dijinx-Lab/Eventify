@@ -30,7 +30,7 @@ class CloudinaryService {
         return BaseResponse(null, response.body);
       }
     } catch (ex) {
-      print(ex);
+      //print(ex);
       return BaseResponse(null, ex.toString());
     }
   }

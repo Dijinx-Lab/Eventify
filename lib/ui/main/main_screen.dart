@@ -131,7 +131,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    print(PrefUtils().getToken);
+    //print(PrefUtils().getToken);
     return Scaffold(
       key: _scaffoldKey,
       body: SafeArea(

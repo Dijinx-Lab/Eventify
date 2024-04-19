@@ -95,13 +95,13 @@ class NotificationUtils {
   static void _performNotificationTap(String action, String id) {
     // if (NavigatorRoutes.isRouteInStack(baseRoute)) {
     //   BaseScreen.eventBus.fire(NotificationRecieved(action: action, id: id));
-    //   print("directNotif");
+    //   //print("directNotif");
     // } else {
     //   PrefUtil().lastNotificationAction =
     //       NotificationAction(action: action, id: id);
-    //   print("prefNotif");
+    //   //print("prefNotif");
     // }
 
-    // print(("notif:${PrefUtil().lastNotificationAction}"));
+    // //print(("notif:${PrefUtil().lastNotificationAction}"));
   }
 }
