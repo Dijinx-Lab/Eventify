@@ -170,31 +170,34 @@ class _DetailScreenState extends State<DetailScreen>
             ),
             actions: [
               PrefUtils().getIsAppTypeCustomer
-                  ? Visibility(
-                      visible: !event.myEvent!,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (bookmarked != null) {
-                              bookmarked = !bookmarked!;
-                            } else {
-                              bookmarked = true;
-                            }
-                          });
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 20),
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            color: ColorStyle.primaryColor.withOpacity(0.60),
-                            shape: BoxShape.circle,
+                  ? AbsorbPointer(
+                      absorbing: (event.myEvent ?? false),
+                      child: Opacity(
+                        opacity: (event.myEvent ?? false) ? 0.4 : 1,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (bookmarked != null) {
+                                bookmarked = !bookmarked!;
+                              } else {
+                                bookmarked = true;
+                              }
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 20),
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: ColorStyle.primaryColor.withOpacity(0.60),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                                (bookmarked ?? false)
+                                    ? Icons.bookmark
+                                    : Icons.bookmark_outline,
+                                color: ColorStyle.accentColor,
+                                size: 18),
                           ),
-                          child: Icon(
-                              (bookmarked ?? false)
-                                  ? Icons.bookmark
-                                  : Icons.bookmark_outline,
-                              color: ColorStyle.accentColor,
-                              size: 18),
                         ),
                       ),
                     )
@@ -318,7 +321,8 @@ class _DetailScreenState extends State<DetailScreen>
                         ],
                       ),
                       const SizedBox(height: 15),
-                      (event.myEvent ?? false)
+                      (event.myEvent ?? false) &&
+                              PrefUtils().getIsAppTypeCustomer == false
                           ? SizedBox(
                               height: 200,
                               width: double.maxFinite,
@@ -536,103 +540,113 @@ class _DetailScreenState extends State<DetailScreen>
                                   )
                                 ],
                               ))
-                          : Container(
-                              width: double.maxFinite,
-                              padding: const EdgeInsets.all(15),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  color: ColorStyle.primaryTextColor),
-                              child: Column(children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      action = "interested";
-                                    });
-                                  },
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        height: 20.0,
-                                        width: 20.0,
-                                        child: Theme(
-                                          data: ThemeData(
-                                            unselectedWidgetColor:
-                                                ColorStyle.secondaryTextColor,
+                          : AbsorbPointer(
+                              absorbing: (event.myEvent ?? false),
+                              child: Opacity(
+                                opacity: (event.myEvent ?? false) ? 0.4 : 1,
+                                child: Container(
+                                  width: double.maxFinite,
+                                  padding: const EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      color: ColorStyle.primaryTextColor),
+                                  child: Column(children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          action = "interested";
+                                        });
+                                      },
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            height: 20.0,
+                                            width: 20.0,
+                                            child: Theme(
+                                              data: ThemeData(
+                                                unselectedWidgetColor:
+                                                    ColorStyle
+                                                        .secondaryTextColor,
+                                              ),
+                                              child: Transform.scale(
+                                                scale: 0.9,
+                                                child: Radio(
+                                                    value: "interested",
+                                                    splashRadius: 0,
+                                                    fillColor:
+                                                        const MaterialStatePropertyAll(
+                                                            ColorStyle
+                                                                .whiteColor),
+                                                    groupValue: action,
+                                                    onChanged: (newValue) {
+                                                      setState(() {
+                                                        action = newValue;
+                                                      });
+                                                    }),
+                                              ),
+                                            ),
                                           ),
-                                          child: Transform.scale(
-                                            scale: 0.9,
-                                            child: Radio(
-                                                value: "interested",
-                                                splashRadius: 0,
-                                                fillColor:
-                                                    const MaterialStatePropertyAll(
-                                                        ColorStyle.whiteColor),
-                                                groupValue: action,
-                                                onChanged: (newValue) {
-                                                  setState(() {
-                                                    action = newValue;
-                                                  });
-                                                }),
+                                          const SizedBox(width: 10),
+                                          const Text(
+                                            "I am interested in this event",
+                                            style: TextStyle(
+                                                color: ColorStyle.whiteColor,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                      const SizedBox(width: 10),
-                                      const Text(
-                                        "I am interested in this event",
-                                        style: TextStyle(
-                                            color: ColorStyle.whiteColor,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          action = "going";
+                                        });
+                                      },
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            height: 20.0,
+                                            width: 20.0,
+                                            child: Theme(
+                                              data: ThemeData(
+                                                unselectedWidgetColor:
+                                                    ColorStyle
+                                                        .secondaryTextColor,
+                                              ),
+                                              child: Transform.scale(
+                                                scale: 0.9,
+                                                child: Radio(
+                                                    value: "going",
+                                                    splashRadius: 0,
+                                                    fillColor:
+                                                        const MaterialStatePropertyAll(
+                                                            ColorStyle
+                                                                .whiteColor),
+                                                    groupValue: action,
+                                                    onChanged: (newValue) {
+                                                      setState(() {
+                                                        action = newValue;
+                                                      });
+                                                    }),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          const Text(
+                                            "I am going to this event",
+                                            style: TextStyle(
+                                                color: ColorStyle.whiteColor,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
+                                    )
+                                  ]),
                                 ),
-                                const SizedBox(height: 10),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      action = "going";
-                                    });
-                                  },
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        height: 20.0,
-                                        width: 20.0,
-                                        child: Theme(
-                                          data: ThemeData(
-                                            unselectedWidgetColor:
-                                                ColorStyle.secondaryTextColor,
-                                          ),
-                                          child: Transform.scale(
-                                            scale: 0.9,
-                                            child: Radio(
-                                                value: "going",
-                                                splashRadius: 0,
-                                                fillColor:
-                                                    const MaterialStatePropertyAll(
-                                                        ColorStyle.whiteColor),
-                                                groupValue: action,
-                                                onChanged: (newValue) {
-                                                  setState(() {
-                                                    action = newValue;
-                                                  });
-                                                }),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      const Text(
-                                        "I am going to this event",
-                                        style: TextStyle(
-                                            color: ColorStyle.whiteColor,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ]),
+                              ),
                             ),
                       const SizedBox(height: 20),
                       const Text(

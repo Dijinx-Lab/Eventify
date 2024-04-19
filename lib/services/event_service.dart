@@ -46,8 +46,8 @@ class EventService {
         "Authorization": "Bearer ${PrefUtils().getToken}",
         "content-type": "application/json"
       });
-      //print(params);
-      //print(response.body);
+      print(params);
+      print(response.body);
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
@@ -103,7 +103,8 @@ class EventService {
         "content-type": "application/json"
       });
 
-      //print(params);
+      print(params);
+      print(response.body);
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);

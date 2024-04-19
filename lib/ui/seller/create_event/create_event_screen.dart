@@ -136,7 +136,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   @override
   Widget build(BuildContext context) {
-    SmartDialog.dismiss();
+    // SmartDialog.dismiss();
     return WillPopScope(
       onWillPop: () {
         if (stepperIndex > 0) {
@@ -241,6 +241,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                 FocusManager.instance.primaryFocus?.unfocus();
                                 bool areImagesUpload =
                                     await _getImageInternetUrls();
+
                                 if (areImagesUpload) {
                                   if (eventArgs.passes != null &&
                                       eventArgs.passes!.isNotEmpty) {
@@ -326,7 +327,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       await passService.deletePasses(eventArgs.eventId!);
     }
 
-    passService.addPasses(eventArgs.passes ?? []).then((value) {
+    passService.addPasses(eventArgs.passes!).then((value) {
       SmartDialog.dismiss();
       if (value.snapshot != null) {
         PassResponse apiResponse = value.snapshot;
@@ -453,10 +454,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     ? "Publishing your event..."
                     : "Saving your event...",
               ));
-      // eventArgs.address = "Saima pride";
-      // eventArgs.latitude = 24.907308611344934;
-      // eventArgs.longitude = 67.11179960385019;
-      // eventArgs.city = "Karachi";
+
       eventService.uploadEvent(eventArgs, passIds).then((value) {
         SmartDialog.dismiss();
         if (value.snapshot != null) {
@@ -472,7 +470,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
               ),
               contentText: "Congratulations! Your event has been published",
             );
-            Future.delayed(const Duration(milliseconds: 2000)).then((value) {
+            Future.delayed(const Duration(milliseconds: 1600)).then((value) {
               Navigator.of(context).pop();
             });
           } else {

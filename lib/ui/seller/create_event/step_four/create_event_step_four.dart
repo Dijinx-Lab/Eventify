@@ -35,6 +35,7 @@ class _StepFourContainerState extends State<StepFourContainer> {
   DateTime selectedDate = DateTime.now();
   String _groupValue = "";
   late EventArgs eventArgs;
+  bool isPassErrorShown = false;
   List<Pass> passes = [];
 
   @override
@@ -358,6 +359,7 @@ class _StepFourContainerState extends State<StepFourContainer> {
   }
 
   _updateControllers(int? index) {
+    isPassErrorShown = false;
     if (index == null) {
       _passPriceController.text = "";
       _discountPercentController.text = "";
@@ -377,6 +379,31 @@ class _StepFourContainerState extends State<StepFourContainer> {
     }
   }
 
+  bool _checkPassInputValid() {
+    bool isValid = false;
+    bool isNameFilled = _passInfoController.text.isNotEmpty;
+    bool isPriceFilled = _passPriceController.text.isNotEmpty;
+
+    if (isNameFilled && isPriceFilled) {
+      isValid = true;
+    } else {
+      isValid = false;
+    }
+    if (isValid) {
+      bool isDiscFilled = _dicountedPriceController.text.isNotEmpty;
+      bool isPercFilled = _discountPercentController.text.isNotEmpty;
+      bool isEndFilled = _discountEndDateController.text.isNotEmpty;
+
+      if ((isDiscFilled && isPercFilled && isEndFilled) ||
+          (!isDiscFilled && !isPercFilled && !isEndFilled)) {
+        isValid = true;
+      } else {
+        isValid = false;
+      }
+    }
+    return isValid;
+  }
+
   _showPassDetailsDialog(int? index) {
     _updateControllers(index);
     Dialog dialog = Dialog(
@@ -387,170 +414,194 @@ class _StepFourContainerState extends State<StepFourContainer> {
         onTap: () {
           FocusManager.instance.primaryFocus?.unfocus();
         },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25.0),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Center(
-                  child: Text(
-                    "Pass Details",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: ColorStyle.primaryTextColor,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16),
+        child: StatefulBuilder(builder: (context, setInnerState) {
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Center(
+                    child: Text(
+                      "Pass Details",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: ColorStyle.primaryTextColor,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16),
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: StatefulBuilder(builder: (context, setState) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CustomTextField(
-                            controller: _passInfoController,
-                            hint: "Pass Name",
-                            //   icon: const Icon(Icons.sell_outlined),
-                            keyboardType: TextInputType.name),
-                        const SizedBox(height: 15),
-                        CustomTextField(
-                            controller: _passPriceController,
-                            hint: "Full Price",
-                            inputFormatters: [
-                              InputFormattingUtils.numbersOnly(),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: StatefulBuilder(builder: (context, setState) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomTextField(
+                              controller: _passInfoController,
+                              hint: "Pass Name",
+                              //   icon: const Icon(Icons.sell_outlined),
+                              keyboardType: TextInputType.name),
+                          const SizedBox(height: 15),
+                          CustomTextField(
+                              controller: _passPriceController,
+                              hint: "Full Price",
+                              inputFormatters: [
+                                InputFormattingUtils.numbersOnly(),
+                              ],
+                              // icon: const Icon(Icons.sell_outlined),
+                              keyboardType: TextInputType.number),
+                          const SizedBox(height: 25),
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Discount (Optional)",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: ColorStyle.secondaryTextColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CustomTextField(
+                                    controller: _dicountedPriceController,
+                                    hint: "Price",
+                                    inputFormatters: [
+                                      InputFormattingUtils.numbersOnly(),
+                                    ],
+                                    keyboardType: TextInputType.number),
+                              ),
+                              const SizedBox(width: 15),
+                              Expanded(
+                                child: CustomTextField(
+                                    controller: _discountPercentController,
+                                    hint: "Percentage",
+                                    inputFormatters: [
+                                      InputFormattingUtils.numbersOnly(),
+                                    ],
+                                    keyboardType: TextInputType.number),
+                              ),
                             ],
-                            // icon: const Icon(Icons.sell_outlined),
-                            keyboardType: TextInputType.number),
-                        const SizedBox(height: 25),
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Discount (Optional)",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: ColorStyle.secondaryTextColor,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14),
                           ),
-                        ),
-                        const SizedBox(height: 15),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomTextField(
-                                  controller: _dicountedPriceController,
-                                  hint: "Price",
-                                  inputFormatters: [
-                                    InputFormattingUtils.numbersOnly(),
-                                  ],
-                                  keyboardType: TextInputType.number),
-                            ),
-                            const SizedBox(width: 15),
-                            Expanded(
-                              child: CustomTextField(
-                                  controller: _discountPercentController,
-                                  hint: "Percentage",
-                                  inputFormatters: [
-                                    InputFormattingUtils.numbersOnly(),
-                                  ],
-                                  keyboardType: TextInputType.number),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 15),
-                        GestureDetector(
-                          onTap: () {
-                            _selectDate(context);
-                          },
-                          child: AbsorbPointer(
-                            absorbing: true,
-                            child: SizedBox(
-                              height: 60,
-                              child: CustomTextField(
-                                  controller: _discountEndDateController,
-                                  hint: "Ending On",
-                                  keyboardType: TextInputType.name),
+                          const SizedBox(height: 15),
+                          GestureDetector(
+                            onTap: () {
+                              _selectDate(context);
+                            },
+                            child: AbsorbPointer(
+                              absorbing: true,
+                              child: SizedBox(
+                                height: 60,
+                                child: CustomTextField(
+                                    controller: _discountEndDateController,
+                                    hint: "Ending On",
+                                    keyboardType: TextInputType.name),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  }),
-                ),
-                const SizedBox(height: 30),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: SizedBox(
-                              height: 50,
-                              child: CustomRoundedButton(
-                                "Cancel",
-                                () {
-                                  Navigator.of(context).pop();
-                                },
-                                borderColor: ColorStyle.greyColor,
-                                buttonBackgroundColor: ColorStyle.greyColor,
-                                textColor: ColorStyle.secondaryTextColor,
-                                textSize: 14,
-                                roundedCorners: 4,
-                                textWeight: FontWeight.w600,
-                              ))),
-                      const SizedBox(
-                        width: 15,
-                      ),
-                      Expanded(
-                          child: SizedBox(
-                              height: 50,
-                              child: CustomRoundedButton(
-                                "Save",
-                                () {
-                                  Pass pass = Pass(
-                                      id: eventArgs.eventId ?? "",
-                                      name: _passInfoController.text.trim(),
-                                      fullPrice: int.tryParse(
-                                          _passPriceController.text),
-                                      discount: _dicountedPriceController.text
-                                                  .trim() ==
-                                              ""
-                                          ? null
-                                          : Discount(
-                                              discountedPrice: int.tryParse(
-                                                  _dicountedPriceController
-                                                      .text),
-                                              percentage: int.tryParse(
-                                                  _discountPercentController
-                                                      .text),
-                                              lastDate: _discountEndingOn));
-                                  if (index != null) {
-                                    passes[index] = pass;
-                                  } else {
-                                    passes.add(pass);
-                                  }
-
-                                  setState(() {});
-                                  _alertParentWidget();
-                                  Navigator.of(context).pop();
-                                },
-                                textSize: 14,
-                                roundedCorners: 4,
-                                textWeight: FontWeight.w600,
-                              ))),
-                    ],
+                        ],
+                      );
+                    }),
                   ),
-                ),
-              ],
+                  Visibility(
+                    visible: isPassErrorShown,
+                    child: const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Text(
+                          "Invalid Input",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: ColorStyle.primaryColor,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: SizedBox(
+                                height: 50,
+                                child: CustomRoundedButton(
+                                  "Cancel",
+                                  () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  borderColor: ColorStyle.greyColor,
+                                  buttonBackgroundColor: ColorStyle.greyColor,
+                                  textColor: ColorStyle.secondaryTextColor,
+                                  textSize: 14,
+                                  roundedCorners: 4,
+                                  textWeight: FontWeight.w600,
+                                ))),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        Expanded(
+                            child: SizedBox(
+                                height: 50,
+                                child: CustomRoundedButton(
+                                  "Save",
+                                  () {
+                                    if (!_checkPassInputValid()) {
+                                      setInnerState(() {
+                                        isPassErrorShown = true;
+                                      });
+                                      return;
+                                    }
+                                    Pass pass = Pass(
+                                        id: eventArgs.eventId ?? "",
+                                        name: _passInfoController.text.trim(),
+                                        fullPrice: int.tryParse(
+                                            _passPriceController.text),
+                                        discount: _dicountedPriceController.text
+                                                    .trim() ==
+                                                ""
+                                            ? null
+                                            : Discount(
+                                                discountedPrice: int.tryParse(
+                                                    _dicountedPriceController
+                                                        .text),
+                                                percentage: int.tryParse(
+                                                    _discountPercentController
+                                                        .text),
+                                                lastDate: _discountEndingOn));
+                                    if (index != null) {
+                                      passes[index] = pass;
+                                    } else {
+                                      passes.add(pass);
+                                    }
+
+                                    setState(() {});
+                                    _alertParentWidget();
+                                    Navigator.of(context).pop();
+                                  },
+                                  textSize: 14,
+                                  roundedCorners: 4,
+                                  textWeight: FontWeight.w600,
+                                ))),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        }),
       ),
     );
 
