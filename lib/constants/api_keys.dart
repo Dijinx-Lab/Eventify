@@ -1,5 +1,6 @@
 class ApiConstants {
   static const String baseUrl =
+
       //"http://192.168.100.228:3000/api/v1/eventify";
       "https://eventify-server-sand.vercel.app/api/v1/eventify";
 
@@ -20,6 +21,7 @@ class ApiConstants {
   static const String getEvents = "$baseUrl/event/list";
 
   static const String updateStats = "$baseUrl/stats/update";
+  static const String getStatsUsers = "$baseUrl/stats/users";
 
   static const String addPasses = "$baseUrl/pass/create/all";
   static const String deletePasses = "$baseUrl/pass/delete/all";

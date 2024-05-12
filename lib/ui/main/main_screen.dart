@@ -3,11 +3,8 @@ import 'dart:async';
 import 'package:event_bus/event_bus.dart';
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/event_bus/refresh_discover_event.dart';
-import 'package:eventify/models/event_bus/refresh_saved_events.dart';
-import 'package:eventify/models/event_bus/update_event_preference.dart';
 import 'package:eventify/models/screen_args/main_args.dart';
 import 'package:eventify/models/screen_args/splash_args.dart';
-import 'package:eventify/services/stats_service.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/ui/accounts/accounts_screen.dart';
 import 'package:eventify/ui/alerts/alerts_screen.dart';
@@ -49,16 +46,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     super.initState();
     _index = widget.args.index;
 
-    MainScreen.eventBus.on<UpdateEventPreference>().listen((ev) async {
-      Future.delayed(const Duration(milliseconds: 300)).then(
-        (value) {
-          StatsService().updateStats(ev.preference, ev.bookmarked, ev.id);
-          SavedScreen.eventBus.fire(RefreshSavedEvents());
-          DiscoverScreen.eventBus.fire(RefreshDiscoverEvents());
-          AlertsScreen.eventBus.fire(RefreshDiscoverEvents());
-        },
-      );
-    });
+    // MainScreen.eventBus.on<UpdateEventPreference>().listen((ev) async {
+    //   Future.delayed(const Duration(milliseconds: 300)).then(
+    //     (value) {
+          
+    //     },
+    //   );
+    // });
     NotificationUtils.initializeFirebase();
 
     remoteMessageStream = FirebaseMessaging.onMessage.listen((message) {

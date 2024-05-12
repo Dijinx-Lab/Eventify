@@ -1,4 +1,5 @@
 import 'package:eventify/models/screen_args/event_args.dart';
+import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
@@ -42,6 +43,24 @@ class _StepThreeContainerState extends State<StepThreeContainer> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.info_outline_rounded,
+              color: ColorStyle.secondaryTextColor,
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'This represents the amount of available space there is at your event',
+                style: TextStyle(
+                  color: ColorStyle.secondaryTextColor,
+                ),
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 30),
         CustomTextField(
             controller: _capacityController,

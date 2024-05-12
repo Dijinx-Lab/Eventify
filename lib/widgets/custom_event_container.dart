@@ -159,53 +159,71 @@ class CustomEventContainer extends StatelessWidget {
 
   _buildSaveCard() {
     return GestureDetector(
-      onTap: () {
-        if (event.myEvent!) {
-          onBookmarked(event.id!);
-        }
-      },
-      child: event.approvedOn == null
-          ? Container(
-              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: ColorStyle.accentColor.withOpacity(0.70),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.warning_amber_outlined,
-                      color: ColorStyle.primaryColor, size: 18),
-                  SizedBox(
-                    width: 4,
-                  ),
-                  Text(
-                    "Pending Approval",
-                    style: TextStyle(
-                        color: ColorStyle.primaryColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700),
-                  ),
-                ],
-              ),
-            )
-          : Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: ColorStyle.primaryColor.withOpacity(0.70),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                  event.myEvent!
-                      ? event.listingVisible!
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined
-                      : (event.preference?.bookmarked ?? false)
-                          ? Icons.bookmark
-                          : Icons.bookmark_outline,
-                  color: ColorStyle.accentColor,
-                  size: 18),
-            ),
-    );
+        onTap: () {
+          if (event.myEvent!) {
+            onBookmarked(event.id!);
+          }
+        },
+        child: event.approvedOn == null
+            ? Container(
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: ColorStyle.accentColor.withOpacity(0.70),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.warning_amber_outlined,
+                        color: ColorStyle.primaryColor, size: 18),
+                    SizedBox(
+                      width: 4,
+                    ),
+                    Text(
+                      "Pending Approval",
+                      style: TextStyle(
+                          color: ColorStyle.primaryColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+              )
+            : event.myEvent!
+                ? Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: ColorStyle.primaryColor.withOpacity(0.70),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                        event.listingVisible!
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        color: ColorStyle.accentColor,
+                        size: 18))
+                : (event.preference?.bookmarked ?? false)
+                    ? Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            color: ColorStyle.primaryColor.withOpacity(0.70),
+                            borderRadius: BorderRadius.circular(8)),
+                        child: const Text(
+                          "Saved",
+                          style: TextStyle(
+                              color: ColorStyle.accentColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600),
+                        ))
+                    : Container()
+        // Icon(
+        //     event.myEvent!
+        //         ?
+        //         :
+        //             ? Icons.bookmark
+        //             : Icons.bookmark_outline,
+        //     ),
+
+        );
   }
 
   _buildTimingsCard() {

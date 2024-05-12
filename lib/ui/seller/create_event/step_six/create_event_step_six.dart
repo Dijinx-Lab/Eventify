@@ -88,7 +88,7 @@ class _StepSixContainerState extends State<StepSixContainer> {
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,
@@ -124,7 +124,7 @@ class _StepSixContainerState extends State<StepSixContainer> {
   //     } else {
   //       ToastUtils.showCustomSnackbar(
   //         context: context,
-  //         contentText: value.error ?? "",
+  //         contentText: "Please check your connection and try again later",
   //         icon: const Icon(
   //           Icons.cancel_outlined,
   //           color: ColorStyle.whiteColor,

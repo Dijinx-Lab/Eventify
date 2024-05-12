@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:eventify/models/api_models/contacts_response/contacts_response.dart';
 import 'package:eventify/models/api_models/generic_response/generic_response.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:http/http.dart' as http;
@@ -26,12 +27,37 @@ class StatsService {
         "Authorization": "Bearer ${PrefUtils().getToken}",
         "content-type": "application/json"
       });
-      //print(url);
-      //print(params);
-      //print(response.body);
+
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
         GenericResponse apiResponse = GenericResponse.fromJson(responseBody);
+        return BaseResponse(apiResponse, null);
+      } else {
+        return BaseResponse(null, response.body);
+      }
+    } catch (ex) {
+      return BaseResponse(null, ex.toString());
+    }
+  }
+
+  Future<BaseResponse> getStatsUsers(
+    String filter,
+    String eventId,
+  ) async {
+    try {
+      var url =
+          Uri.parse("${ApiConstants.getStatsUsers}?id=$eventId&filter=$filter");
+
+      http.Response response = await http.get(url, headers: {
+        "Authorization": "Bearer ${PrefUtils().getToken}",
+        "content-type": "application/json"
+      });
+
+      print(url);
+
+      if (response.statusCode == 200) {
+        var responseBody = json.decode(response.body);
+        ContactsResponse apiResponse = ContactsResponse.fromJson(responseBody);
         return BaseResponse(apiResponse, null);
       } else {
         return BaseResponse(null, response.body);

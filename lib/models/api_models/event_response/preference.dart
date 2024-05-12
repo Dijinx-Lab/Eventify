@@ -1,6 +1,6 @@
 class Preference {
   bool? bookmarked;
-   String? preference;
+  String? preference;
 
   Preference({
     this.bookmarked,

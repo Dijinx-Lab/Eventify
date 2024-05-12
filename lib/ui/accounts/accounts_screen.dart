@@ -44,7 +44,11 @@ class _AccountsScreenState extends State<AccountsScreen> {
     });
     Future.delayed(const Duration(milliseconds: 300)).then(
       (value) {
-        PrefUtils().setIsAppTypeCustomer = !PrefUtils().getIsAppTypeCustomer;
+        if (PrefUtils().getIsAppTypeCustomer) {
+          PrefUtils().setIsAppTypeCustomer = false;
+        } else {
+          PrefUtils().setIsAppTypeCustomer = true;
+        }
 
         Navigator.of(context).pushNamedAndRemoveUntil(
             initialRoute, (e) => false,
@@ -75,7 +79,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
         SmartDialog.dismiss();
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,

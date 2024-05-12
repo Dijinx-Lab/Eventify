@@ -35,7 +35,7 @@ class _StepFourContainerState extends State<StepFourContainer> {
   DateTime selectedDate = DateTime.now();
   String _groupValue = "";
   late EventArgs eventArgs;
-  bool isPassErrorShown = false;
+  String? passError;
   List<Pass> passes = [];
 
   @override
@@ -359,7 +359,7 @@ class _StepFourContainerState extends State<StepFourContainer> {
   }
 
   _updateControllers(int? index) {
-    isPassErrorShown = false;
+    passError = null;
     if (index == null) {
       _passPriceController.text = "";
       _discountPercentController.text = "";
@@ -379,29 +379,30 @@ class _StepFourContainerState extends State<StepFourContainer> {
     }
   }
 
-  bool _checkPassInputValid() {
-    bool isValid = false;
+  String? _checkPassInputValid() {
+    String? validation;
     bool isNameFilled = _passInfoController.text.isNotEmpty;
     bool isPriceFilled = _passPriceController.text.isNotEmpty;
 
     if (isNameFilled && isPriceFilled) {
-      isValid = true;
+      validation = null;
     } else {
-      isValid = false;
+      validation = "Name and Price are required";
     }
-    if (isValid) {
+    if (validation == null) {
       bool isDiscFilled = _dicountedPriceController.text.isNotEmpty;
       bool isPercFilled = _discountPercentController.text.isNotEmpty;
       bool isEndFilled = _discountEndDateController.text.isNotEmpty;
 
       if ((isDiscFilled && isPercFilled && isEndFilled) ||
           (!isDiscFilled && !isPercFilled && !isEndFilled)) {
-        isValid = true;
+        validation = null;
       } else {
-        isValid = false;
+        validation =
+            "Price and End Date are required while offering a discount";
       }
     }
-    return isValid;
+    return validation;
   }
 
   _showPassDetailsDialog(int? index) {
@@ -513,14 +514,14 @@ class _StepFourContainerState extends State<StepFourContainer> {
                     }),
                   ),
                   Visibility(
-                    visible: isPassErrorShown,
-                    child: const Center(
+                    visible: passError != null,
+                    child: Center(
                       child: Padding(
-                        padding: EdgeInsets.only(top: 10),
+                        padding: const EdgeInsets.only(top: 10),
                         child: Text(
-                          "Invalid Input",
+                          passError ?? "",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                               color: ColorStyle.primaryColor,
                               fontWeight: FontWeight.w400,
                               fontSize: 12),
@@ -557,9 +558,9 @@ class _StepFourContainerState extends State<StepFourContainer> {
                                 child: CustomRoundedButton(
                                   "Save",
                                   () {
-                                    if (!_checkPassInputValid()) {
+                                    if (_checkPassInputValid() != null) {
                                       setInnerState(() {
-                                        isPassErrorShown = true;
+                                        passError = _checkPassInputValid();
                                       });
                                       return;
                                     }

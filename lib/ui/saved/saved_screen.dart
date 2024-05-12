@@ -1,10 +1,8 @@
 import 'package:event_bus/event_bus.dart';
 import 'package:eventify/models/api_models/event_response/event.dart';
 import 'package:eventify/models/api_models/event_response/event_list_response.dart';
-import 'package:eventify/models/event_bus/refresh_discover_event.dart';
-import 'package:eventify/models/event_bus/refresh_saved_events.dart';
+import 'package:eventify/models/event_bus/update_stats_event.dart';
 import 'package:eventify/services/event_service.dart';
-import 'package:eventify/services/stats_service.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/custom_event_container.dart';
@@ -29,7 +27,11 @@ class _SavedScreenState extends State<SavedScreen> {
   void initState() {
     _getSavedList();
     super.initState();
-    SavedScreen.eventBus.on<RefreshSavedEvents>().listen((ev) {
+    // SavedScreen.eventBus.on<RefreshSavedEvents>().listen((ev) {
+    //   _getEventsListWithoutLoading();
+    // });
+
+    SavedScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
       _getEventsListWithoutLoading();
     });
   }
@@ -56,7 +58,7 @@ class _SavedScreenState extends State<SavedScreen> {
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,
@@ -95,7 +97,7 @@ class _SavedScreenState extends State<SavedScreen> {
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,
@@ -103,13 +105,6 @@ class _SavedScreenState extends State<SavedScreen> {
         );
       }
     });
-  }
-
-  _saveEventPrefs(Event event) async {
-    await StatsService().updateStats(
-        event.preference!.preference, event.preference!.bookmarked, event.id!);
-
-    SavedScreen.eventBus.fire(RefreshDiscoverEvents());
   }
 
   @override
@@ -140,13 +135,13 @@ class _SavedScreenState extends State<SavedScreen> {
                         return CustomEventContainer(
                           event: eventsList![index],
                           onBookmarked: (eventId) {
-                            int index = eventsList!
-                                .indexWhere((event) => event.id == eventId);
-                            if (index != -1) {
-                              eventsList![index].preference!.bookmarked =
-                                  !eventsList![index].preference!.bookmarked!;
-                              _saveEventPrefs(eventsList![index]);
-                            }
+                            // int index = eventsList!
+                            //     .indexWhere((event) => event.id == eventId);
+                            // if (index != -1) {
+                            //   eventsList![index].preference!.bookmarked =
+                            //       !eventsList![index].preference!.bookmarked!;
+                            //   _saveEventPrefs(eventsList![index]);
+                            // }
                           },
                         );
                       }),

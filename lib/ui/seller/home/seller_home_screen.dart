@@ -82,6 +82,14 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
     SellerHomeScreen.eventBus.on<RefreshDiscoverEvents>().listen((ev) {
       _getEventsList();
     });
+
+    // SellerHomeScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
+    //   int index = eventsList!.indexWhere((element) => element.id == ev.id);
+    //   if (index != -1) {
+    //     eventsList![index].stats = ev.stats;
+    //     setState(() {});
+    //   }
+    // });
   }
 
   @override
@@ -136,7 +144,7 @@ class _SellerHomeScreenState extends State<SellerHomeScreen> {
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,

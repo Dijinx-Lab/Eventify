@@ -108,9 +108,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       Navigator.of(context)
           .pushNamedAndRemoveUntil(roleSelectionRoute, (e) => false);
     } else if (PrefUtils().getAppPreference == "viewer") {
+      PrefUtils().setIsAppTypeCustomer = true;
       Navigator.of(context).pushNamedAndRemoveUntil(
           mainRoute, arguments: MainArgs(0), (e) => false);
     } else {
+      PrefUtils().setIsAppTypeCustomer = false;
       Navigator.of(context)
           .pushNamedAndRemoveUntil(sellerHomeRoute, (e) => false);
     }
@@ -243,7 +245,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,
@@ -290,7 +292,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           } else {
             ToastUtils.showCustomSnackbar(
               context: context,
-              contentText: value.error ?? "",
+              contentText: "Please check your connection and try again later",
               icon: const Icon(
                 Icons.cancel_outlined,
                 color: ColorStyle.whiteColor,
@@ -346,7 +348,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,
@@ -388,7 +390,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,

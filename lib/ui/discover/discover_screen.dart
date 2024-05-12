@@ -4,7 +4,7 @@ import 'package:event_bus/event_bus.dart';
 import 'package:eventify/models/api_models/category_response/category.dart';
 import 'package:eventify/models/api_models/category_response/category_list_response.dart';
 import 'package:eventify/models/event_bus/refresh_discover_event.dart';
-import 'package:eventify/models/event_bus/refresh_saved_events.dart';
+import 'package:eventify/models/event_bus/update_stats_event.dart';
 import 'package:eventify/services/category_service.dart';
 import 'package:eventify/services/event_service.dart';
 import 'package:eventify/constants/city_list.dart';
@@ -13,10 +13,8 @@ import 'package:eventify/models/api_models/event_response/event.dart';
 import 'package:eventify/models/api_models/event_response/event_list_response.dart';
 import 'package:eventify/models/misc_models/city.dart';
 import 'package:eventify/models/screen_args/search_args.dart';
-import 'package:eventify/services/stats_service.dart';
 import 'package:eventify/services/user_service.dart';
 import 'package:eventify/styles/color_style.dart';
-import 'package:eventify/ui/saved/saved_screen.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/bottom_sheets/category_list_sheet.dart';
@@ -66,15 +64,30 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       _getEventsListWithoutLoading();
     });
 
+    DiscoverScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
+      if (filteredEventsList == null || filteredEventsList!.isEmpty) {
+        return;
+      }
+      int index =
+          filteredEventsList!.indexWhere((element) => element.id == ev.id);
+
+      if (index != -1) {
+        Event updatedEvent = filteredEventsList![index];
+        updatedEvent.preference!.bookmarked = ev.bookmarked;
+        filteredEventsList![index] = updatedEvent;
+        setState(() {});
+      }
+    });
+
     super.initState();
   }
 
-  _saveEventPrefs(Event event) async {
-    await StatsService().updateStats(
-        event.preference!.preference, event.preference!.bookmarked, event.id!);
+  // _saveEventPrefs(Event event) async {
+  //   await StatsService().updateStats(
+  //       event.preference!.preference, event.preference!.bookmarked, event.id!);
 
-    SavedScreen.eventBus.fire(RefreshSavedEvents());
-  }
+  //   SavedScreen.eventBus.fire(RefreshSavedEvents());
+  // }
 
   _setCityAndGetList(String city) {
     setState(() {
@@ -101,21 +114,29 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
+      _setCityAndGetList(
+          PrefUtils().getCity == "" ? "Karachi" : PrefUtils().getCity);
+      return;
+      // return Future.error('Location services are disabled.');
     }
+
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        _setCityAndGetList('Karachi');
+        _setCityAndGetList(
+            PrefUtils().getCity == "" ? "Karachi" : PrefUtils().getCity);
+        return;
         //print('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      _setCityAndGetList('Karachi');
+      _setCityAndGetList(
+          PrefUtils().getCity == "" ? "Karachi" : PrefUtils().getCity);
+      return;
       //print(
-          // 'Location permissions are permanently denied, we cannot request permissions.');
+      // 'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     _getCurrentCity();
@@ -171,7 +192,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,
@@ -202,7 +223,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,
@@ -240,7 +261,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,
@@ -276,7 +297,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       } else {
         ToastUtils.showCustomSnackbar(
           context: context,
-          contentText: value.error ?? "",
+          contentText: "Please check your connection and try again later",
           icon: const Icon(
             Icons.cancel_outlined,
             color: ColorStyle.whiteColor,
@@ -545,18 +566,18 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                                       return CustomEventContainer(
                                         event: filteredEventsList![index],
                                         onBookmarked: (eventId) {
-                                          int index = eventsList!.indexWhere(
-                                              (event) => event.id == eventId);
-                                          if (index != -1) {
-                                            eventsList![index]
-                                                    .preference!
-                                                    .bookmarked =
-                                                !eventsList![index]
-                                                    .preference!
-                                                    .bookmarked!;
-                                            _saveEventPrefs(eventsList![index]);
-                                            _applyCategoryAsFilter();
-                                          }
+                                          // int index = eventsList!.indexWhere(
+                                          //     (event) => event.id == eventId);
+                                          // if (index != -1) {
+                                          //   eventsList![index]
+                                          //           .preference!
+                                          //           .bookmarked =
+                                          //       !eventsList![index]
+                                          //           .preference!
+                                          //           .bookmarked!;
+                                          //   _saveEventPrefs(eventsList![index]);
+                                          //   _applyCategoryAsFilter();
+                                          // }
                                         },
                                       );
                                     }),
