@@ -125,6 +125,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   ];
 
   _childDataFilled(EventArgs updatedEventArgs, bool validation) {
+    print(updatedEventArgs.description);
     setState(() {
       if (validation) {
         eventArgs = updatedEventArgs;

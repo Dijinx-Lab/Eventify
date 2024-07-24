@@ -65,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
         if (apiResponse.success ?? false) {
           _saveUserData(apiResponse.data!.user!, loggedIn: true);
         }
-      } else if (value.error == "401") {
+      } else if (value.error?.startsWith('4') ?? false) {
         PrefUtils().setIsUserLoggedIn = false;
         ToastUtils.showCustomSnackbar(
           context: context,

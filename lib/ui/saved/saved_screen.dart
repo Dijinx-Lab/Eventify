@@ -1,6 +1,7 @@
 import 'package:event_bus/event_bus.dart';
 import 'package:eventify/models/api_models/event_response/event.dart';
 import 'package:eventify/models/api_models/event_response/event_list_response.dart';
+import 'package:eventify/models/event_bus/refresh_saved_events.dart';
 import 'package:eventify/models/event_bus/update_stats_event.dart';
 import 'package:eventify/services/event_service.dart';
 import 'package:eventify/styles/color_style.dart';
@@ -27,12 +28,22 @@ class _SavedScreenState extends State<SavedScreen> {
   void initState() {
     _getSavedList();
     super.initState();
-    // SavedScreen.eventBus.on<RefreshSavedEvents>().listen((ev) {
-    //   _getEventsListWithoutLoading();
-    // });
-
     SavedScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
-      _getEventsListWithoutLoading();
+      if (eventsList == null || eventsList!.isEmpty || !mounted) {
+        return;
+      }
+      int index = eventsList!.indexWhere((element) => element.id == ev.id);
+
+      if (index != -1) {
+        eventsList!.removeAt(index);
+        setState(() {});
+      }
+    });
+
+    SavedScreen.eventBus.on<RefreshSavedEvents>().listen((ev) {
+      if (mounted) {
+        _getSavedList();
+      }
     });
   }
 

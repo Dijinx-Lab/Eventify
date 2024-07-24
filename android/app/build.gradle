@@ -50,8 +50,8 @@ android {
     defaultConfig {
         applicationId "com.dijinx.eventbazaar"
         multiDexEnabled true
-        minSdkVersion 20
-        targetSdkVersion flutter.targetSdkVersion
+        minSdkVersion 23
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

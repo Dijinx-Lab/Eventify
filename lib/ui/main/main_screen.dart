@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:event_bus/event_bus.dart';
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/event_bus/refresh_discover_event.dart';
+import 'package:eventify/models/event_bus/refresh_saved_events.dart';
 import 'package:eventify/models/screen_args/main_args.dart';
 import 'package:eventify/models/screen_args/splash_args.dart';
 import 'package:eventify/styles/color_style.dart';
@@ -49,7 +50,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     // MainScreen.eventBus.on<UpdateEventPreference>().listen((ev) async {
     //   Future.delayed(const Duration(milliseconds: 300)).then(
     //     (value) {
-          
+
     //     },
     //   );
     // });
@@ -157,9 +158,13 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             if (!PrefUtils().getIsUserLoggedIn) {
               Navigator.of(context).pushNamed(notLoggedInRoute);
             } else {
-              setState(() {
-                _index = value;
-              });
+              _index = value;
+
+              if (_index == 1) {
+                SavedScreen.eventBus.fire(RefreshSavedEvents());
+              }
+
+              setState(() {});
             }
           },
           backgroundColor: ColorStyle.whiteColor,

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -13,7 +14,6 @@ import 'package:eventify/models/screen_args/detail_args.dart';
 import 'package:eventify/services/event_service.dart';
 import 'package:eventify/services/stats_service.dart';
 import 'package:eventify/styles/color_style.dart';
-import 'package:eventify/ui/alerts/alerts_screen.dart';
 import 'package:eventify/ui/discover/discover_screen.dart';
 import 'package:eventify/ui/saved/saved_screen.dart';
 import 'package:eventify/ui/seller/home/seller_home_screen.dart';
@@ -26,6 +26,7 @@ import 'package:eventify/widgets/bottom_sheets/user_contact_list_sheet.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -41,6 +42,7 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen>
     with WidgetsBindingObserver {
+  final QuillController _controller = QuillController.basic();
   String? action;
   bool? bookmarked;
   late Event event;
@@ -48,6 +50,7 @@ class _DetailScreenState extends State<DetailScreen>
       PageController(viewportFraction: 1, keepPage: true);
   int currentPage = 0;
   StatsService statsService = StatsService();
+  bool plainTextView = false;
 
   @override
   initState() {
@@ -58,6 +61,9 @@ class _DetailScreenState extends State<DetailScreen>
       action = event.preference!.preference;
       bookmarked = event.preference!.bookmarked;
     }
+    // final jsonDescription = json.decode(event.description ?? "");
+    // _controller.document = Document.fromJson(jsonDescription);
+    _initializeDocument();
     SellerHomeScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
       event.stats = ev.stats;
       setState(() {});
@@ -68,6 +74,15 @@ class _DetailScreenState extends State<DetailScreen>
   dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void _initializeDocument() {
+    try {
+      final jsonDescription = json.decode(event.description ?? "");
+      _controller.document = Document.fromJson(jsonDescription);
+    } catch (e) {
+      plainTextView = true;
+    }
   }
 
   // @override
@@ -94,10 +109,10 @@ class _DetailScreenState extends State<DetailScreen>
       id: event.id!,
       bookmarked: bookmarked,
     ));
-    AlertsScreen.eventBus.fire(UpdateStatsEvent(
-      id: event.id!,
-      bookmarked: bookmarked,
-    ));
+    // AlertsScreen.eventBus.fire(UpdateStatsEvent(
+    //   id: event.id!,
+    //   bookmarked: bookmarked,
+    // ));
   }
 
   launchSms() async {
@@ -195,7 +210,21 @@ class _DetailScreenState extends State<DetailScreen>
                             } else {
                               bookmarked = true;
                             }
+                            ToastUtils.showCustomSnackbar(
+                              context: context,
+                              millisecond: 2000,
+                              icon: Icon(
+                                bookmarked!
+                                    ? Icons.favorite
+                                    : Icons.favorite_outline,
+                                color: ColorStyle.whiteColor,
+                              ),
+                              contentText: bookmarked!
+                                  ? "Event saved to favourites"
+                                  : "Event removed from favourites",
+                            );
                           });
+
                           _saveEventPrefs();
                         },
                         child: Container(
@@ -692,108 +721,106 @@ class _DetailScreenState extends State<DetailScreen>
                                   color:
                                       ColorStyle.blackColor.withOpacity(0.25))
                             ]),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  event.contact?.name ?? "",
-                                  style: const TextStyle(
-                                    color: ColorStyle.primaryTextColor,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                const Text(
-                                  "Ad lister",
-                                  style: TextStyle(
-                                    color: ColorStyle.secondaryTextColor,
-                                    fontSize: 10,
-                                  ),
-                                )
-                              ],
+                            Text(
+                              "${event.contact?.name ?? ""} - Ad Lister",
+                              style: const TextStyle(
+                                color: ColorStyle.primaryTextColor,
+                                fontSize: 14,
+                              ),
                             ),
-                            const Spacer(),
-                            Wrap(
-                              alignment: WrapAlignment.center,
-                              runAlignment: WrapAlignment.center,
-                              runSpacing: 10,
+                            SizedBox(height: 10),
+                            Row(
                               children: [
-                                GestureDetector(
-                                  onTap: () async {
-                                    await launchEmail();
-                                  },
-                                  child: Container(
-                                    width: 35,
-                                    height: 35,
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 3),
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                        color:
-                                            ColorStyle.primaryColorExtraLight,
-                                        borderRadius: BorderRadius.circular(8)),
-                                    child: const Icon(Icons.email_outlined,
-                                        color: ColorStyle.primaryColor,
-                                        size: 16),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    await launchSms();
-                                  },
-                                  child: Container(
-                                    width: 35,
-                                    height: 35,
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 3),
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                        color:
-                                            ColorStyle.primaryColorExtraLight,
-                                        borderRadius: BorderRadius.circular(8)),
-                                    child: const Icon(Icons.chat_outlined,
-                                        color: ColorStyle.primaryColor,
-                                        size: 16),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    launchWhatsapp();
-                                  },
-                                  child: Container(
-                                    width: 35,
-                                    height: 35,
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 3),
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                        color:
-                                            ColorStyle.primaryColorExtraLight,
-                                        borderRadius: BorderRadius.circular(8)),
-                                    child: Image.asset(
-                                      "assets/pngs/ic_whatsapp.png",
-                                      fit: BoxFit.cover,
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      await launchEmail();
+                                    },
+                                    child: Container(
+                                      // width: 35,
+                                      height: 40,
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 3),
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          color:
+                                              ColorStyle.primaryColorExtraLight,
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      child: const Icon(Icons.email_outlined,
+                                          color: ColorStyle.primaryColor,
+                                          size: 20),
                                     ),
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: () async {
-                                    await launchPhone();
-                                  },
-                                  child: Container(
-                                    width: 35,
-                                    height: 35,
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 3),
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                        color:
-                                            ColorStyle.primaryColorExtraLight,
-                                        borderRadius: BorderRadius.circular(8)),
-                                    child: const Icon(Icons.call_outlined,
-                                        color: ColorStyle.primaryColor,
-                                        size: 16),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      await launchSms();
+                                    },
+                                    child: Container(
+                                      // width: 35,
+                                      height: 40,
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 3),
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          color:
+                                              ColorStyle.primaryColorExtraLight,
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      child: const Icon(Icons.chat_outlined,
+                                          color: ColorStyle.primaryColor,
+                                          size: 20),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      launchWhatsapp();
+                                    },
+                                    child: Container(
+                                      // width: 35,
+                                      height: 40,
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 3),
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          color:
+                                              ColorStyle.primaryColorExtraLight,
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      child: Image.asset(
+                                        "assets/pngs/ic_whatsapp.png",
+                                        fit: BoxFit.scaleDown,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      await launchPhone();
+                                    },
+                                    child: Container(
+                                      // width: 35,
+                                      height: 40,
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 3),
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          color:
+                                              ColorStyle.primaryColorExtraLight,
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      child: const Icon(Icons.call_outlined,
+                                          color: ColorStyle.primaryColor,
+                                          size: 20),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -1152,14 +1179,21 @@ class _DetailScreenState extends State<DetailScreen>
                               ),
                             ],
                           ),
-                          child: Text(
-                            event.description ?? "",
-                            style: const TextStyle(
-                              color: ColorStyle.primaryTextColor,
-                              fontSize: 12,
-                              height: 1.5,
-                            ),
-                          ),
+                          child: plainTextView
+                              ? Text(
+                                  event.description ?? "",
+                                  style: const TextStyle(
+                                    color: ColorStyle.primaryTextColor,
+                                    fontSize: 12,
+                                    height: 1.5,
+                                  ),
+                                )
+                              : QuillEditor.basic(
+                                  configurations: QuillEditorConfigurations(
+                                      controller: _controller,
+                                      readOnly: true,
+                                      showCursor: false),
+                                ),
                         ),
                         const SizedBox(height: 30),
                       ],

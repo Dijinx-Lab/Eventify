@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:eventify/models/api_models/category_response/category.dart';
 import 'package:eventify/models/api_models/category_response/category_list_response.dart';
 import 'package:eventify/models/screen_args/event_args.dart';
@@ -6,6 +8,7 @@ import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 class StepSixContainer extends StatefulWidget {
   final EventArgs event;
@@ -18,8 +21,8 @@ class StepSixContainer extends StatefulWidget {
 }
 
 class _StepSixContainerState extends State<StepSixContainer> {
-  final TextEditingController _descriptionController = TextEditingController();
-  // CategoryService categoryService = CategoryService();
+  // final TextEditingController _descriptionController = TextEditingController();
+  final _controller = QuillController.basic();
   List<Category> categories = [];
   String selectedCategory = "";
   late EventArgs eventArgs;
@@ -31,15 +34,18 @@ class _StepSixContainerState extends State<StepSixContainer> {
     //print(eventArgs.description);
     //print(eventArgs.categoryId);
     if (eventArgs.description != null && eventArgs.categoryId != null) {
-      _descriptionController.text = eventArgs.description ?? "";
+      final jsonDescription = json.decode(eventArgs.description ?? "");
+      _controller.document = Document.fromJson(jsonDescription);
+      // _descriptionController.text = eventArgs.description ?? "";
       selectedCategory = eventArgs.categoryId ?? "";
     }
 
     super.initState();
     _getCategories();
-    _descriptionController.addListener(() {
-      _alertParentWidget();
-    });
+    _controller.addListener(() => _alertParentWidget());
+    // _descriptionController.addListener(() {
+    //   _alertParentWidget();
+    // });
 
     Future.delayed(const Duration(microseconds: 500)).then((value) {
       _alertParentWidget();
@@ -47,10 +53,13 @@ class _StepSixContainerState extends State<StepSixContainer> {
   }
 
   _alertParentWidget() async {
-    if (_descriptionController.text != "" &&
+    String jsonDescription =
+        json.encode(_controller.document.toDelta().toJson());
+    if (jsonDescription != "" &&
         selectedCategory != "" &&
         categories.isNotEmpty) {
-      eventArgs.description = _descriptionController.text;
+      eventArgs.description = jsonDescription;
+      // _descriptionController.text;
       eventArgs.categoryId = categories
           .where((element) => element.id! == selectedCategory)
           .first
@@ -140,12 +149,54 @@ class _StepSixContainerState extends State<StepSixContainer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 30),
-        CustomTextField(
-          controller: _descriptionController,
-          hint: "Description",
-          keyboardType: TextInputType.name,
-          maxLines: 6,
+        QuillToolbar.simple(
+          configurations: QuillSimpleToolbarConfigurations(
+            toolbarSize: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border:
+                  Border.all(color: ColorStyle.secondaryTextColor, width: 0.7),
+            ),
+            controller: _controller,
+            multiRowsDisplay: false,
+            showInlineCode: false,
+            showColorButton: false,
+            showBackgroundColorButton: false,
+            showFontSize: false,
+            showFontFamily: false,
+            showLeftAlignment: false,
+            showCenterAlignment: false,
+            showRightAlignment: false,
+            showJustifyAlignment: true,
+            showListCheck: false,
+            showCodeBlock: false,
+            showIndent: false,
+            showUndo: false,
+            showRedo: false,
+            showDirection: false,
+            showSearchButton: false,
+            showSubscript: false,
+            showSuperscript: false,
+          ),
         ),
+        SizedBox(height: 10),
+        Container(
+          width: double.maxFinite,
+          padding: EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            border:
+                Border.all(color: ColorStyle.secondaryTextColor, width: 0.7),
+          ),
+          child: QuillEditor.basic(
+            configurations: QuillEditorConfigurations(
+              controller: _controller,
+              minHeight: 100,
+              maxHeight: 150,
+            ),
+          ),
+        ),
+
         const SizedBox(height: 30),
         const Text(
           "Categories",

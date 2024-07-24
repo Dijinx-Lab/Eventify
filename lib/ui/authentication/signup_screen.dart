@@ -50,6 +50,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   PhoneNumber _phoneSignInNumber = PhoneNumber(isoCode: 'PK');
 
   bool isPwdVisible = false;
+  bool isConfPwdVisible = false;
   bool isSignupSeleted = true;
   bool isTermsChecked = false;
   bool isErrorEnforced = false;
@@ -61,6 +62,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   UserService userService = UserService();
 
   final FocusNode focusNode = FocusNode();
+  final FocusNode phonefocusNode = FocusNode();
   final defaultPinTheme = const PinTheme(
     width: 50,
     height: 50,
@@ -85,7 +87,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void initState() {
     isSignupSeleted = widget.args.isSignupSelected;
+
     super.initState();
+
+    phonefocusNode.addListener(() {
+      setState(() {});
+    });
   }
 
   _resetFields() {
@@ -300,6 +307,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
             );
           }
         });
+      } else {
+        SmartDialog.dismiss();
+        ToastUtils.showCustomSnackbar(
+          context: context,
+          contentText:
+              "Could not connect to Google services at the moment, please try again later",
+          icon: const Icon(
+            Icons.cancel_outlined,
+            color: ColorStyle.whiteColor,
+          ),
+        );
       }
     });
   }
@@ -567,18 +585,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                    color: ColorStyle.secondaryTextColor)),
+                                    width: phonefocusNode.hasFocus ? 2 : 1,
+                                    color: phonefocusNode.hasFocus
+                                        ? ColorStyle.primaryColor
+                                        : ColorStyle.secondaryTextColor)),
                             child: Row(
                               children: [
                                 Icon(
                                   Icons.phone_outlined,
-                                  color: ColorStyle.secondaryTextColor
-                                      .withOpacity(0.8),
+                                  color: phonefocusNode.hasFocus
+                                      ? ColorStyle.primaryColor
+                                      : ColorStyle.secondaryTextColor
+                                          .withOpacity(0.8),
                                   size: 25,
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: InternationalPhoneNumberInput(
+                                    focusNode: phonefocusNode,
                                     onInputChanged: (PhoneNumber number) {
                                       setState(() {
                                         _phoneNumber = number;
@@ -654,15 +678,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           controller: _confPwdController,
                           hint: "Confirm Password",
                           icon: const Icon(Icons.lock_outline),
-                          obscuretext: !isPwdVisible,
+                          obscuretext: !isConfPwdVisible,
                           trailing: IconButton(
                               splashColor: Colors.transparent,
                               onPressed: () {
                                 setState(() {
-                                  isPwdVisible = !isPwdVisible;
+                                  isConfPwdVisible = !isConfPwdVisible;
                                 });
                               },
-                              icon: Icon(isPwdVisible
+                              icon: Icon(isConfPwdVisible
                                   ? Icons.visibility_off_outlined
                                   : Icons.visibility_outlined))),
                     ),
@@ -913,6 +937,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
         context: context,
         builder: (BuildContext context) =>
             StatefulBuilder(builder: (context, setState) {
+              phonefocusNode.addListener(() {
+                if (mounted) {
+                  setState(() {});
+                }
+              });
               return Dialog(
                 insetPadding: const EdgeInsets.symmetric(horizontal: 20.0),
                 elevation: 2.0,
@@ -945,18 +974,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                    color: ColorStyle.secondaryTextColor)),
+                                    width: phonefocusNode.hasFocus ? 2 : 1,
+                                    color: phonefocusNode.hasFocus
+                                        ? ColorStyle.primaryColor
+                                        : ColorStyle.secondaryTextColor)),
                             child: Row(
                               children: [
                                 Icon(
                                   Icons.phone_outlined,
-                                  color: ColorStyle.secondaryTextColor
-                                      .withOpacity(0.8),
+                                  color: phonefocusNode.hasFocus
+                                      ? ColorStyle.primaryColor
+                                      : ColorStyle.secondaryTextColor
+                                          .withOpacity(0.8),
                                   size: 25,
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: InternationalPhoneNumberInput(
+                                    focusNode: phonefocusNode,
                                     onInputChanged: (PhoneNumber number) {
                                       setState(() {
                                         _phoneSignInNumber = number;

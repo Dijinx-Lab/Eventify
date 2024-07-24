@@ -6,6 +6,7 @@ class AuthUtil {
 
   static Future<void> signOut() async {
     await firebaseAuth.signOut();
+    await GoogleSignIn().signOut();
   }
 
   static Future<UserCredential?> signInWithGoogle() async {

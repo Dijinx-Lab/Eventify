@@ -82,13 +82,6 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     super.initState();
   }
 
-  // _saveEventPrefs(Event event) async {
-  //   await StatsService().updateStats(
-  //       event.preference!.preference, event.preference!.bookmarked, event.id!);
-
-  //   SavedScreen.eventBus.fire(RefreshSavedEvents());
-  // }
-
   _setCityAndGetList(String city) {
     setState(() {
       selectedCity = city;
@@ -116,27 +109,27 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     if (!serviceEnabled) {
       _setCityAndGetList(
           PrefUtils().getCity == "" ? "Karachi" : PrefUtils().getCity);
+      print('Location services are disabled.');
       return;
-      // return Future.error('Location services are disabled.');
     }
 
     permission = await Geolocator.checkPermission();
+
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         _setCityAndGetList(
             PrefUtils().getCity == "" ? "Karachi" : PrefUtils().getCity);
+        print('Location permissions are denied.');
         return;
-        //print('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
       _setCityAndGetList(
           PrefUtils().getCity == "" ? "Karachi" : PrefUtils().getCity);
+      print('Location permissions are denied.');
       return;
-      //print(
-      // 'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     _getCurrentCity();
@@ -146,7 +139,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     String city = "Karachi";
     try {
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+          desiredAccuracy: LocationAccuracy.medium);
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
@@ -178,6 +171,12 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         EventListResponse apiResponse = value.snapshot;
         if (apiResponse.success ?? false) {
           eventsList = apiResponse.data?.events ?? [];
+          eventsList?.removeWhere(
+            (element) {
+              DateTime eventTime = DateTime.parse(element.dateTime!);
+              return eventTime.isBefore(DateTime.now());
+            },
+          );
           _applyCategoryAsFilter();
         } else {
           ToastUtils.showCustomSnackbar(

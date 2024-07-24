@@ -192,6 +192,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                     const SizedBox(height: 10),
                     Text(
                       eventsList?[index].name ?? "",
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: ColorStyle.primaryTextColor,
                         fontSize: 14,
@@ -210,9 +211,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
                         const SizedBox(height: 2),
                         Text(
                           eventsList?[index].contact?.name ?? "",
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                               color: ColorStyle.secondaryTextColor,
-                              fontSize: 10,
                               fontWeight: FontWeight.w600),
                         ),
                       ],
