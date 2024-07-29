@@ -6,7 +6,6 @@ import 'package:eventify/models/screen_args/event_args.dart';
 import 'package:eventify/services/category_service.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/toast_utils.dart';
-import 'package:eventify/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
@@ -179,10 +178,10 @@ class _StepSixContainerState extends State<StepSixContainer> {
             showSuperscript: false,
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Container(
           width: double.maxFinite,
-          padding: EdgeInsets.all(15),
+          padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             border:

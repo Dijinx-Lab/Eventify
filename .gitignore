@@ -45,3 +45,7 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+.env
+
+ios/Runner/Config.plist

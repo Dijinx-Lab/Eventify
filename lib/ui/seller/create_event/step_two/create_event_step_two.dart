@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:eventify/models/screen_args/event_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -166,6 +167,7 @@ class _StepTwoContainerState extends State<StepTwoContainer> {
                     },
                     markers: _getMarker(),
                     mapType: MapType.normal,
+                    zoomControlsEnabled: false,
                     mapToolbarEnabled: false,
                     myLocationButtonEnabled: false,
                     compassEnabled: false,
@@ -188,7 +190,7 @@ class _StepTwoContainerState extends State<StepTwoContainer> {
                 height: 60,
                 child: GooglePlaceAutoCompleteTextField(
                   textEditingController: _locationValueController,
-                  googleAPIKey: "AIzaSyDjpIILOlFeed05Z6OksQR9SHhmVLbUFpQ",
+                  googleAPIKey: dotenv.env['GOOGLE-MAP-KEY']!,
                   inputDecoration: InputDecoration(
                     prefixIcon: const Icon(Icons.location_on),
                     hintText: "Location",

@@ -731,7 +731,7 @@ class _DetailScreenState extends State<DetailScreen>
                                 fontSize: 14,
                               ),
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             Row(
                               children: [
                                 Expanded(

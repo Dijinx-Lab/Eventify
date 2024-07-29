@@ -121,6 +121,7 @@ class _LocationDetailSheetState extends State<LocationDetailSheet> {
                                       _controller.complete(controller);
                                     }
                                   },
+                                  zoomControlsEnabled: false,
                                   markers: _getMarker(),
                                   mapType: MapType.normal,
                                   mapToolbarEnabled: false,
