@@ -348,250 +348,268 @@ class _DetailScreenState extends State<DetailScreen>
                           child: _buildPagerDotIndicator(),
                         )),
                     const SizedBox(height: 15),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            event.name ?? "",
-                            maxLines: null,
-                            style: const TextStyle(
-                                color: ColorStyle.blackColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ),
-                        _buildSellerCard()
-                      ],
+                    Text(
+                      event.name ?? "",
+                      maxLines: null,
+                      style: const TextStyle(
+                          color: ColorStyle.blackColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500),
                     ),
+                    const SizedBox(height: 8),
+                    _buildSellerCard(),
+
                     const SizedBox(height: 15),
                     (event.myEvent ?? false) &&
                             PrefUtils().getIsAppTypeCustomer == false
-                        ? SizedBox(
-                            height: 200,
-                            width: double.maxFinite,
-                            child: GridView.count(
-                              crossAxisCount: 2,
-                              childAspectRatio: 1.9,
-                              physics: const NeverScrollableScrollPhysics(),
-                              children: [
-                                Container(
-                                  width: double.maxFinite,
-                                  margin:
-                                      const EdgeInsets.only(right: 10, top: 10),
-                                  padding: const EdgeInsets.only(
-                                      top: 15, bottom: 15, left: 10),
-                                  decoration: BoxDecoration(
-                                      color: ColorStyle.accentColor,
-                                      borderRadius: BorderRadius.circular(12),
-                                      boxShadow: [
-                                        BoxShadow(
-                                            offset: const Offset(0, 4),
-                                            blurRadius: 4,
-                                            color: ColorStyle.blackColor
-                                                .withOpacity(0.25))
-                                      ]),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.visibility_outlined,
-                                        color: ColorStyle.primaryColor,
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Row(
+                        ? Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      margin: const EdgeInsets.only(
+                                          right: 10, top: 10),
+                                      padding: const EdgeInsets.only(
+                                          top: 15, bottom: 15, left: 10),
+                                      decoration: BoxDecoration(
+                                          color: ColorStyle.accentColor,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                offset: const Offset(0, 4),
+                                                blurRadius: 4,
+                                                color: ColorStyle.blackColor
+                                                    .withOpacity(0.25))
+                                          ]),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Text(
-                                            (event.stats?.viewed ?? 0)
-                                                .toString(),
-                                            style: const TextStyle(
-                                                color: ColorStyle.primaryColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold),
+                                          const Icon(
+                                            Icons.visibility_outlined,
+                                            color: ColorStyle.primaryColor,
                                           ),
-                                          const Text(
-                                            " people viewed",
-                                            style: TextStyle(
-                                                color: ColorStyle.primaryColor,
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w400),
+                                          const SizedBox(height: 5),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                (event.stats?.viewed ?? 0)
+                                                    .toString(),
+                                                style: const TextStyle(
+                                                    color:
+                                                        ColorStyle.primaryColor,
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              const Text(
+                                                " people viewed",
+                                                style: TextStyle(
+                                                    color:
+                                                        ColorStyle.primaryColor,
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                                GestureDetector(
-                                  onTap: () => _openContactsBottomSheet(
-                                      context, "bookmarked"),
-                                  child: Container(
-                                    width: double.maxFinite,
-                                    margin: const EdgeInsets.only(
-                                        left: 10, top: 10),
-                                    padding: const EdgeInsets.only(
-                                        top: 15, bottom: 15, left: 10),
-                                    decoration: BoxDecoration(
-                                        color: ColorStyle.accentColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              offset: const Offset(0, 4),
-                                              blurRadius: 4,
-                                              color: ColorStyle.blackColor
-                                                  .withOpacity(0.25))
-                                        ]),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.bookmark_add_outlined,
-                                          color: ColorStyle.primaryColor,
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Row(
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _openContactsBottomSheet(
+                                          context, "bookmarked"),
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 10, top: 10),
+                                        padding: const EdgeInsets.only(
+                                            top: 15, bottom: 15, left: 10),
+                                        decoration: BoxDecoration(
+                                            color: ColorStyle.accentColor,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  offset: const Offset(0, 4),
+                                                  blurRadius: 4,
+                                                  color: ColorStyle.blackColor
+                                                      .withOpacity(0.25))
+                                            ]),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
-                                            Text(
-                                              (event.stats?.bookmarked ?? 0)
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                  color:
-                                                      ColorStyle.primaryColor,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold),
+                                            const Icon(
+                                              Icons.bookmark_add_outlined,
+                                              color: ColorStyle.primaryColor,
                                             ),
-                                            const Text(
-                                              " people saved",
-                                              style: TextStyle(
-                                                  color:
-                                                      ColorStyle.primaryColor,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w400),
+                                            const SizedBox(height: 5),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  (event.stats?.bookmarked ?? 0)
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                const Text(
+                                                  " people saved",
+                                                  style: TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                GestureDetector(
-                                  onTap: () => _openContactsBottomSheet(
-                                      context, "interested"),
-                                  child: Container(
-                                    width: double.maxFinite,
-                                    margin: const EdgeInsets.only(
-                                        right: 10, top: 10),
-                                    padding: const EdgeInsets.only(
-                                        top: 15, bottom: 15, left: 10),
-                                    decoration: BoxDecoration(
-                                        color: ColorStyle.accentColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              offset: const Offset(0, 4),
-                                              blurRadius: 4,
-                                              color: ColorStyle.blackColor
-                                                  .withOpacity(0.25))
-                                        ]),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.lightbulb_circle_outlined,
-                                          color: ColorStyle.primaryColor,
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Row(
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _openContactsBottomSheet(
+                                          context, "interested"),
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                            right: 10, top: 10),
+                                        padding: const EdgeInsets.only(
+                                            top: 15, bottom: 15, left: 10),
+                                        decoration: BoxDecoration(
+                                            color: ColorStyle.accentColor,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  offset: const Offset(0, 4),
+                                                  blurRadius: 4,
+                                                  color: ColorStyle.blackColor
+                                                      .withOpacity(0.25))
+                                            ]),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
-                                            Text(
-                                              (event.stats?.interested ?? 0)
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                  color:
-                                                      ColorStyle.primaryColor,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold),
+                                            const Icon(
+                                              Icons.lightbulb_circle_outlined,
+                                              color: ColorStyle.primaryColor,
                                             ),
-                                            const Text(
-                                              " are interested",
-                                              style: TextStyle(
-                                                  color:
-                                                      ColorStyle.primaryColor,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w400),
+                                            const SizedBox(height: 5),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  (event.stats?.interested ?? 0)
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                const Text(
+                                                  " are interested",
+                                                  style: TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                GestureDetector(
-                                  onTap: () => _openContactsBottomSheet(
-                                      context, "going"),
-                                  child: Container(
-                                    width: double.maxFinite,
-                                    margin: const EdgeInsets.only(
-                                        left: 10, top: 10),
-                                    padding: const EdgeInsets.only(
-                                        top: 15, bottom: 15, left: 10),
-                                    decoration: BoxDecoration(
-                                        color: ColorStyle.accentColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              offset: const Offset(0, 4),
-                                              blurRadius: 4,
-                                              color: ColorStyle.blackColor
-                                                  .withOpacity(0.25))
-                                        ]),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.done_all_outlined,
-                                          color: ColorStyle.primaryColor,
-                                        ),
-                                        Row(
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _openContactsBottomSheet(
+                                          context, "going"),
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 10, top: 10),
+                                        padding: const EdgeInsets.only(
+                                            top: 15, bottom: 15, left: 10),
+                                        decoration: BoxDecoration(
+                                            color: ColorStyle.accentColor,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  offset: const Offset(0, 4),
+                                                  blurRadius: 4,
+                                                  color: ColorStyle.blackColor
+                                                      .withOpacity(0.25))
+                                            ]),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
-                                            Text(
-                                              (event.stats?.going ?? 0)
-                                                  .toString(),
-                                              style: const TextStyle(
-                                                  color:
-                                                      ColorStyle.primaryColor,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold),
+                                            const Icon(
+                                              Icons.done_all_outlined,
+                                              color: ColorStyle.primaryColor,
                                             ),
-                                            const Text(
-                                              " are coming",
-                                              style: TextStyle(
-                                                  color:
-                                                      ColorStyle.primaryColor,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w400),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  (event.stats?.going ?? 0)
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                const Text(
+                                                  " are coming",
+                                                  style: TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                )
-                              ],
-                            ))
+                                  )
+                                ],
+                              )
+                            ],
+                          )
                         : AbsorbPointer(
                             absorbing: (event.myEvent ?? false),
                             child: Opacity(

@@ -147,7 +147,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        height: 100,
+        height: 112,
         width: MediaQuery.of(context).size.width - 60,
         decoration: BoxDecoration(
             color: ColorStyle.whiteColor,
@@ -158,111 +158,108 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   blurRadius: 4,
                   color: ColorStyle.blackColor.withOpacity(0.25))
             ]),
-        child: Stack(
+        child: Row(
+          //mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              //mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: SizedBox(
-                    height: 80,
-                    width: 100,
-                    child: CachedNetworkImage(
-                        imageUrl: eventsList?[index].images?.first ?? "",
-                        errorWidget: (context, url, error) {
-                          return Container(
-                            color: ColorStyle.secondaryTextColor,
-                            child: const Center(
-                                child: Icon(
-                              Icons.error_outline,
-                              color: ColorStyle.whiteColor,
-                            )),
-                          );
-                        },
-                        fit: BoxFit.cover),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    const SizedBox(height: 10),
-                    Text(
-                      eventsList?[index].name ?? "",
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                height: 100,
+                width: 100,
+                child: CachedNetworkImage(
+                    imageUrl: eventsList?[index].images?.first ?? "",
+                    errorWidget: (context, url, error) {
+                      return Container(
+                        color: ColorStyle.secondaryTextColor,
+                        child: const Center(
+                            child: Icon(
+                          Icons.error_outline,
+                          color: ColorStyle.whiteColor,
+                        )),
+                      );
+                    },
+                    fit: BoxFit.cover),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  const SizedBox(height: 10),
+                  Text(
+                    eventsList?[index].name ?? "",
+                    // overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: ColorStyle.primaryTextColor,
+                      fontSize: 14,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: ColorStyle.primaryTextColor,
-                        fontSize: 14,
-                        overflow: TextOverflow.ellipsis,
-                      ),
                     ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.assignment_ind_outlined,
-                            color: ColorStyle.secondaryTextColor, size: 14),
-                        const SizedBox(
-                          width: 3,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.assignment_ind_outlined,
+                          color: ColorStyle.secondaryTextColor, size: 14),
+                      const SizedBox(
+                        width: 3,
+                      ),
+                      const SizedBox(height: 2),
+                      Expanded(
+                        child: Text(
                           eventsList?[index].contact?.name ?? "",
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                               color: ColorStyle.secondaryTextColor,
                               fontWeight: FontWeight.w600),
                         ),
-                      ],
-                    ),
-                  ],
-                )
-              ],
-            ),
-            Positioned(
-              bottom: 5,
-              right: 10,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      const Icon(Icons.schedule,
-                          color: ColorStyle.primaryColor, size: 14),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        DateFormat('h:mm a').format(
-                            DateTime.parse(eventsList![index].dateTime!)),
-
-                        //"9:30 PM",
-                        style: const TextStyle(
-                          color: ColorStyle.primaryColor,
-                          fontSize: 12,
-                        ),
                       ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  SizedBox(height: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Icon(Icons.today_outlined,
-                          color: ColorStyle.primaryColor, size: 14),
-                      const SizedBox(
-                        width: 5,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Icon(Icons.schedule,
+                              color: ColorStyle.primaryColor, size: 14),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            DateFormat('h:mm a').format(
+                                DateTime.parse(eventsList![index].dateTime!)),
+
+                            //"9:30 PM",
+                            style: const TextStyle(
+                              color: ColorStyle.primaryColor,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        DateFormat('MMM d, y').format(
-                            DateTime.parse(eventsList![index].dateTime!)),
-                        style: const TextStyle(
-                          color: ColorStyle.primaryColor,
-                          fontSize: 12,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Icon(Icons.today_outlined,
+                              color: ColorStyle.primaryColor, size: 14),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Text(
+                            DateFormat('MMM d, y').format(
+                                DateTime.parse(eventsList![index].dateTime!)),
+                            style: const TextStyle(
+                              color: ColorStyle.primaryColor,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
