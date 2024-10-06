@@ -140,11 +140,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         child: BottomNavigationBar(
           items: const [
             BottomNavigationBarItem(
-                icon: Icon(Icons.search), label: 'Discover'),
+                icon: Icon(Icons.calendar_today_outlined), label: 'Events'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.sell_outlined), label: 'Sales'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.bookmark_outline), label: 'Saved'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.notifications_outlined), label: 'Alerts'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.account_circle_outlined), label: 'Accounts')
           ],

@@ -1,17 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/api_models/event_response/event.dart';
+import 'package:eventify/models/api_models/sale_response/sale.dart';
+import 'package:eventify/models/screen_args/create_sale_args.dart';
 import 'package:eventify/models/screen_args/detail_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class CustomEventContainer extends StatelessWidget {
-  final Event event;
+class CustomSaleContainer extends StatelessWidget {
+  final Sale sale;
   final Function(String eventId) onBookmarked;
-  const CustomEventContainer(
-      {super.key, required this.event, required this.onBookmarked});
+  const CustomSaleContainer(
+      {super.key, required this.sale, required this.onBookmarked});
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +24,8 @@ class CustomEventContainer extends StatelessWidget {
           if (!PrefUtils().getIsUserLoggedIn) {
             Navigator.of(context).pushNamed(notLoggedInRoute);
           } else {
-            Navigator.of(context)
-                .pushNamed(eventDetailRoute, arguments: DetailArgs(event));
+            Navigator.of(context).pushNamed(saleDetailRoute,
+                arguments: CreateSaleArgs(sale: sale));
           }
         },
         child: Column(
@@ -37,7 +39,7 @@ class CustomEventContainer extends StatelessWidget {
                     width: double.maxFinite,
                     height: 160,
                     child: CachedNetworkImage(
-                        imageUrl: event.images?.first ?? "",
+                        imageUrl: sale.images?.first ?? "",
                         errorWidget: (context, url, error) {
                           return Container(
                             color: ColorStyle.secondaryTextColor,
@@ -90,7 +92,7 @@ class CustomEventContainer extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              event.name ?? "",
+              sale.name ?? "",
               style: const TextStyle(
                   color: ColorStyle.primaryTextColor,
                   fontSize: 16,
@@ -118,7 +120,7 @@ class CustomEventContainer extends StatelessWidget {
             width: 3,
           ),
           Text(
-            event.contact?.name ?? "",
+            sale.contact?.name ?? "",
             style: const TextStyle(
                 color: ColorStyle.whiteColor,
                 fontSize: 10,
@@ -129,42 +131,40 @@ class CustomEventContainer extends StatelessWidget {
     );
   }
 
-  _buildPriceCard() {
-    return Container(
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-          color: ColorStyle.primaryColor.withOpacity(0.70),
-          borderRadius: BorderRadius.circular(8)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.sell_outlined,
-              color: ColorStyle.accentColor, size: 14),
-          const SizedBox(
-            width: 3,
-          ),
-          Text(
-            event.priceStartsFrom == 0 && event.priceGoesUpto == 0
-                ? "Free"
-                : "Starts From Rs ${event.priceStartsFrom ?? 0}",
-            style: const TextStyle(
-                color: ColorStyle.accentColor,
-                fontSize: 10,
-                fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
-  }
+    _buildPriceCard() {
+      return Container(
+        padding: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+            color: ColorStyle.primaryColor.withOpacity(0.70),
+            borderRadius: BorderRadius.circular(8)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.sell_outlined,
+                color: ColorStyle.accentColor, size: 14),
+            const SizedBox(
+              width: 3,
+            ),
+            Text(
+              sale.discountDescription ?? "",
+              style: const TextStyle(
+                  color: ColorStyle.accentColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      );
+    }
 
   _buildSaveCard() {
     return GestureDetector(
         onTap: () {
-          if (event.myEvent!) {
-            onBookmarked(event.id!);
+          if (sale.myEvent!) {
+            onBookmarked(sale.id!);
           }
         },
-        child: event.approvedOn == null
+        child: sale.approvedOn == null
             ? Container(
                 padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                 decoration: BoxDecoration(
@@ -188,7 +188,7 @@ class CustomEventContainer extends StatelessWidget {
                   ],
                 ),
               )
-            : event.myEvent!
+            : sale.myEvent!
                 ? Container(
                     padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
@@ -196,12 +196,12 @@ class CustomEventContainer extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                        event.listingVisible!
+                        sale.listingVisibile!
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
                         color: ColorStyle.accentColor,
                         size: 18))
-                : (event.preference?.bookmarked ?? false)
+                : (sale.preference?.bookmarked ?? false)
                     ? Container(
                         padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
@@ -244,7 +244,8 @@ class CustomEventContainer extends StatelessWidget {
                 width: 3,
               ),
               Text(
-                DateFormat('MMM d, y').format(DateTime.parse(event.dateTime!)),
+                DateFormat('MMM d, y')
+                    .format(DateTime.parse(sale.endDateTime!)),
                 style: const TextStyle(
                     color: ColorStyle.whiteColor,
                     fontSize: 10,
@@ -262,7 +263,7 @@ class CustomEventContainer extends StatelessWidget {
                 width: 3,
               ),
               Text(
-                DateFormat('h:mm a').format(DateTime.parse(event.dateTime!)),
+                DateFormat('h:mm a').format(DateTime.parse(sale.endDateTime!)),
                 style: const TextStyle(
                     color: ColorStyle.whiteColor,
                     fontSize: 10,

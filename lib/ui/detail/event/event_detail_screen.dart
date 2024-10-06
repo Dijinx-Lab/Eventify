@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -16,7 +18,7 @@ import 'package:eventify/services/stats_service.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/ui/discover/discover_screen.dart';
 import 'package:eventify/ui/saved/saved_screen.dart';
-import 'package:eventify/ui/seller/home/seller_home_screen.dart';
+import 'package:eventify/ui/seller/base/base_seller_screen.dart';
 import 'package:eventify/utils/loading_utils.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
@@ -32,15 +34,15 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class DetailScreen extends StatefulWidget {
+class EventDetailScreen extends StatefulWidget {
   final DetailArgs args;
-  const DetailScreen({super.key, required this.args});
+  const EventDetailScreen({super.key, required this.args});
 
   @override
-  State<DetailScreen> createState() => _DetailScreenState();
+  State<EventDetailScreen> createState() => _EventDetailScreenState();
 }
 
-class _DetailScreenState extends State<DetailScreen>
+class _EventDetailScreenState extends State<EventDetailScreen>
     with WidgetsBindingObserver {
   final QuillController _controller = QuillController.basic();
   String? action;
@@ -64,7 +66,7 @@ class _DetailScreenState extends State<DetailScreen>
     // final jsonDescription = json.decode(event.description ?? "");
     // _controller.document = Document.fromJson(jsonDescription);
     _initializeDocument();
-    SellerHomeScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
+    BaseSellerScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
       event.stats = ev.stats;
       setState(() {});
     });
@@ -484,7 +486,7 @@ class _DetailScreenState extends State<DetailScreen>
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                               Row(
                                 children: [
                                   Expanded(
@@ -1441,18 +1443,15 @@ class _DetailScreenState extends State<DetailScreen>
                     child: Container(
                         height: 60,
                         color: Colors.white,
-                        child: Container(
-                          // margin: const EdgeInsets.only(left: 25),
-                          child: Center(
-                            child: Text(
-                                (event.listingVisible ?? false)
-                                    ? "Disable Visibility"
-                                    : "Enable Visibility",
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: ColorStyle.primaryTextColor)),
-                          ),
+                        child: Center(
+                          child: Text(
+                              (event.listingVisible ?? false)
+                                  ? "Disable Visibility"
+                                  : "Enable Visibility",
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: ColorStyle.primaryTextColor)),
                         )),
                   ),
                   GestureDetector(
@@ -1463,15 +1462,12 @@ class _DetailScreenState extends State<DetailScreen>
                     child: Container(
                         height: 60,
                         color: Colors.white,
-                        child: Container(
-                          // margin: const EdgeInsets.only(left: 25),
-                          child: const Center(
-                            child: Text("Delete Listing",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: ColorStyle.primaryTextColor)),
-                          ),
+                        child: const Center(
+                          child: Text("Delete Listing",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: ColorStyle.primaryTextColor)),
                         )),
                   ),
                 ],
@@ -1508,7 +1504,7 @@ class _DetailScreenState extends State<DetailScreen>
         if (value.snapshot != null) {
           EventResponse apiResponse = value.snapshot;
           if (apiResponse.success ?? false) {
-            SellerHomeScreen.eventBus.fire(RefreshMyEvents());
+            BaseSellerScreen.eventBus.fire(RefreshMyEvents());
             setState(() {
               event = apiResponse.data!.event!;
             });
@@ -1649,7 +1645,7 @@ class _DetailScreenState extends State<DetailScreen>
               contentText: "Event permanently deleted",
             );
             Future.delayed(const Duration(milliseconds: 1000)).then((value) {
-              SellerHomeScreen.eventBus.fire(RefreshDiscoverEvents());
+              BaseSellerScreen.eventBus.fire(RefreshDiscoverEvents());
               Navigator.of(context).pop();
             });
           } else {

@@ -1,31 +1,27 @@
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:eventify/models/api_models/event_response/event_list_response.dart';
-import 'package:eventify/models/api_models/event_response/event_response.dart';
-import 'package:eventify/models/api_models/generic_response/generic_response.dart';
-import 'package:eventify/models/screen_args/event_args.dart';
-import 'package:eventify/utils/pref_utils.dart';
-
-import 'package:http/http.dart' as http;
 import 'package:eventify/constants/api_keys.dart';
 import 'package:eventify/models/api_models/base_response/base_response.dart';
+import 'package:eventify/models/api_models/generic_response/generic_response.dart';
+import 'package:eventify/models/api_models/sale_response/sale_list_response.dart';
+import 'package:eventify/models/api_models/sale_response/sale_response.dart';
+import 'package:eventify/models/screen_args/sale_args.dart';
+import 'package:eventify/utils/pref_utils.dart';
+import 'package:http/http.dart' as http;
 
-class EventService {
-  Future<BaseResponse> getEvents(String filter) async {
+class SaleService {
+  Future<BaseResponse> getSales(String filter) async {
     try {
-      var url = Uri.parse("${ApiConstants.getEvents}?filter=$filter");
+      var url = Uri.parse("${ApiConstants.getSales}?filter=$filter");
 
       http.Response response = await http.get(url, headers: {
         "Authorization": "Bearer ${PrefUtils().getToken}",
       });
 
-      ////print(response.body);
-
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
-        EventListResponse apiResponse =
-            EventListResponse.fromJson(responseBody);
+        SaleListResponse apiResponse = SaleListResponse.fromJson(responseBody);
         return BaseResponse(apiResponse, null);
       } else {
         return BaseResponse(null, response.body);
@@ -35,11 +31,10 @@ class EventService {
     }
   }
 
-  Future<BaseResponse> uploadEvent(
-      EventArgs eventArgs, List<String> passIds) async {
+  Future<BaseResponse> uploadSale(SaleArgs eventArgs) async {
     try {
-      var url = Uri.parse(ApiConstants.addEvent);
-      var params = _getHashMap(eventArgs, passIds);
+      var url = Uri.parse(ApiConstants.addSale);
+      var params = _getHashMap(eventArgs);
 
       http.Response response =
           await http.post(url, body: json.encode(params), headers: {
@@ -49,7 +44,8 @@ class EventService {
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
-        EventResponse apiResponse = EventResponse.fromJson(responseBody);
+        SaleResponse apiResponse = SaleResponse.fromJson(responseBody);
+
         return BaseResponse(apiResponse, null);
       } else {
         return BaseResponse(null, response.body);
@@ -60,23 +56,17 @@ class EventService {
     }
   }
 
-  HashMap _getHashMap(EventArgs eventArgs, List<String> passIds) {
+  HashMap _getHashMap(SaleArgs eventArgs) {
     var params = HashMap();
     params["listing_visibile"] = eventArgs.listingVisible;
     params["name"] = eventArgs.name;
     params["description"] = eventArgs.description;
-    params["category_id"] = eventArgs.categoryId;
-    params["date_time"] = eventArgs.dateTime;
-    params["address"] = eventArgs.address;
-    params["city"] = eventArgs.city;
-    params["latitude"] = eventArgs.latitude;
-    params["longitude"] = eventArgs.longitude;
-    params["max_capacity"] = eventArgs.maxCapacity;
-    params["price_type"] = eventArgs.priceType;
-    params["price_starts_from"] = eventArgs.priceStartsFrom;
-    params["price_goes_upto"] = eventArgs.priceGoesUpto;
+    params["start_date_time"] = eventArgs.startDateTime;
+    params["end_date_time"] = eventArgs.endDateTime;
+    params["link_to_stores"] = eventArgs.linkToStores;
+    params["website"] = eventArgs.website;
+    params["discount_description"] = eventArgs.discountDescription;
     params["images"] = eventArgs.images;
-    params["pass_ids"] = passIds;
     params["contact"] = {
       "name": eventArgs.contactName,
       "phone": eventArgs.contactPhone,
@@ -88,12 +78,10 @@ class EventService {
     return params;
   }
 
-  Future<BaseResponse> editEvent(
-      EventArgs eventArgs, List<String> passIds) async {
+  Future<BaseResponse> editSale(SaleArgs eventArgs) async {
     try {
-      var url =
-          Uri.parse('${ApiConstants.updateEvent}?id=${eventArgs.eventId}');
-      var params = _getHashMap(eventArgs, passIds);
+      var url = Uri.parse('${ApiConstants.updateSale}?id=${eventArgs.eventId}');
+      var params = _getHashMap(eventArgs);
 
       http.Response response =
           await http.put(url, body: json.encode(params), headers: {
@@ -103,7 +91,7 @@ class EventService {
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
-        EventResponse apiResponse = EventResponse.fromJson(responseBody);
+        SaleResponse apiResponse = SaleResponse.fromJson(responseBody);
         return BaseResponse(apiResponse, null);
       } else {
         return BaseResponse(null, response.body);
@@ -114,22 +102,24 @@ class EventService {
     }
   }
 
-  Future<BaseResponse> toggleListing(
-      String eventId, bool listingVisible) async {
+  Future<BaseResponse> toggleListing(String saleId, bool listingVisible) async {
     try {
-      var url = Uri.parse('${ApiConstants.updateEvent}?id=$eventId');
+      var url = Uri.parse('${ApiConstants.updateSale}?id=$saleId');
       var params = HashMap();
       params["listing_visibile"] = listingVisible;
 
+      
+
       http.Response response =
           await http.put(url, body: json.encode(params), headers: {
         "Authorization": "Bearer ${PrefUtils().getToken}",
         "content-type": "application/json"
       });
+      
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
-        EventResponse apiResponse = EventResponse.fromJson(responseBody);
+        SaleResponse apiResponse = SaleResponse.fromJson(responseBody);
         return BaseResponse(apiResponse, null);
       } else {
         return BaseResponse(null, response.body);
@@ -140,9 +130,9 @@ class EventService {
     }
   }
 
-  Future<BaseResponse> deleteEvent(String eventId) async {
+  Future<BaseResponse> deleteSale(String saleId) async {
     try {
-      var url = Uri.parse("${ApiConstants.deleteEvent}?id=$eventId");
+      var url = Uri.parse("${ApiConstants.deleteSale}?id=$saleId");
 
       http.Response response = await http.delete(url, headers: {
         "Authorization": "Bearer ${PrefUtils().getToken}",

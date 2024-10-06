@@ -143,8 +143,7 @@ class _UnLoggedInScreenState extends State<UnLoggedInScreen> {
                                   arguments: SignupArgs(true, true));
                             },
                             child: const Padding(
-                              padding:
-                                  EdgeInsets.symmetric(horizontal: 25),
+                              padding: EdgeInsets.symmetric(horizontal: 25),
                               child: Text("Create a free account",
                                   style: TextStyle(
                                       color: ColorStyle.primaryColor,
@@ -163,36 +162,36 @@ class _UnLoggedInScreenState extends State<UnLoggedInScreen> {
     );
   }
 
-  _overlayContainer() {
-    return Container(
-      height: double.maxFinite,
-      width: double.maxFinite,
-      decoration: BoxDecoration(
-        // Add a background color or image to see the blur effect
-        color: Colors.transparent,
-        // Apply a blur effect using BackdropFilter
-        borderRadius: BorderRadius.circular(10.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white.withOpacity(0.5),
-            blurRadius: 10.0,
-            spreadRadius: 2.0,
-          ),
-        ],
-      ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-        child: const Center(
-          child: Text(
-            'Blur',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // _overlayContainer() {
+  //   return Container(
+  //     height: double.maxFinite,
+  //     width: double.maxFinite,
+  //     decoration: BoxDecoration(
+  //       // Add a background color or image to see the blur effect
+  //       color: Colors.transparent,
+  //       // Apply a blur effect using BackdropFilter
+  //       borderRadius: BorderRadius.circular(10.0),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.white.withOpacity(0.5),
+  //           blurRadius: 10.0,
+  //           spreadRadius: 2.0,
+  //         ),
+  //       ],
+  //     ),
+  //     child: BackdropFilter(
+  //       filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+  //       child: const Center(
+  //         child: Text(
+  //           'Blur',
+  //           style: TextStyle(
+  //             color: Colors.white,
+  //             fontSize: 24.0,
+  //             fontWeight: FontWeight.bold,
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

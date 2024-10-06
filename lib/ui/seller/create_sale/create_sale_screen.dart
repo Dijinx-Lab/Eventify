@@ -1,81 +1,64 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:eventify/models/api_models/base_response/base_response.dart';
 import 'package:eventify/models/api_models/cloudinary_response/cloudinary_upload_response.dart';
-import 'package:eventify/models/api_models/event_response/event.dart';
-import 'package:eventify/models/api_models/event_response/event_response.dart';
-import 'package:eventify/models/api_models/pass_response/pass_response.dart';
+import 'package:eventify/models/api_models/sale_response/sale.dart';
+import 'package:eventify/models/api_models/sale_response/sale_response.dart';
 import 'package:eventify/models/event_bus/refresh_my_events.dart';
-import 'package:eventify/models/screen_args/create_event_args.dart';
-import 'package:eventify/models/screen_args/event_args.dart';
+import 'package:eventify/models/screen_args/create_sale_args.dart';
+import 'package:eventify/models/screen_args/sale_args.dart';
 import 'package:eventify/services/cloudinary_service.dart';
-import 'package:eventify/services/event_service.dart';
-import 'package:eventify/services/pass_service.dart';
+import 'package:eventify/services/sale_service.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/ui/seller/base/base_seller_screen.dart';
-import 'package:eventify/ui/seller/create_event/step_five/create_event_step_five.dart';
-import 'package:eventify/ui/seller/create_event/step_four/create_event_step_four.dart';
-import 'package:eventify/ui/seller/create_event/step_one/create_event_step_one.dart';
-import 'package:eventify/ui/seller/create_event/step_seven/create_event_step_seven.dart';
-import 'package:eventify/ui/seller/create_event/step_six/create_event_step_six.dart';
-import 'package:eventify/ui/seller/create_event/step_three/create_event_step_three.dart';
-import 'package:eventify/ui/seller/create_event/step_two/create_event_step_two.dart';
-
+import 'package:eventify/ui/seller/create_sale/step_five/sale_step_five.dart';
+import 'package:eventify/ui/seller/create_sale/step_four/sale_step_four.dart';
+import 'package:eventify/ui/seller/create_sale/step_one/sale_step_one.dart';
+import 'package:eventify/ui/seller/create_sale/step_six/sale_step_six.dart';
+import 'package:eventify/ui/seller/create_sale/step_three/sale_step_three.dart';
+import 'package:eventify/ui/seller/create_sale/step_two/sale_step_two.dart';
 import 'package:eventify/utils/loading_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
-class CreateEventScreen extends StatefulWidget {
-  final CreateEventsArgs args;
-  const CreateEventScreen({super.key, required this.args});
+class CreateSaleScreen extends StatefulWidget {
+  final CreateSaleArgs args;
+  const CreateSaleScreen({super.key, required this.args});
 
   @override
-  State<CreateEventScreen> createState() => _CreateEventScreenState();
+  State<CreateSaleScreen> createState() => _CreateSaleScreenState();
 }
 
-class _CreateEventScreenState extends State<CreateEventScreen> {
+class _CreateSaleScreenState extends State<CreateSaleScreen> {
   CloudinaryService cloudinaryService = CloudinaryService();
-  EventService eventService = EventService();
-  PassService passService = PassService();
+  SaleService saleService = SaleService();
   int stepperIndex = 0;
   bool isValidToProceed = false;
-  //late Event event;
-  late EventArgs eventArgs;
+  late SaleArgs eventArgs;
   late List<Widget> steps;
-
-  //EVENT REQ ARGS
-  List<String> passIds = [];
 
   @override
   initState() {
-    eventArgs = widget.args.event != null
-        ? _getEventArgsFromEvent(widget.args.event!)
-        : EventArgs();
-
+    eventArgs = widget.args.sale != null
+        ? _getEventArgsFromEvent(widget.args.sale!)
+        : SaleArgs();
     steps = _getStepsList();
     super.initState();
   }
 
-  EventArgs _getEventArgsFromEvent(Event event) {
-    return EventArgs(
+  SaleArgs _getEventArgsFromEvent(Sale event) {
+    return SaleArgs(
       eventId: event.id,
-      listingVisible: event.listingVisible,
+      listingVisible: event.listingVisibile,
       name: event.name,
       description: event.description,
-      categoryId: event.category?.id,
-      dateTime: event.dateTime,
-      address: event.address,
-      city: event.city,
-      longitude: event.longitude,
-      latitude: event.latitude,
-      maxCapacity: event.maxCapacity,
-      priceType: event.priceType,
-      priceStartsFrom: event.priceStartsFrom,
-      priceGoesUpto: event.priceGoesUpto,
+      startDateTime: event.startDateTime,
+      endDateTime: event.endDateTime,
+      linkToStores: event.linkToStores,
+      website: event.website,
+      discountDescription: event.discountDescription,
       images: event.images,
-      passes: event.passes,
       contactName: event.contact?.name,
       contactPhone: event.contact?.phone,
       contactWhatsApp: event.contact?.whatsapp,
@@ -86,48 +69,43 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
   List<Widget> _getStepsList() {
     return [
-      StepOneContainer(
-          event: eventArgs,
+      SaleStepOne(
+          sale: eventArgs,
           onDataFilled: (event, validation) =>
               _childDataFilled(event, validation)),
-      StepTwoContainer(
-          event: eventArgs,
+      SaleStepTwo(
+          sale: eventArgs,
           onDataFilled: (event, validation) =>
               _childDataFilled(event, validation)),
-      StepThreeContainer(
-          event: eventArgs,
+      SaleStepThree(
+          sale: eventArgs,
           onDataFilled: (event, validation) =>
               _childDataFilled(event, validation)),
-      StepFourContainer(
-          event: eventArgs,
+      SaleStepFour(
+          sale: eventArgs,
           onDataFilled: (event, validation) =>
               _childDataFilled(event, validation)),
-      StepFiveContainer(
-          event: eventArgs,
+      SaleStepFive(
+          sale: eventArgs,
           onDataFilled: (event, validation) =>
-              _childDataFilled(eventArgs, validation)),
-      StepSixContainer(
-          event: eventArgs,
+              _childDataFilled(event, validation)),
+      SaleStepSix(
+          sale: eventArgs,
           onDataFilled: (event, validation) =>
-              _childDataFilled(eventArgs, validation)),
-      StepSevenContainer(
-          event: eventArgs,
-          onDataFilled: (event, validation) =>
-              _childDataFilled(eventArgs, validation))
+              _childDataFilled(event, validation)),
     ];
   }
 
   List<String> titles = [
-    "When is it going to happen?",
-    "Where is it going to happen?",
-    "How much space is there?",
-    "What is the price range for your pass?",
-    "Have a name and photo for your event?",
-    "Want to describe your event to attendees?",
-    "Where should we contact for inquiries?"
+    "Select a time range for the sale",
+    "Enter information about the vendor",
+    "Enter the discount range that you are offering",
+    "Add images and a name for your sale",
+    "Tell people more about the specifics of your sale",
+    "Contact information for inquiries",
   ];
 
-  _childDataFilled(EventArgs updatedEventArgs, bool validation) {
+  _childDataFilled(SaleArgs updatedEventArgs, bool validation) {
     setState(() {
       if (validation) {
         eventArgs = updatedEventArgs;
@@ -160,7 +138,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             foregroundColor: ColorStyle.secondaryTextColor,
             elevation: 0.5,
             title: Text(
-              eventArgs.eventId != null ? "Edit Event" : "Upload Event",
+              eventArgs.eventId != null ? "Edit Sale" : "Upload Sale",
               style: const TextStyle(
                   color: ColorStyle.primaryTextColor,
                   fontSize: 16,
@@ -233,9 +211,9 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                             textWeight: FontWeight.bold,
                           )
                         : CustomRoundedButton(
-                            stepperIndex < 6 ? 'Continue' : 'Publish',
+                            stepperIndex < 5 ? 'Continue' : 'Publish',
                             () async {
-                              if (stepperIndex < 6 && isValidToProceed) {
+                              if (stepperIndex < 5 && isValidToProceed) {
                                 setState(() {
                                   stepperIndex++;
                                   isValidToProceed = false;
@@ -246,12 +224,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                                     await _getImageInternetUrls();
 
                                 if (areImagesUpload) {
-                                  if (eventArgs.passes != null &&
-                                      eventArgs.passes!.isNotEmpty) {
-                                    _getPassIds();
-                                  } else {
-                                    _showPublishPreferanceDialog();
-                                  }
+                                  _showPublishPreferanceDialog();
                                 }
                               }
                             },
@@ -318,36 +291,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-  _getPassIds() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    SmartDialog.showLoading(
-        builder: (_) => const LoadingUtil(
-              type: 4,
-              text: "Please wait...",
-            ));
-
-    if (eventArgs.eventId != null) {
-      await passService.deletePasses(eventArgs.eventId!);
-    }
-
-    passService.addPasses(eventArgs.passes!).then((value) {
-      SmartDialog.dismiss();
-      if (value.snapshot != null) {
-        PassResponse apiResponse = value.snapshot;
-        if (apiResponse.success ?? false) {
-          passIds = apiResponse.data?.passIds ?? [];
-          _showPublishPreferanceDialog();
-        } else {
-          ToastUtils.showCustomSnackbar(
-              context: context, contentText: apiResponse.message ?? "");
-        }
-      } else {
-        ToastUtils.showCustomSnackbar(
-            context: context, contentText: value.error ?? "");
-      }
-    });
-  }
-
   _showPublishPreferanceDialog() {
     Dialog dialog = Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -378,7 +321,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   height: 20,
                 ),
                 const Text(
-                  "To maintain integrity, your event will be reviewed by our team. After the approval do you want to publish this event to the public catalogue of Event Bazaar instantly?",
+                  "To maintain integrity, your listing will be reviewed by our team. After the approval do you want to publish this listing to the public catalogue of Event Bazaar instantly?",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: ColorStyle.primaryTextColor,
@@ -458,10 +401,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     : "Saving your event...",
               ));
 
-      eventService.uploadEvent(eventArgs, passIds).then((value) {
+      saleService.uploadSale(eventArgs).then((value) {
         SmartDialog.dismiss();
         if (value.snapshot != null) {
-          EventResponse apiResponse = value.snapshot;
+          SaleResponse apiResponse = value.snapshot;
           if (apiResponse.success ?? false) {
             BaseSellerScreen.eventBus.fire(RefreshMyEvents());
             ToastUtils.showCustomSnackbar(
@@ -471,7 +414,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 Icons.celebration_outlined,
                 color: ColorStyle.whiteColor,
               ),
-              contentText: "Congratulations! Your event has been published",
+              contentText: "Congratulations! Your sale has been published",
             );
             Future.delayed(const Duration(milliseconds: 1600)).then((value) {
               Navigator.of(context).pop();
@@ -495,12 +438,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     try {
       SmartDialog.showLoading(
           builder: (_) =>
-              const LoadingUtil(type: 4, text: "Updating your event..."));
+              const LoadingUtil(type: 4, text: "Updating your listing..."));
 
-      eventService.editEvent(eventArgs, passIds).then((value) {
+      saleService.editSale(eventArgs).then((value) {
         SmartDialog.dismiss();
         if (value.snapshot != null) {
-          EventResponse apiResponse = value.snapshot;
+          SaleResponse apiResponse = value.snapshot;
           if (apiResponse.success ?? false) {
             BaseSellerScreen.eventBus.fire(RefreshMyEvents());
             ToastUtils.showCustomSnackbar(
@@ -511,7 +454,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                 color: ColorStyle.whiteColor,
               ),
               contentText:
-                  "Congratulations! Your event has been updated successfully",
+                  "Congratulations! Your listing has been updated successfully",
             );
             Future.delayed(const Duration(milliseconds: 2000)).then((value) {
               Navigator.of(context).pop();
@@ -720,39 +663,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             visible: stepperIndex == 5,
             child: const Text(
               "6",
-              style: TextStyle(
-                  color: ColorStyle.whiteColor, fontWeight: FontWeight.bold),
-            ),
-          )),
-        ),
-        const SizedBox(width: 2),
-        Container(
-          width: 20,
-          height: 2,
-          color: stepperIndex >= 6
-              ? ColorStyle.primaryColorLight
-              : ColorStyle.cardColor,
-        ),
-        const SizedBox(width: 2),
-        AnimatedContainer(
-          height: 25,
-          width: 25,
-          curve: Curves.decelerate,
-          duration: const Duration(milliseconds: 300),
-          decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                  color: stepperIndex >= 6
-                      ? ColorStyle.primaryColor
-                      : ColorStyle.cardColor),
-              color: stepperIndex >= 6
-                  ? ColorStyle.primaryColorLight
-                  : ColorStyle.cardColor),
-          child: Center(
-              child: Visibility(
-            visible: stepperIndex == 6,
-            child: const Text(
-              "7",
               style: TextStyle(
                   color: ColorStyle.whiteColor, fontWeight: FontWeight.bold),
             ),

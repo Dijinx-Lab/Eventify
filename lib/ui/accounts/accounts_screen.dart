@@ -333,6 +333,39 @@ class _AccountsScreenState extends State<AccountsScreen> {
               ),
               GestureDetector(
                 onTap: () {
+                  Navigator.of(context).pushNamed(alertsRoute);
+                },
+                child: Container(
+                  height: 55,
+                  width: double.infinity,
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        width: 2,
+                        color: ColorStyle.secondaryTextColor.withOpacity(0.2),
+                      )),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Alerts",
+                        style: TextStyle(
+                            color: ColorStyle.primaryTextColor,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      Icon(
+                        Icons.arrow_forward,
+                        color: ColorStyle.secondaryTextColor,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
                   Navigator.of(context).pushNamed(privacyRoute);
                 },
                 child: Container(

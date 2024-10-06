@@ -106,42 +106,6 @@ class _StepSixContainerState extends State<StepSixContainer> {
     });
   }
 
-  // _getCategories() {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //   categoryService.getCategories(isForAll: true).then((value) async {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //     if (value.error == null) {
-  //       CategoryResponse apiResponse = value.snapshot;
-  //       if (apiResponse.isSuccess ?? false) {
-  //         categories = apiResponse.data ?? [];
-  //         _alertParentWidget();
-  //       } else {
-  //         ToastUtils.showCustomSnackbar(
-  //           context: context,
-  //           contentText: apiResponse.message ?? "",
-  //           icon: const Icon(
-  //             Icons.cancel_outlined,
-  //             color: ColorStyle.whiteColor,
-  //           ),
-  //         );
-  //       }
-  //     } else {
-  //       ToastUtils.showCustomSnackbar(
-  //         context: context,
-  //         contentText: "Please check your connection and try again later",
-  //         icon: const Icon(
-  //           Icons.cancel_outlined,
-  //           color: ColorStyle.whiteColor,
-  //         ),
-  //       );
-  //     }
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -195,7 +159,6 @@ class _StepSixContainerState extends State<StepSixContainer> {
             ),
           ),
         ),
-
         const SizedBox(height: 30),
         const Text(
           "Categories",
@@ -277,58 +240,8 @@ class _StepSixContainerState extends State<StepSixContainer> {
                             )
                             .toList(),
                       ),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     setState(() {
-                      //       selectedCategory = "Other";
-                      //     });
-                      //     _alertParentWidget();
-                      //   },
-                      //   child: Container(
-                      //       margin: const EdgeInsets.only(bottom: 15),
-                      //       width: double.maxFinite,
-                      //       height: 60,
-                      //       padding: const EdgeInsets.symmetric(vertical: 20),
-                      //       decoration: BoxDecoration(
-                      //         borderRadius: BorderRadius.circular(15),
-                      //         border: Border.all(
-                      //             color: selectedCategory == "Other"
-                      //                 ? ColorStyle.primaryColor
-                      //                 : ColorStyle.secondaryTextColor,
-                      //             width: 0.7),
-                      //       ),
-                      //       child: Row(children: [
-                      //         Radio(
-                      //             value: "Other",
-                      //             groupValue: selectedCategory,
-                      //             onChanged: (value) {
-                      //               if (value != null) {
-                      //                 setState(() {
-                      //                   selectedCategory = "Other";
-                      //                 });
-                      //                 _alertParentWidget();
-                      //               }
-                      //             }),
-                      //         Text(
-                      //           "Other",
-                      //           style: TextStyle(
-                      //               fontSize: 16,
-                      //               color: selectedCategory == "Other"
-                      //                   ? ColorStyle.primaryColor
-                      //                   : ColorStyle.secondaryTextColor),
-                      //         ),
-                      //       ])),
-                      // ),
                     ],
                   ),
-        // Visibility(
-        //   visible: selectedCategory == "Other",
-        //   child: CustomTextField(
-        //       controller: _descriptionController,
-        //       hint: "Category Name",
-        //       icon: null,
-        //       keyboardType: TextInputType.name),
-        // ),
         const SizedBox(
           height: 20,
         )

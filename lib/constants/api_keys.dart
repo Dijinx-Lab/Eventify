@@ -1,8 +1,6 @@
 class ApiConstants {
-  static const String baseUrl =
-
-      //"http://192.168.100.228:3000/api/v1/eventify";
-      "https://eventify-server-sand.vercel.app/api/v1/eventify";
+  static const String baseUrl = "http://192.168.100.228:3000/api/v1/eventify";
+  // "https://eventify-server-sand.vercel.app/api/v1/eventify";
 
   static const String signIn = "$baseUrl/user/sign-in";
   static const String signOut = "$baseUrl/user/sign-out";
@@ -32,4 +30,9 @@ class ApiConstants {
 
   static const String cloudinaryUpload =
       "https://api.cloudinary.com/v1_1/djhgeh6nt/image/upload";
+
+  static const String getSales = "$baseUrl/sale/list";
+  static const String addSale = "$baseUrl/sale/create";
+  static const String updateSale = "$baseUrl/sale/update";
+  static const String deleteSale = "$baseUrl/sale/delete";
 }

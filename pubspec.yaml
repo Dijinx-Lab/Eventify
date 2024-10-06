@@ -64,6 +64,7 @@ dependencies:
   flutter_quill: 9.2.6
   flutter_dotenv: ^5.1.0
   google_maps_flutter_android: ^2.8.0
+  google_maps_flutter_platform_interface: ^2.9.0
   
   
 

@@ -1,22 +1,22 @@
 import 'dart:io';
 
-import 'package:eventify/models/screen_args/event_args.dart';
+import 'package:eventify/models/screen_args/sale_args.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class StepSevenContainer extends StatefulWidget {
-  final EventArgs event;
-  final Function(EventArgs, bool) onDataFilled;
-  const StepSevenContainer(
-      {super.key, required this.event, required this.onDataFilled});
+class SaleStepSix extends StatefulWidget {
+  final SaleArgs sale;
+  final Function(SaleArgs, bool) onDataFilled;
+  const SaleStepSix(
+      {super.key, required this.sale, required this.onDataFilled});
 
   @override
-  State<StepSevenContainer> createState() => _StepSevenContainerState();
+  State<SaleStepSix> createState() => _SaleStepSixState();
 }
 
-class _StepSevenContainerState extends State<StepSevenContainer> {
+class _SaleStepSixState extends State<SaleStepSix> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _waController = TextEditingController();
@@ -25,11 +25,11 @@ class _StepSevenContainerState extends State<StepSevenContainer> {
 
   bool isPhotoTaken = false;
   String? imagePath;
-  late EventArgs eventArgs;
+  late SaleArgs eventArgs;
 
   @override
   void initState() {
-    eventArgs = widget.event;
+    eventArgs = widget.sale;
     if (eventArgs.eventId != null) {
       _nameController.text = eventArgs.contactName ?? "";
       _organizerController.text = eventArgs.contactOrganization ?? "";
@@ -94,9 +94,7 @@ class _StepSevenContainerState extends State<StepSevenContainer> {
         const SizedBox(height: 30),
         Center(
           child: GestureDetector(
-            onTap: () {
-              //  _openOptionsSheet();
-            },
+            onTap: () {},
             child: SizedBox(
               height: 70,
               width: 70,
@@ -122,48 +120,24 @@ class _StepSevenContainerState extends State<StepSevenContainer> {
                               )),
                     ),
                   ),
-                  // Positioned(
-                  //   bottom: 0,
-                  //   right: 0,
-                  //   child: Container(
-                  //     height: 20,
-                  //     width: 20,
-                  //     decoration: BoxDecoration(
-                  //         color: ColorStyle.primaryColor,
-                  //         borderRadius: BorderRadius.circular(6)),
-                  //     child: const Icon(
-                  //       Icons.edit,
-                  //       color: ColorStyle.whiteColor,
-                  //       size: 12,
-                  //     ),
-                  //   ),
-                  // )
                 ],
               ),
             ),
           ),
         ),
         const SizedBox(height: 40),
-        // CustomTextField(
-        //   controller: _firstController,
-        //   hint: "First name",
-        //   keyboardType: TextInputType.name,
-        // ),
-        // const SizedBox(height: 30),
         CustomTextField(
           controller: _nameController,
           hint: "Name",
           keyboardType: TextInputType.name,
         ),
         const SizedBox(height: 30),
-
         CustomTextField(
           controller: _phoneController,
           hint: "Phone number",
           keyboardType: TextInputType.number,
         ),
         const SizedBox(height: 30),
-
         CustomTextField(
           controller: _waController,
           hint: "Whatsapp number",
@@ -178,7 +152,7 @@ class _StepSevenContainerState extends State<StepSevenContainer> {
         const SizedBox(height: 30),
         CustomTextField(
           controller: _organizerController,
-          hint: "Event Organizer",
+          hint: "Sale Organizer",
           keyboardType: TextInputType.emailAddress,
         ),
       ],

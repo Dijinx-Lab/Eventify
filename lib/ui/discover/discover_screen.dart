@@ -109,7 +109,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     if (!serviceEnabled) {
       _setCityAndGetList(
           PrefUtils().getCity == "" ? "Karachi" : PrefUtils().getCity);
-      print('Location services are disabled.');
+
       return;
     }
 
@@ -120,7 +120,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       if (permission == LocationPermission.denied) {
         _setCityAndGetList(
             PrefUtils().getCity == "" ? "Karachi" : PrefUtils().getCity);
-        print('Location permissions are denied.');
+
         return;
       }
     }
@@ -128,7 +128,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     if (permission == LocationPermission.deniedForever) {
       _setCityAndGetList(
           PrefUtils().getCity == "" ? "Karachi" : PrefUtils().getCity);
-      print('Location permissions are denied.');
+
       return;
     }
 

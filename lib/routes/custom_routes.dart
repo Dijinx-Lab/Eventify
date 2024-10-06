@@ -1,5 +1,6 @@
 import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/screen_args/create_event_args.dart';
+import 'package:eventify/models/screen_args/create_sale_args.dart';
 import 'package:eventify/models/screen_args/detail_args.dart';
 import 'package:eventify/models/screen_args/forgot_pass_args.dart';
 import 'package:eventify/models/screen_args/main_args.dart';
@@ -11,19 +12,22 @@ import 'package:eventify/ui/accounts/privacy_policy_screen.dart';
 import 'package:eventify/ui/accounts/profile_screen.dart';
 import 'package:eventify/ui/accounts/reset_password_screen.dart';
 import 'package:eventify/ui/accounts/terms_and_conditions_screen.dart';
+import 'package:eventify/ui/alerts/alerts_screen.dart';
 import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_one_screen.dart';
 import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_three_screen.dart';
 import 'package:eventify/ui/authentication/forgot_pass/forgot_pass_two_screen.dart';
 import 'package:eventify/ui/authentication/role_selection_screen.dart';
 import 'package:eventify/ui/authentication/signup_screen.dart';
-import 'package:eventify/ui/detail/detail_screen.dart';
+import 'package:eventify/ui/detail/event/event_detail_screen.dart';
+import 'package:eventify/ui/detail/sale/sale_detail_screen.dart';
 import 'package:eventify/ui/discover/search_screen.dart';
 import 'package:eventify/ui/main/main_screen.dart';
 import 'package:eventify/ui/onboarding/onboarding_screen_one.dart';
 import 'package:eventify/ui/onboarding/onboarding_screen_three.dart';
 import 'package:eventify/ui/onboarding/onboarding_screen_two.dart';
+import 'package:eventify/ui/seller/base/base_seller_screen.dart';
 import 'package:eventify/ui/seller/create_event/create_event_screen.dart';
-import 'package:eventify/ui/seller/home/seller_home_screen.dart';
+import 'package:eventify/ui/seller/create_sale/create_sale_screen.dart';
 import 'package:eventify/ui/splash/splash_screen.dart';
 import 'package:eventify/ui/unloggedin/unloggedin_screen.dart';
 import 'package:flutter/material.dart';
@@ -57,10 +61,10 @@ class CustomRoutes {
         return MaterialPageRoute(
             builder: (_) =>
                 SearchScreen(args: settings.arguments as SearchArgs));
-      case detailRoute:
+      case eventDetailRoute:
         return MaterialPageRoute(
             builder: (_) =>
-                DetailScreen(args: settings.arguments as DetailArgs));
+                EventDetailScreen(args: settings.arguments as DetailArgs));
       case profileRoute:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
       case resetpassRoute:
@@ -71,7 +75,7 @@ class CustomRoutes {
         return MaterialPageRoute(
             builder: (_) => const TermsAndConditionScreen());
       case sellerHomeRoute:
-        return MaterialPageRoute(builder: (_) => const SellerHomeScreen());
+        return MaterialPageRoute(builder: (_) => const BaseSellerScreen());
       case accountsRoute:
         return MaterialPageRoute(builder: (_) => const AccountsScreen());
       case createEventRoute:
@@ -93,6 +97,17 @@ class CustomRoutes {
                 ));
       case notLoggedInRoute:
         return MaterialPageRoute(builder: (_) => const UnLoggedInScreen());
+      case createSaleRoute:
+        return MaterialPageRoute(
+            builder: (_) => CreateSaleScreen(
+                  args: settings.arguments as CreateSaleArgs,
+                ));
+      case saleDetailRoute:
+        return MaterialPageRoute(
+            builder: (_) =>
+                SaleDetailScreen(args: settings.arguments as CreateSaleArgs));
+      case alertsRoute:
+        return MaterialPageRoute(builder: (_) => AlertsScreen());
       default:
         return MaterialPageRoute(
             builder: (_) =>

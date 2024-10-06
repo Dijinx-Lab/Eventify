@@ -142,8 +142,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
   Widget _alertsCard(index) {
     return GestureDetector(
-      onTap: () => Navigator.of(context)
-          .pushNamed(detailRoute, arguments: DetailArgs(eventsList![index])),
+      onTap: () => Navigator.of(context).pushNamed(eventDetailRoute,
+          arguments: DetailArgs(eventsList![index])),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -219,7 +219,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 15),
+                  const SizedBox(height: 15),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [

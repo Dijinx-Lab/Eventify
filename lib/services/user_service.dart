@@ -170,8 +170,6 @@ class UserService {
         "content-type": "application/json"
       });
 
-      print(response.body);
-
       if (response.statusCode == 401) {
         return BaseResponse(null, response.statusCode.toString());
       } else if (response.statusCode == 200) {

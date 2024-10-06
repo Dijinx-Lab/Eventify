@@ -11,7 +11,7 @@ class ToastUtils {
     Color background = ColorStyle.primaryColorLight,
     bool isCenteredText = false,
   }) {
-    bool isExecute = true;
+    // bool isExecute = true;
     final snackbar = SnackBar(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -22,10 +22,11 @@ class ToastUtils {
       content: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          icon ?? const SizedBox(
-                  width: 0,
-                  height: 0,
-                ),
+          icon ??
+              const SizedBox(
+                width: 0,
+                height: 0,
+              ),
           icon != null
               ? const SizedBox(
                   width: 10,

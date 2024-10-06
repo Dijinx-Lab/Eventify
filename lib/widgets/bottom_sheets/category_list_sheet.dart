@@ -28,13 +28,15 @@ class _CategoryListSheetState extends State<CategoryListSheet> {
       child: Column(
         children: [
           Expanded(
-            child: categoryList == null
-                ? const Center(
-                    child: SizedBox(
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                : ListView.separated(
+            child:
+                // categoryList == null
+                //     ? const Center(
+                //         child: SizedBox(
+                //           child: CircularProgressIndicator(),
+                //         ),
+                //       )
+                //     :
+                ListView.separated(
                     itemBuilder: (context, index) => TextButton(
                         style:
                             const ButtonStyle(alignment: Alignment.centerLeft),

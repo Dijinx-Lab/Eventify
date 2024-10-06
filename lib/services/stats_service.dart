@@ -53,7 +53,7 @@ class StatsService {
         "content-type": "application/json"
       });
 
-      print(url);
+      
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
