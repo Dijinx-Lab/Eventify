@@ -1,25 +1,24 @@
-import 'package:event_bus/event_bus.dart';
 import 'package:eventify/models/api_models/event_response/event.dart';
 import 'package:eventify/models/api_models/event_response/event_list_response.dart';
 import 'package:eventify/models/event_bus/refresh_saved_events.dart';
 import 'package:eventify/models/event_bus/update_stats_event.dart';
 import 'package:eventify/services/event_service.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/ui/saved/saved_base_screen.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/custom_event_container.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class SavedScreen extends StatefulWidget {
-  static final eventBus = EventBus();
-  const SavedScreen({super.key});
+class SavedEventsScreen extends StatefulWidget {
+  const SavedEventsScreen({super.key});
 
   @override
-  State<SavedScreen> createState() => _SavedScreenState();
+  State<SavedEventsScreen> createState() => _SavedEventsScreenState();
 }
 
-class _SavedScreenState extends State<SavedScreen> {
+class _SavedEventsScreenState extends State<SavedEventsScreen> {
   List<Event>? eventsList;
   bool isEventsLoading = true;
   EventService eventService = EventService();
@@ -28,7 +27,7 @@ class _SavedScreenState extends State<SavedScreen> {
   void initState() {
     _getSavedList();
     super.initState();
-    SavedScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
+    SavedBaseScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
       if (eventsList == null || eventsList!.isEmpty || !mounted) {
         return;
       }
@@ -40,7 +39,7 @@ class _SavedScreenState extends State<SavedScreen> {
       }
     });
 
-    SavedScreen.eventBus.on<RefreshSavedEvents>().listen((ev) {
+    SavedBaseScreen.eventBus.on<RefreshSavedEvents>().listen((ev) {
       if (mounted) {
         _getSavedList();
       }
@@ -89,19 +88,6 @@ class _SavedScreenState extends State<SavedScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: ColorStyle.whiteColor,
-        foregroundColor: ColorStyle.secondaryTextColor,
-        elevation: 0.5,
-        centerTitle: true,
-        title: const Text(
-          "Saved Events",
-          style: TextStyle(
-              color: ColorStyle.primaryTextColor,
-              fontSize: 16,
-              fontWeight: FontWeight.bold),
-        ),
-      ),
       body: isEventsLoading
           ? const Center(child: CircularProgressIndicator())
           : eventsList == null

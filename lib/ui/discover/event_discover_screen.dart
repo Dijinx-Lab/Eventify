@@ -27,15 +27,15 @@ import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
-class DiscoverScreen extends StatefulWidget {
+class EventDiscoverScreen extends StatefulWidget {
   static final eventBus = EventBus();
-  const DiscoverScreen({super.key});
+  const EventDiscoverScreen({super.key});
 
   @override
-  State<DiscoverScreen> createState() => _DiscoverScreenState();
+  State<EventDiscoverScreen> createState() => _EventDiscoverScreenState();
 }
 
-class _DiscoverScreenState extends State<DiscoverScreen> {
+class _EventDiscoverScreenState extends State<EventDiscoverScreen> {
   final TextEditingController _searchController = TextEditingController();
   late List<City> cityList;
   List<Category>? categoryList;
@@ -60,11 +60,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     _checkLocationPermission();
     _getCategories();
 
-    DiscoverScreen.eventBus.on<RefreshDiscoverEvents>().listen((ev) {
+    EventDiscoverScreen.eventBus.on<RefreshDiscoverEvents>().listen((ev) {
       _getEventsListWithoutLoading();
     });
 
-    DiscoverScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
+    EventDiscoverScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
       if (filteredEventsList == null || filteredEventsList!.isEmpty) {
         return;
       }
@@ -74,8 +74,11 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       if (index != -1) {
         Event updatedEvent = filteredEventsList![index];
         updatedEvent.preference!.bookmarked = ev.bookmarked;
+        updatedEvent.preference!.preference = ev.action;
         filteredEventsList![index] = updatedEvent;
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       }
     });
 

@@ -346,10 +346,10 @@ class _AccountsScreenState extends State<AccountsScreen> {
                         width: 2,
                         color: ColorStyle.secondaryTextColor.withOpacity(0.2),
                       )),
-                  child: Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         "Alerts",
                         style: TextStyle(
                             color: ColorStyle.primaryTextColor,

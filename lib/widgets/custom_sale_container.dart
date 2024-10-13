@@ -1,9 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eventify/constants/route_keys.dart';
-import 'package:eventify/models/api_models/event_response/event.dart';
 import 'package:eventify/models/api_models/sale_response/sale.dart';
 import 'package:eventify/models/screen_args/create_sale_args.dart';
-import 'package:eventify/models/screen_args/detail_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:flutter/material.dart';
@@ -131,31 +129,31 @@ class CustomSaleContainer extends StatelessWidget {
     );
   }
 
-    _buildPriceCard() {
-      return Container(
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-            color: ColorStyle.primaryColor.withOpacity(0.70),
-            borderRadius: BorderRadius.circular(8)),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.sell_outlined,
-                color: ColorStyle.accentColor, size: 14),
-            const SizedBox(
-              width: 3,
-            ),
-            Text(
-              sale.discountDescription ?? "",
-              style: const TextStyle(
-                  color: ColorStyle.accentColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600),
-            ),
-          ],
-        ),
-      );
-    }
+  _buildPriceCard() {
+    return Container(
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+          color: ColorStyle.primaryColor.withOpacity(0.70),
+          borderRadius: BorderRadius.circular(8)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.sell_outlined,
+              color: ColorStyle.accentColor, size: 14),
+          const SizedBox(
+            width: 3,
+          ),
+          Text(
+            sale.discountDescription ?? "",
+            style: const TextStyle(
+                color: ColorStyle.accentColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
 
   _buildSaveCard() {
     return GestureDetector(

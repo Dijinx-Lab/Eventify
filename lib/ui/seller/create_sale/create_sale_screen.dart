@@ -18,7 +18,6 @@ import 'package:eventify/ui/seller/create_sale/step_two/sale_step_two.dart';
 import 'package:eventify/utils/loading_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 

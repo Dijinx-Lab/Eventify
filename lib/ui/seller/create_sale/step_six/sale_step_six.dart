@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:eventify/models/screen_args/sale_args.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class SaleStepSix extends StatefulWidget {

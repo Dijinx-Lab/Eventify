@@ -5,21 +5,21 @@ import 'package:eventify/models/api_models/event_response/preference.dart';
 import 'package:eventify/models/api_models/event_response/stats.dart';
 
 class Sale {
-  final String? id;
-  final bool? listingVisibile;
-  final String? name;
-  final String? description;
-  final String? startDateTime;
-  final String? endDateTime;
-  final String? linkToStores;
-  final String? website;
-  final String? discountDescription;
-  final List<String>? images;
-  final Contact? contact;
-  final Stats? stats;
-  final DateTime? approvedOn;
-  final bool? myEvent;
-  final Preference? preference;
+  String? id;
+  bool? listingVisibile;
+  String? name;
+  String? description;
+  String? startDateTime;
+  String? endDateTime;
+  String? linkToStores;
+  String? website;
+  String? discountDescription;
+  List<String>? images;
+  Contact? contact;
+  Stats? stats;
+  DateTime? approvedOn;
+  bool? myEvent;
+  Preference? preference;
 
   Sale({
     this.id,

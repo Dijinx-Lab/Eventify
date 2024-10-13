@@ -10,9 +10,13 @@ import 'package:flutter_svg/svg.dart';
 class UserContactListSheet extends StatefulWidget {
   final String filter;
   final String eventId;
+  final bool sale;
 
   const UserContactListSheet(
-      {super.key, required this.filter, required this.eventId});
+      {super.key,
+      required this.filter,
+      required this.eventId,
+      required this.sale});
 
   @override
   State<UserContactListSheet> createState() => _UserContactListSheetState();
@@ -33,7 +37,11 @@ class _UserContactListSheetState extends State<UserContactListSheet> {
       isLoading = true;
     });
     StatsService()
-        .getStatsUsers(widget.filter, widget.eventId)
+        .getStatsUsers(
+      widget.filter,
+      widget.eventId,
+      widget.sale,
+    )
         .then((value) async {
       setState(() {
         isLoading = false;
@@ -119,10 +127,12 @@ class _UserContactListSheetState extends State<UserContactListSheet> {
                                   const SizedBox(
                                     height: 10,
                                   ),
-                                  const Text(
-                                    "Currently there are no impressions on this event",
+                                  Text(
+                                    widget.sale
+                                        ? "Currently there are no impressions on this sale"
+                                        : "Currently there are no impressions on this event",
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 16,
                                         color: ColorStyle.secondaryTextColor),
                                   ),
@@ -135,7 +145,7 @@ class _UserContactListSheetState extends State<UserContactListSheet> {
                                 itemBuilder: (context, index) => InkWell(
                                   onTap: () {
                                     FlutterClipboard.copy(
-                                        "Name: ${contacts?[index].firstName} ${contacts?[index].lastName}\nEmail: ${contacts?[index].email ?? "N/A"}\nPhone: ${contacts?[index].phone == null ? "N/A" : "${contacts?[index].countryCode} ${contacts?[index].phone}"}");
+                                        "Name: ${contacts?[index].firstName} ${contacts?[index].lastName ?? ""}\nEmail: ${contacts?[index].email ?? "N/A"}\nPhone: ${contacts?[index].phone == null ? "N/A" : "${contacts?[index].countryCode} ${contacts?[index].phone}"}");
                                   },
                                   child: Row(
                                     crossAxisAlignment:
@@ -155,7 +165,7 @@ class _UserContactListSheetState extends State<UserContactListSheet> {
                                                 ),
                                                 const SizedBox(width: 10),
                                                 Text(
-                                                  "${contacts?[index].firstName} ${contacts?[index].lastName}",
+                                                  "${contacts?[index].firstName} ${contacts?[index].lastName ?? ""}",
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   style: const TextStyle(
@@ -232,8 +242,7 @@ class _UserContactListSheetState extends State<UserContactListSheet> {
                                         ),
                                       ),
                                       const Padding(
-                                        padding:
-                                            EdgeInsets.only(top: 8.0),
+                                        padding: EdgeInsets.only(top: 8.0),
                                         child: Icon(
                                           Icons.copy_all,
                                           color: ColorStyle.primaryColor,

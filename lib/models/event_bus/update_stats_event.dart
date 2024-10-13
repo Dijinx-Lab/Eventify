@@ -4,5 +4,7 @@ class UpdateStatsEvent {
   final Stats? stats;
   final String id;
   final bool? bookmarked;
-  UpdateStatsEvent({required this.id, this.stats, this.bookmarked});
+  final String? action;
+  UpdateStatsEvent(
+      {required this.id, this.stats, this.bookmarked, this.action});
 }

@@ -107,7 +107,7 @@ class CustomRoutes {
             builder: (_) =>
                 SaleDetailScreen(args: settings.arguments as CreateSaleArgs));
       case alertsRoute:
-        return MaterialPageRoute(builder: (_) => AlertsScreen());
+        return MaterialPageRoute(builder: (_) => const AlertsScreen());
       default:
         return MaterialPageRoute(
             builder: (_) =>

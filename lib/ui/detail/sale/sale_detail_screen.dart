@@ -13,6 +13,8 @@ import 'package:eventify/models/screen_args/create_sale_args.dart';
 import 'package:eventify/services/sale_service.dart';
 import 'package:eventify/services/stats_service.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/ui/discover/sales_discover_screen.dart';
+import 'package:eventify/ui/saved/saved_base_screen.dart';
 import 'package:eventify/ui/seller/base/base_seller_screen.dart';
 import 'package:eventify/utils/loading_utils.dart';
 import 'package:eventify/utils/pref_utils.dart';
@@ -23,7 +25,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -56,13 +57,12 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
       action = sale.preference!.preference;
       bookmarked = sale.preference!.bookmarked;
     }
-    // final jsonDescription = json.decode(event.description ?? "");
-    // _controller.document = Document.fromJson(jsonDescription);
+
     _initializeDocument();
-    // BaseSellerScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
-    //   // event.stats = ev.stats;
-    //   setState(() {});
-    // });
+    BaseSellerScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
+      // event.stats = ev.stats;
+      setState(() {});
+    });
   }
 
   @override
@@ -91,24 +91,25 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
   //   }
   // }
 
-  // _saveEventPrefs() async {
-  //   if (event.myEvent ?? false) {
-  //     return;
-  //   }
-  //   StatsService().updateStats(action, bookmarked, event.id!);
-  //   SavedScreen.eventBus.fire(UpdateStatsEvent(
-  //     id: event.id!,
-  //     bookmarked: bookmarked,
-  //   ));
-  //   DiscoverScreen.eventBus.fire(UpdateStatsEvent(
-  //     id: event.id!,
-  //     bookmarked: bookmarked,
-  //   ));
-  //   // AlertsScreen.eventBus.fire(UpdateStatsEvent(
-  //   //   id: event.id!,
-  //   //   bookmarked: bookmarked,
-  //   // ));
-  // }
+  _saveEventPrefs() async {
+    if (sale.myEvent ?? false) {
+      return;
+    }
+    StatsService().updateStats(
+      action,
+      bookmarked,
+      sale.id!,
+      sale: true,
+    );
+    SavedBaseScreen.eventBus.fire(
+        UpdateStatsEvent(id: sale.id!, bookmarked: bookmarked, action: action));
+    SalesDiscoverScreen.eventBus.fire(
+        UpdateStatsEvent(id: sale.id!, bookmarked: bookmarked, action: action));
+    // AlertsScreen.eventBus.fire(UpdateStatsEvent(
+    //   id: event.id!,
+    //   bookmarked: bookmarked,
+    // ));
+  }
 
   launchSms() async {
     final Uri launchUri = Uri(
@@ -152,6 +153,15 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
               const SnackBar(content: Text("Whatsapp not installed")));
         }
       }
+    }
+  }
+
+  _launchUrl(String url) async {
+    Uri launchableUrl = Uri.parse(url);
+    if (await canLaunchUrl(launchableUrl)) {
+      await launchUrl(launchableUrl, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $launchableUrl';
     }
   }
 
@@ -209,7 +219,7 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
           title: const Text("Details"),
           leading: IconButton(
             onPressed: () {
-              // _saveEventPrefs();
+              _saveEventPrefs();
               Navigator.of(context).pop();
             },
             icon: const Icon(
@@ -217,15 +227,73 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
               color: ColorStyle.secondaryTextColor,
             ),
           ),
+          // actions: [
+          //   Padding(
+          //     padding: const EdgeInsets.only(right: 15),
+          //     child: IconButton(
+          //         onPressed: () {
+          //           _openOptionsSheet();
+          //         },
+          //         icon: const Icon(Icons.menu)),
+          //   ),
+          // ],
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 15),
-              child: IconButton(
-                  onPressed: () {
-                    _openOptionsSheet();
-                  },
-                  icon: const Icon(Icons.menu)),
-            ),
+            PrefUtils().getIsAppTypeCustomer
+                // ? Container()
+                ? AbsorbPointer(
+                    absorbing: (sale.myEvent ?? false),
+                    child: Opacity(
+                      opacity: (sale.myEvent ?? false) ? 0.4 : 1,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (bookmarked != null) {
+                              bookmarked = !bookmarked!;
+                            } else {
+                              bookmarked = true;
+                            }
+                            ToastUtils.showCustomSnackbar(
+                              context: context,
+                              millisecond: 2000,
+                              icon: Icon(
+                                bookmarked!
+                                    ? Icons.favorite
+                                    : Icons.favorite_outline,
+                                color: ColorStyle.whiteColor,
+                              ),
+                              contentText: bookmarked!
+                                  ? "Sale saved to favourites"
+                                  : "Sale removed from favourites",
+                            );
+                          });
+
+                          // _saveEventPrefs();
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 20),
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: ColorStyle.primaryColor.withOpacity(0.60),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                              (bookmarked ?? false)
+                                  ? Icons.bookmark
+                                  : Icons.bookmark_outline,
+                              color: ColorStyle.accentColor,
+                              size: 18),
+                        ),
+                      ),
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(right: 15),
+                    child: IconButton(
+                        onPressed: () {
+                          _openOptionsSheet();
+                        },
+                        icon: const Icon(Icons.menu)),
+                  ),
           ],
         ),
         body: Stack(
@@ -346,9 +414,13 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                     ),
 
                     const SizedBox(height: 15),
+                    // if (
                     (sale.myEvent ?? false) &&
                             PrefUtils().getIsAppTypeCustomer == false
-                        ? Column(
+                        ?
+                        // )
+
+                        Column(
                             children: [
                               Row(
                                 children: [
@@ -394,7 +466,7 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                                                         FontWeight.bold),
                                               ),
                                               const Text(
-                                                " people viewed this listing",
+                                                " people viewed",
                                                 style: TextStyle(
                                                     color:
                                                         ColorStyle.primaryColor,
@@ -408,9 +480,192 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                                       ),
                                     ),
                                   ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _openContactsBottomSheet(
+                                          context, "bookmarked"),
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 10, top: 10),
+                                        padding: const EdgeInsets.only(
+                                            top: 15, bottom: 15, left: 10),
+                                        decoration: BoxDecoration(
+                                            color: ColorStyle.accentColor,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  offset: const Offset(0, 4),
+                                                  blurRadius: 4,
+                                                  color: ColorStyle.blackColor
+                                                      .withOpacity(0.25))
+                                            ]),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.bookmark_add_outlined,
+                                              color: ColorStyle.primaryColor,
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  (sale.stats?.bookmarked ?? 0)
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                const Text(
+                                                  " people saved",
+                                                  style: TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _openContactsBottomSheet(
+                                          context, "interested"),
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                            right: 10, top: 10),
+                                        padding: const EdgeInsets.only(
+                                            top: 15, bottom: 15, left: 10),
+                                        decoration: BoxDecoration(
+                                            color: ColorStyle.accentColor,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  offset: const Offset(0, 4),
+                                                  blurRadius: 4,
+                                                  color: ColorStyle.blackColor
+                                                      .withOpacity(0.25))
+                                            ]),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.lightbulb_circle_outlined,
+                                              color: ColorStyle.primaryColor,
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  (sale.stats?.interested ?? 0)
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                const Text(
+                                                  " are interested",
+                                                  style: TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _openContactsBottomSheet(
+                                          context, "going"),
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                            left: 10, top: 10),
+                                        padding: const EdgeInsets.only(
+                                            top: 15, bottom: 15, left: 10),
+                                        decoration: BoxDecoration(
+                                            color: ColorStyle.accentColor,
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  offset: const Offset(0, 4),
+                                                  blurRadius: 4,
+                                                  color: ColorStyle.blackColor
+                                                      .withOpacity(0.25))
+                                            ]),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.done_all_outlined,
+                                              color: ColorStyle.primaryColor,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  (sale.stats?.going ?? 0)
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                const Text(
+                                                  " will shop",
+                                                  style: TextStyle(
+                                                      color: ColorStyle
+                                                          .primaryColor,
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              )
                             ],
                           )
                         : AbsorbPointer(
@@ -460,7 +715,7 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                                         ),
                                         const SizedBox(width: 10),
                                         const Text(
-                                          "I am interested in this event",
+                                          "I am interested in this sale",
                                           style: TextStyle(
                                               color: ColorStyle.whiteColor,
                                               fontSize: 14,
@@ -506,7 +761,7 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                                         ),
                                         const SizedBox(width: 10),
                                         const Text(
-                                          "I am going to this event",
+                                          "I am shopping in this sale",
                                           style: TextStyle(
                                               color: ColorStyle.whiteColor,
                                               fontSize: 14,
@@ -655,114 +910,122 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                         Row(
                           children: [
                             Expanded(
-                              child: Container(
-                                height: 85,
-                                width: double.maxFinite,
-                                padding: const EdgeInsets.only(
-                                    top: 15, bottom: 15, left: 10),
-                                decoration: BoxDecoration(
-                                    color: ColorStyle.whiteColor,
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                          offset: const Offset(0, 4),
-                                          blurRadius: 4,
-                                          color: ColorStyle.blackColor
-                                              .withOpacity(0.25))
-                                    ]),
-                                child: const Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Online Store",
-                                        style: TextStyle(
-                                            color: ColorStyle.primaryTextColor,
-                                            fontSize: 12),
-                                      ),
-                                      SizedBox(height: 15),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(Icons.shopping_bag_outlined,
+                              child: GestureDetector(
+                                onTap: () => _launchUrl(sale.website!),
+                                child: Container(
+                                  height: 85,
+                                  width: double.maxFinite,
+                                  padding: const EdgeInsets.only(
+                                      top: 15, bottom: 15, left: 10),
+                                  decoration: BoxDecoration(
+                                      color: ColorStyle.whiteColor,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            offset: const Offset(0, 4),
+                                            blurRadius: 4,
+                                            color: ColorStyle.blackColor
+                                                .withOpacity(0.25))
+                                      ]),
+                                  child: const Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Online Store",
+                                          style: TextStyle(
                                               color:
-                                                  ColorStyle.primaryColorLight,
-                                              size: 20),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(
-                                            "View Store",
-                                            style: TextStyle(
-                                              color: ColorStyle.primaryColor,
-                                              fontSize: 13,
-                                              decoration:
-                                                  TextDecoration.underline,
-                                              decorationColor:
-                                                  ColorStyle.primaryColor,
+                                                  ColorStyle.primaryTextColor,
+                                              fontSize: 12),
+                                        ),
+                                        SizedBox(height: 15),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.shopping_bag_outlined,
+                                                color: ColorStyle
+                                                    .primaryColorLight,
+                                                size: 20),
+                                            SizedBox(
+                                              width: 10,
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ]),
+                                            Text(
+                                              "View Store",
+                                              style: TextStyle(
+                                                color: ColorStyle.primaryColor,
+                                                fontSize: 13,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                decorationColor:
+                                                    ColorStyle.primaryColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ]),
+                                ),
                               ),
                             ),
                             if (sale.website != null &&
                                 sale.website != "" &&
                                 sale.linkToStores != null &&
                                 sale.linkToStores != "")
-                              SizedBox(width: 20),
+                              const SizedBox(width: 20),
                             Expanded(
-                              child: Container(
-                                height: 85,
-                                width: double.maxFinite,
-                                padding: const EdgeInsets.only(
-                                    top: 15, bottom: 15, left: 10),
-                                decoration: BoxDecoration(
-                                    color: ColorStyle.whiteColor,
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                          offset: const Offset(0, 4),
-                                          blurRadius: 4,
-                                          color: ColorStyle.blackColor
-                                              .withOpacity(0.25))
-                                    ]),
-                                child: const Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Store Locations",
-                                        style: TextStyle(
-                                            color: ColorStyle.primaryTextColor,
-                                            fontSize: 12),
-                                      ),
-                                      SizedBox(height: 15),
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(Icons.pin_drop_outlined,
+                              child: GestureDetector(
+                                onTap: () => _launchUrl(sale.linkToStores!),
+                                child: Container(
+                                  height: 85,
+                                  width: double.maxFinite,
+                                  padding: const EdgeInsets.only(
+                                      top: 15, bottom: 15, left: 10),
+                                  decoration: BoxDecoration(
+                                      color: ColorStyle.whiteColor,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            offset: const Offset(0, 4),
+                                            blurRadius: 4,
+                                            color: ColorStyle.blackColor
+                                                .withOpacity(0.25))
+                                      ]),
+                                  child: const Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Store Locations",
+                                          style: TextStyle(
                                               color:
-                                                  ColorStyle.primaryColorLight,
-                                              size: 20),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(
-                                            "View Locations",
-                                            style: TextStyle(
-                                              color: ColorStyle.primaryColor,
-                                              fontSize: 13,
-                                              decoration:
-                                                  TextDecoration.underline,
-                                              decorationColor:
-                                                  ColorStyle.primaryColor,
+                                                  ColorStyle.primaryTextColor,
+                                              fontSize: 12),
+                                        ),
+                                        SizedBox(height: 15),
+                                        Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.pin_drop_outlined,
+                                                color: ColorStyle
+                                                    .primaryColorLight,
+                                                size: 20),
+                                            SizedBox(
+                                              width: 10,
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ]),
+                                            Text(
+                                              "View Locations",
+                                              style: TextStyle(
+                                                color: ColorStyle.primaryColor,
+                                                fontSize: 13,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                decorationColor:
+                                                    ColorStyle.primaryColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ]),
+                                ),
                               ),
                             ),
                           ],
@@ -1044,6 +1307,7 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
       builder: (BuildContext context) => UserContactListSheet(
         filter: filter,
         eventId: sale.id!,
+        sale: true,
       ),
     );
   }
@@ -1132,11 +1396,14 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                         color: ColorStyle.primaryColor,
                         borderRadius: BorderRadius.circular(12)),
                     child: const Center(
-                      child: Text("Cancel",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: ColorStyle.whiteColor)),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: ColorStyle.whiteColor,
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -1158,7 +1425,6 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
           SaleResponse apiResponse = value.snapshot;
           if (apiResponse.success ?? false) {
             BaseSellerScreen.eventBus.fire(RefreshMyEvents());
-
             setState(() {
               sale = apiResponse.data!.sale!;
             });

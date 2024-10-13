@@ -16,8 +16,8 @@ import 'package:eventify/models/screen_args/detail_args.dart';
 import 'package:eventify/services/event_service.dart';
 import 'package:eventify/services/stats_service.dart';
 import 'package:eventify/styles/color_style.dart';
-import 'package:eventify/ui/discover/discover_screen.dart';
-import 'package:eventify/ui/saved/saved_screen.dart';
+import 'package:eventify/ui/discover/event_discover_screen.dart';
+import 'package:eventify/ui/saved/saved_base_screen.dart';
 import 'package:eventify/ui/seller/base/base_seller_screen.dart';
 import 'package:eventify/utils/loading_utils.dart';
 import 'package:eventify/utils/pref_utils.dart';
@@ -103,14 +103,10 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       return;
     }
     StatsService().updateStats(action, bookmarked, event.id!);
-    SavedScreen.eventBus.fire(UpdateStatsEvent(
-      id: event.id!,
-      bookmarked: bookmarked,
-    ));
-    DiscoverScreen.eventBus.fire(UpdateStatsEvent(
-      id: event.id!,
-      bookmarked: bookmarked,
-    ));
+    SavedBaseScreen.eventBus.fire(UpdateStatsEvent(
+        id: event.id!, bookmarked: bookmarked, action: action));
+    EventDiscoverScreen.eventBus.fire(UpdateStatsEvent(
+        id: event.id!, bookmarked: bookmarked, action: action));
     // AlertsScreen.eventBus.fire(UpdateStatsEvent(
     //   id: event.id!,
     //   bookmarked: bookmarked,
@@ -1393,6 +1389,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       builder: (BuildContext context) => UserContactListSheet(
         filter: filter,
         eventId: event.id!,
+        sale: false,
       ),
     );
   }

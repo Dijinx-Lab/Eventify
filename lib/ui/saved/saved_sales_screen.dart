@@ -1,73 +1,68 @@
-import 'package:eventify/constants/route_keys.dart';
 import 'package:eventify/models/api_models/sale_response/sale.dart';
 import 'package:eventify/models/api_models/sale_response/sale_list_response.dart';
-import 'package:eventify/models/event_bus/refresh_discover_event.dart';
-import 'package:eventify/models/event_bus/refresh_my_events.dart';
-import 'package:eventify/models/screen_args/create_sale_args.dart';
+import 'package:eventify/models/event_bus/refresh_saved_events.dart';
+import 'package:eventify/models/event_bus/update_stats_event.dart';
 import 'package:eventify/services/sale_service.dart';
 import 'package:eventify/styles/color_style.dart';
-import 'package:eventify/ui/seller/base/base_seller_screen.dart';
+import 'package:eventify/ui/saved/saved_base_screen.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
 import 'package:eventify/widgets/custom_sale_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class SellerSalesScreen extends StatefulWidget {
-  const SellerSalesScreen({super.key});
+class SavedSalesScreen extends StatefulWidget {
+  const SavedSalesScreen({super.key});
 
   @override
-  State<SellerSalesScreen> createState() => _SellerSalesScreenState();
+  State<SavedSalesScreen> createState() => _SavedSalesScreenState();
 }
 
-class _SellerSalesScreenState extends State<SellerSalesScreen> {
-  List<Sale>? salesList;
-  bool isLoading = true;
-  SaleService saleService = SaleService();
-  bool isFloatingShown = false;
+class _SavedSalesScreenState extends State<SavedSalesScreen> {
+  List<Sale>? eventsList;
+  bool isEventsLoading = true;
+  SaleService eventService = SaleService();
 
   @override
   void initState() {
-    _getSalesList();
-    _showAfterDelay();
+    _getSavedList();
     super.initState();
-
-    BaseSellerScreen.eventBus.on<RefreshDiscoverEvents>().listen((ev) {
+    SavedBaseScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
       if (mounted) {
-        _getSalesList();
+        if (eventsList == null || eventsList!.isEmpty || !mounted) {
+          return;
+        }
+        int index = eventsList!.indexWhere((element) => element.id == ev.id);
+
+        if (index != -1) {
+          eventsList!.removeAt(index);
+          setState(() {});
+        }
+      }
+    });
+
+    SavedBaseScreen.eventBus.on<RefreshSavedEvents>().listen((ev) {
+      if (mounted) {
+        _getSavedList();
       }
     });
   }
 
-  _showAfterDelay() {
-    Future.delayed(const Duration(milliseconds: 500)).then((value) {
-      setState(() {
-        isFloatingShown = true;
-      });
-    });
-
-    BaseSellerScreen.eventBus.on<RefreshMyEvents>().listen((event) {
-      if (mounted) {
-        _getSalesList();
-      }
-    });
-  }
-
-  _getSalesList() {
+  _getSavedList() {
     setState(() {
-      isLoading = true;
-      salesList = null;
+      isEventsLoading = true;
+      eventsList = null;
     });
-    saleService.getSales("user").then((value) async {
+    eventService.getSales("bookmarked").then((value) async {
       setState(() {
-        isLoading = false;
+        isEventsLoading = false;
       });
 
       if (value.error == null) {
         SaleListResponse apiResponse = value.snapshot;
         if (apiResponse.success ?? false) {
           setState(() {
-            salesList = apiResponse.data?.sales ?? [];
+            eventsList = apiResponse.data?.sales ?? [];
           });
         } else {
           ToastUtils.showCustomSnackbar(
@@ -95,72 +90,28 @@ class _SellerSalesScreenState extends State<SellerSalesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: !isFloatingShown
-          ? null
-          : Padding(
-              padding: const EdgeInsets.only(bottom: 15),
-              child: FloatingActionButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(createSaleRoute,
-                      arguments: CreateSaleArgs(sale: null));
-                },
-                backgroundColor: ColorStyle.primaryColor,
-                child: const Icon(
-                  Icons.add,
-                  size: 35,
-                  color: ColorStyle.whiteColor,
-                ),
-              ),
-            ),
-      body: isLoading
+      body: isEventsLoading
           ? const Center(child: CircularProgressIndicator())
-          : salesList == null
+          : eventsList == null
               ? _errorCard()
-              : salesList!.isEmpty
+              : eventsList!.isEmpty
                   ? _emptyCaseCard()
                   : ListView.builder(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      itemCount: salesList!.length,
+                      itemCount: eventsList!.length,
                       itemBuilder: (context, index) {
                         return CustomSaleContainer(
-                          sale: salesList![index],
-                          onBookmarked: (eventId) {},
+                          sale: eventsList![index],
+                          onBookmarked: (eventId) {
+                            // int index = eventsList!
+                            //     .indexWhere((event) => event.id == eventId);
+                            // if (index != -1) {
+                            //   eventsList![index].preference!.bookmarked =
+                            //       !eventsList![index].preference!.bookmarked!;
+                            //   _saveEventPrefs(eventsList![index]);
+                            // }
+                          },
                         );
                       }),
-    );
-  }
-
-  _emptyCaseCard() {
-    return Center(
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            SizedBox(
-              height: 200,
-              width: 200,
-              child: SvgPicture.asset(
-                'assets/svgs/ic_empty_search.svg',
-                fit: BoxFit.contain,
-              ),
-            ),
-            const Text(
-              "You haven't posted any sales yet",
-              textAlign: TextAlign.center,
-              style:
-                  TextStyle(fontSize: 16, color: ColorStyle.secondaryTextColor),
-            ),
-            const SizedBox(height: 25),
-            SizedBox(
-                width: 200,
-                height: 40,
-                child: CustomRoundedButton("Refresh", () {
-                  _getSalesList();
-                }))
-          ],
-        ),
-      ),
     );
   }
 
@@ -190,7 +141,41 @@ class _SellerSalesScreenState extends State<SellerSalesScreen> {
                 width: 200,
                 height: 40,
                 child: CustomRoundedButton("Refresh", () {
-                  _getSalesList();
+                  _getSavedList();
+                }))
+          ],
+        ),
+      ),
+    );
+  }
+
+  _emptyCaseCard() {
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            SizedBox(
+              height: 200,
+              width: 200,
+              child: SvgPicture.asset(
+                'assets/svgs/ic_empty_search.svg',
+                fit: BoxFit.contain,
+              ),
+            ),
+            const Text(
+              "Currently there are no saved sales",
+              textAlign: TextAlign.center,
+              style:
+                  TextStyle(fontSize: 16, color: ColorStyle.secondaryTextColor),
+            ),
+            const SizedBox(height: 25),
+            SizedBox(
+                width: 200,
+                height: 40,
+                child: CustomRoundedButton("Refresh", () {
+                  _getSavedList();
                 }))
           ],
         ),

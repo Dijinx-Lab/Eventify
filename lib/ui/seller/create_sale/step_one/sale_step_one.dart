@@ -1,7 +1,6 @@
 import 'package:eventify/models/screen_args/sale_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -88,7 +87,7 @@ class _SaleStepOneState extends State<SaleStepOne> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 10),
-        Text(
+        const Text(
           "Starting",
           style: TextStyle(
               fontSize: 16,
@@ -132,7 +131,7 @@ class _SaleStepOneState extends State<SaleStepOne> {
           ],
         ),
         const SizedBox(height: 30),
-        Text(
+        const Text(
           "Ending",
           style: TextStyle(
               fontSize: 16,

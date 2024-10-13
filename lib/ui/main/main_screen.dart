@@ -9,8 +9,9 @@ import 'package:eventify/models/screen_args/splash_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/ui/accounts/accounts_screen.dart';
 import 'package:eventify/ui/alerts/alerts_screen.dart';
-import 'package:eventify/ui/discover/discover_screen.dart';
-import 'package:eventify/ui/saved/saved_screen.dart';
+import 'package:eventify/ui/discover/event_discover_screen.dart';
+import 'package:eventify/ui/discover/sales_discover_screen.dart';
+import 'package:eventify/ui/saved/saved_base_screen.dart';
 import 'package:eventify/utils/notification_utils.dart';
 import 'package:eventify/utils/pref_utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -35,9 +36,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   int _index = 0;
 
   final List<Widget> _widgets = const [
-    DiscoverScreen(),
-    SavedScreen(),
-    AlertsScreen(),
+    EventDiscoverScreen(),
+    SalesDiscoverScreen(),
+    SavedBaseScreen(),
     AccountsScreen()
   ];
 
@@ -113,7 +114,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   void _performNotificationTap(String action, String id) {
     Future.delayed(const Duration(milliseconds: 500)).then((value) {
       if (action == "open_alerts") {
-        DiscoverScreen.eventBus.fire(RefreshDiscoverEvents());
+        EventDiscoverScreen.eventBus.fire(RefreshDiscoverEvents());
         AlertsScreen.eventBus.fire(RefreshDiscoverEvents());
       } else if (action == "open_lister_events") {
         PrefUtils().setIsAppTypeCustomer = false;
@@ -161,7 +162,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               _index = value;
 
               if (_index == 1) {
-                SavedScreen.eventBus.fire(RefreshSavedEvents());
+                SavedBaseScreen.eventBus.fire(RefreshSavedEvents());
               }
 
               setState(() {});

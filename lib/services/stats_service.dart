@@ -10,9 +10,10 @@ import 'package:eventify/models/api_models/base_response/base_response.dart';
 
 class StatsService {
   Future<BaseResponse> updateStats(
-      String? preference, bool? bookmarked, String id) async {
+      String? preference, bool? bookmarked, String id,
+      {bool sale = false}) async {
     try {
-      var url = Uri.parse("${ApiConstants.updateStats}?id=$id");
+      var url = Uri.parse("${ApiConstants.updateStats}?id=$id&sale=$sale");
 
       var params = HashMap();
       if (bookmarked != null) {
@@ -27,6 +28,8 @@ class StatsService {
         "Authorization": "Bearer ${PrefUtils().getToken}",
         "content-type": "application/json"
       });
+
+      print(response.body);
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
@@ -43,17 +46,16 @@ class StatsService {
   Future<BaseResponse> getStatsUsers(
     String filter,
     String eventId,
+    bool sale,
   ) async {
     try {
-      var url =
-          Uri.parse("${ApiConstants.getStatsUsers}?id=$eventId&filter=$filter");
+      var url = Uri.parse(
+          "${ApiConstants.getStatsUsers}?id=$eventId&filter=$filter&sale=$sale");
 
       http.Response response = await http.get(url, headers: {
         "Authorization": "Bearer ${PrefUtils().getToken}",
         "content-type": "application/json"
       });
-
-      
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);

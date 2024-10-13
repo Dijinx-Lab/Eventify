@@ -5,7 +5,6 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:eventify/models/screen_args/sale_args.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
