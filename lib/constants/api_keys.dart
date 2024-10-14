@@ -1,6 +1,6 @@
 class ApiConstants {
-  static const String baseUrl = "http://192.168.100.228:3000/api/v1/eventify";
-  // "https://eventify-server-sand.vercel.app/api/v1/eventify";
+  static const String baseUrl = "https://api.eventbazaar.info/api/v1/eventify";
+  //"http://192.168.100.228:3000/api/v1/eventify";
 
   static const String signIn = "$baseUrl/user/sign-in";
   static const String signOut = "$baseUrl/user/sign-out";
