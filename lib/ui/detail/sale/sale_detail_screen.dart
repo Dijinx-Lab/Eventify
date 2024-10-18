@@ -909,125 +909,130 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                       children: [
                         Row(
                           children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => _launchUrl(sale.website!),
-                                child: Container(
-                                  height: 85,
-                                  width: double.maxFinite,
-                                  padding: const EdgeInsets.only(
-                                      top: 15, bottom: 15, left: 10),
-                                  decoration: BoxDecoration(
-                                      color: ColorStyle.whiteColor,
-                                      borderRadius: BorderRadius.circular(12),
-                                      boxShadow: [
-                                        BoxShadow(
-                                            offset: const Offset(0, 4),
-                                            blurRadius: 4,
-                                            color: ColorStyle.blackColor
-                                                .withOpacity(0.25))
-                                      ]),
-                                  child: const Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Online Store",
-                                          style: TextStyle(
-                                              color:
-                                                  ColorStyle.primaryTextColor,
-                                              fontSize: 12),
-                                        ),
-                                        SizedBox(height: 15),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(Icons.shopping_bag_outlined,
-                                                color: ColorStyle
-                                                    .primaryColorLight,
-                                                size: 20),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Text(
-                                              "View Store",
-                                              style: TextStyle(
-                                                color: ColorStyle.primaryColor,
-                                                fontSize: 13,
-                                                decoration:
-                                                    TextDecoration.underline,
-                                                decorationColor:
-                                                    ColorStyle.primaryColor,
+                            if (sale.website != null && sale.website != "")
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => _launchUrl(sale.website!),
+                                  child: Container(
+                                    height: 85,
+                                    width: double.maxFinite,
+                                    padding: const EdgeInsets.only(
+                                        top: 15, bottom: 15, left: 10),
+                                    decoration: BoxDecoration(
+                                        color: ColorStyle.whiteColor,
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              offset: const Offset(0, 4),
+                                              blurRadius: 4,
+                                              color: ColorStyle.blackColor
+                                                  .withOpacity(0.25))
+                                        ]),
+                                    child: const Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Online Store",
+                                            style: TextStyle(
+                                                color:
+                                                    ColorStyle.primaryTextColor,
+                                                fontSize: 12),
+                                          ),
+                                          SizedBox(height: 15),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(Icons.shopping_bag_outlined,
+                                                  color: ColorStyle
+                                                      .primaryColorLight,
+                                                  size: 20),
+                                              SizedBox(
+                                                width: 10,
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ]),
+                                              Text(
+                                                "View Store",
+                                                style: TextStyle(
+                                                  color:
+                                                      ColorStyle.primaryColor,
+                                                  fontSize: 13,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  decorationColor:
+                                                      ColorStyle.primaryColor,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ]),
+                                  ),
                                 ),
                               ),
-                            ),
                             if (sale.website != null &&
                                 sale.website != "" &&
                                 sale.linkToStores != null &&
                                 sale.linkToStores != "")
                               const SizedBox(width: 20),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => _launchUrl(sale.linkToStores!),
-                                child: Container(
-                                  height: 85,
-                                  width: double.maxFinite,
-                                  padding: const EdgeInsets.only(
-                                      top: 15, bottom: 15, left: 10),
-                                  decoration: BoxDecoration(
-                                      color: ColorStyle.whiteColor,
-                                      borderRadius: BorderRadius.circular(12),
-                                      boxShadow: [
-                                        BoxShadow(
-                                            offset: const Offset(0, 4),
-                                            blurRadius: 4,
-                                            color: ColorStyle.blackColor
-                                                .withOpacity(0.25))
-                                      ]),
-                                  child: const Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Store Locations",
-                                          style: TextStyle(
-                                              color:
-                                                  ColorStyle.primaryTextColor,
-                                              fontSize: 12),
-                                        ),
-                                        SizedBox(height: 15),
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(Icons.pin_drop_outlined,
-                                                color: ColorStyle
-                                                    .primaryColorLight,
-                                                size: 20),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Text(
-                                              "View Locations",
-                                              style: TextStyle(
-                                                color: ColorStyle.primaryColor,
-                                                fontSize: 13,
-                                                decoration:
-                                                    TextDecoration.underline,
-                                                decorationColor:
-                                                    ColorStyle.primaryColor,
+                            if (sale.linkToStores != null &&
+                                sale.linkToStores != "")
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => _launchUrl(sale.linkToStores!),
+                                  child: Container(
+                                    height: 85,
+                                    width: double.maxFinite,
+                                    padding: const EdgeInsets.only(
+                                        top: 15, bottom: 15, left: 10),
+                                    decoration: BoxDecoration(
+                                        color: ColorStyle.whiteColor,
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              offset: const Offset(0, 4),
+                                              blurRadius: 4,
+                                              color: ColorStyle.blackColor
+                                                  .withOpacity(0.25))
+                                        ]),
+                                    child: const Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Store Locations",
+                                            style: TextStyle(
+                                                color:
+                                                    ColorStyle.primaryTextColor,
+                                                fontSize: 12),
+                                          ),
+                                          SizedBox(height: 15),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(Icons.pin_drop_outlined,
+                                                  color: ColorStyle
+                                                      .primaryColorLight,
+                                                  size: 20),
+                                              SizedBox(
+                                                width: 10,
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ]),
+                                              Text(
+                                                "View Locations",
+                                                style: TextStyle(
+                                                  color:
+                                                      ColorStyle.primaryColor,
+                                                  fontSize: 13,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  decorationColor:
+                                                      ColorStyle.primaryColor,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ]),
+                                  ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ],
@@ -1075,9 +1080,8 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                                           width: 10,
                                         ),
                                         Text(
-                                          DateFormat('MMM d, y').format(
-                                              DateTime.parse(
-                                                  sale.startDateTime!)),
+                                          DateFormat('MMM d, y')
+                                              .format(sale.startDateTime!),
                                           style: const TextStyle(
                                               color:
                                                   ColorStyle.primaryTextColor,
@@ -1096,9 +1100,8 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                                           width: 10,
                                         ),
                                         Text(
-                                          DateFormat('h:mm a').format(
-                                              DateTime.parse(
-                                                  sale.startDateTime!)),
+                                          DateFormat('h:mm a')
+                                              .format(sale.startDateTime!),
                                           style: const TextStyle(
                                             color: ColorStyle.primaryTextColor,
                                             fontSize: 12,
@@ -1153,9 +1156,8 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                                           width: 10,
                                         ),
                                         Text(
-                                          DateFormat('MMM d, y').format(
-                                              DateTime.parse(
-                                                  sale.endDateTime!)),
+                                          DateFormat('MMM d, y')
+                                              .format(sale.endDateTime!),
                                           style: const TextStyle(
                                               color:
                                                   ColorStyle.primaryTextColor,
@@ -1174,9 +1176,8 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                                           width: 10,
                                         ),
                                         Text(
-                                          DateFormat('h:mm a').format(
-                                              DateTime.parse(
-                                                  sale.endDateTime!)),
+                                          DateFormat('h:mm a')
+                                              .format(sale.endDateTime!),
                                           style: const TextStyle(
                                             color: ColorStyle.primaryTextColor,
                                             fontSize: 12,
@@ -1312,19 +1313,19 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
     );
   }
 
-  void _openBottomSheet(BuildContext context, Widget sheet) async {
-    await showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(30.0),
-        ),
-      ),
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (BuildContext context) => sheet,
-    );
-  }
+  // void _openBottomSheet(BuildContext context, Widget sheet) async {
+  //   await showModalBottomSheet(
+  //     context: context,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(
+  //         top: Radius.circular(30.0),
+  //       ),
+  //     ),
+  //     isScrollControlled: true,
+  //     showDragHandle: true,
+  //     builder: (BuildContext context) => sheet,
+  //   );
+  // }
 
   _openOptionsSheet() {
     showCupertinoModalPopup(

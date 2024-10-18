@@ -37,7 +37,10 @@ class CustomEventContainer extends StatelessWidget {
                     width: double.maxFinite,
                     height: 160,
                     child: CachedNetworkImage(
-                        imageUrl: event.images?.first ?? "",
+                        imageUrl:
+                            (event.images != null && event.images!.isNotEmpty)
+                                ? event.images?.first ?? ""
+                                : "",
                         errorWidget: (context, url, error) {
                           return Container(
                             color: ColorStyle.secondaryTextColor,
@@ -144,7 +147,7 @@ class CustomEventContainer extends StatelessWidget {
             width: 3,
           ),
           Text(
-            event.priceStartsFrom == 0 && event.priceGoesUpto == 0
+            event.priceStartsFrom == '0' && event.priceGoesUpto == '0'
                 ? "Free"
                 : "Starts From Rs ${event.priceStartsFrom ?? 0}",
             style: const TextStyle(

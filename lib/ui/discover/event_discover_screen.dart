@@ -545,7 +545,7 @@ class _EventDiscoverScreenState extends State<EventDiscoverScreen> {
                                         selectedCity ?? "Loading...",
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                          color: ColorStyle.primaryTextColor,
+                                          color: ColorStyle.primaryColor,
                                           fontSize: 12,
                                         ),
                                       ),

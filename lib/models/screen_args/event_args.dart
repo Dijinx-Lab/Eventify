@@ -11,10 +11,10 @@ class EventArgs {
   String? city;
   double? latitude;
   double? longitude;
-  int? maxCapacity;
+  String? maxCapacity;
   String? priceType;
-  int? priceStartsFrom;
-  int? priceGoesUpto;
+  String? priceStartsFrom;
+  String? priceGoesUpto;
   List<String>? images;
   List<Pass>? passes;
   String? contactName;

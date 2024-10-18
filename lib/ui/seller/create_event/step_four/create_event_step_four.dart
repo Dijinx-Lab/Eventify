@@ -80,8 +80,8 @@ class _StepFourContainerState extends State<StepFourContainer> {
   _alertParentWidget() async {
     if (_groupValue != "") {
       if (_groupValue == "free") {
-        eventArgs.priceStartsFrom = 0;
-        eventArgs.priceGoesUpto = 0;
+        eventArgs.priceStartsFrom = '0';
+        eventArgs.priceGoesUpto = '0';
         eventArgs.priceType = "free";
         widget.onDataFilled(eventArgs, true);
       } else if (_groupValue == "paid" &&
@@ -89,8 +89,8 @@ class _StepFourContainerState extends State<StepFourContainer> {
           _goesUptoController.text != "" &&
           passes.isNotEmpty) {
         eventArgs.priceType = "paid";
-        eventArgs.priceStartsFrom = int.parse(_startsFromController.text);
-        eventArgs.priceGoesUpto = int.parse(_goesUptoController.text);
+        eventArgs.priceStartsFrom = _startsFromController.text;
+        eventArgs.priceGoesUpto = _goesUptoController.text;
         eventArgs.passes = passes;
         widget.onDataFilled(eventArgs, true);
       } else {

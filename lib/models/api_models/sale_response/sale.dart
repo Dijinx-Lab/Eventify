@@ -9,8 +9,8 @@ class Sale {
   bool? listingVisibile;
   String? name;
   String? description;
-  String? startDateTime;
-  String? endDateTime;
+  DateTime? startDateTime;
+  DateTime? endDateTime;
   String? linkToStores;
   String? website;
   String? discountDescription;
@@ -20,6 +20,8 @@ class Sale {
   DateTime? approvedOn;
   bool? myEvent;
   Preference? preference;
+  DateTime? createdOn;
+  DateTime? deletedOn;
 
   Sale({
     this.id,
@@ -37,6 +39,8 @@ class Sale {
     this.approvedOn,
     this.myEvent,
     this.preference,
+    this.createdOn,
+    this.deletedOn,
   });
 
   factory Sale.fromRawJson(String str) => Sale.fromJson(json.decode(str));
@@ -48,8 +52,12 @@ class Sale {
         listingVisibile: json["listing_visibile"],
         name: json["name"],
         description: json["description"],
-        startDateTime: json["start_date_time"],
-        endDateTime: json["end_date_time"],
+        startDateTime: json["start_date_time"] == null
+            ? null
+            : DateTime.parse(json["start_date_time"]),
+        endDateTime: json["end_date_time"] == null
+            ? null
+            : DateTime.parse(json["end_date_time"]),
         linkToStores: json["link_to_stores"],
         website: json["website"],
         discountDescription: json["discount_description"],
@@ -66,6 +74,12 @@ class Sale {
         preference: json["preference"] == null
             ? null
             : Preference.fromJson(json["preference"]),
+        createdOn: json["created_on"] == null
+            ? null
+            : DateTime.parse(json["created_on"]),
+        deletedOn: json["deleted_on"] == null
+            ? null
+            : DateTime.parse(json["deleted_on"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -73,8 +87,8 @@ class Sale {
         "listing_visibile": listingVisibile,
         "name": name,
         "description": description,
-        "start_date_time": startDateTime,
-        "end_date_time": endDateTime,
+        "start_date_time": startDateTime?.toIso8601String(),
+        "end_date_time": endDateTime?.toIso8601String(),
         "link_to_stores": linkToStores,
         "website": website,
         "discount_description": discountDescription,
@@ -85,5 +99,7 @@ class Sale {
         "approved_on": approvedOn?.toIso8601String(),
         "my_event": myEvent,
         "preference": preference?.toJson(),
+        "created_on": createdOn?.toIso8601String(),
+        "deleted_on": deletedOn?.toIso8601String(),
       };
 }

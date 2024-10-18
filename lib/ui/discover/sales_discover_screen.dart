@@ -2,9 +2,11 @@ import 'package:event_bus/event_bus.dart';
 import 'package:eventify/models/api_models/sale_response/sale.dart';
 import 'package:eventify/models/api_models/sale_response/sale_list_response.dart';
 import 'package:eventify/models/event_bus/update_stats_event.dart';
+import 'package:eventify/models/misc_models/sale_filter.dart';
 import 'package:eventify/services/sale_service.dart';
 import 'package:eventify/styles/color_style.dart';
 import 'package:eventify/utils/toast_utils.dart';
+import 'package:eventify/widgets/bottom_sheets/sale_filter_sheet.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
 import 'package:eventify/widgets/custom_sale_container.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +24,7 @@ class _SalesDiscoverScreenState extends State<SalesDiscoverScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<Sale>? salesList;
   List<Sale>? filteredSalesList;
-
+  late SaleFilter saleFilters;
   SaleService saleService = SaleService();
 
   bool isEventsLoading = true;
@@ -31,7 +33,12 @@ class _SalesDiscoverScreenState extends State<SalesDiscoverScreen> {
   void initState() {
     super.initState();
     _getEventsList();
-    // _searchController.addListener(() => _searchListings());
+    saleFilters = SaleFilter(
+      saleLocationType: "both",
+      startDateTime: null,
+      endDateTime: null,
+      sortBy: "relevance",
+    );
     SalesDiscoverScreen.eventBus.on<UpdateStatsEvent>().listen((ev) {
       if (filteredSalesList == null || filteredSalesList!.isEmpty) {
         return;
@@ -51,6 +58,13 @@ class _SalesDiscoverScreenState extends State<SalesDiscoverScreen> {
     });
   }
 
+  _checkDefaultFilter() {
+    return saleFilters.sortBy == "relevance" &&
+        saleFilters.endDateTime == null &&
+        saleFilters.startDateTime == null &&
+        saleFilters.saleLocationType == "both";
+  }
+
   _searchListings() {
     if (_searchController.text == "") {
       filteredSalesList = List.from(salesList ?? []);
@@ -63,6 +77,56 @@ class _SalesDiscoverScreenState extends State<SalesDiscoverScreen> {
           [];
     }
     FocusManager.instance.primaryFocus?.unfocus();
+    _applySaleFilter();
+  }
+
+  _applySaleFilter() {
+    //DATES
+
+    if (saleFilters.startDateTime != null) {
+      filteredSalesList = [
+        ...filteredSalesList?.where(
+                (e) => e.startDateTime!.isAfter(saleFilters.startDateTime!)) ??
+            []
+      ];
+    }
+
+    if (saleFilters.endDateTime != null) {
+      filteredSalesList = [
+        ...filteredSalesList?.where(
+                (e) => e.endDateTime!.isAfter(saleFilters.endDateTime!)) ??
+            []
+      ];
+    }
+
+    //LOCATION
+
+    if (saleFilters.saleLocationType == "online") {
+      filteredSalesList = [
+        ...filteredSalesList
+                ?.where((e) => e.website != null && e.website != "") ??
+            []
+      ];
+    } else if (saleFilters.saleLocationType == "offline") {
+      filteredSalesList = [
+        ...filteredSalesList?.where(
+                (e) => e.linkToStores != null && e.linkToStores != "") ??
+            []
+      ];
+    }
+
+    //SORTING
+
+    if (saleFilters.sortBy == "relevance") {
+      filteredSalesList?.sort((a, b) => b.createdOn!.compareTo(a.createdOn!));
+    } else if (saleFilters.sortBy == "dateStarting") {
+      filteredSalesList
+          ?.sort((a, b) => a.startDateTime!.compareTo(b.startDateTime!));
+    } else if (saleFilters.sortBy == "dateEnding") {
+      filteredSalesList
+          ?.sort((a, b) => a.endDateTime!.compareTo(b.endDateTime!));
+    }
+
     setState(() {});
   }
 
@@ -83,7 +147,7 @@ class _SalesDiscoverScreenState extends State<SalesDiscoverScreen> {
           salesList = apiResponse.data?.sales ?? [];
           salesList?.removeWhere(
             (element) {
-              DateTime eventTime = DateTime.parse(element.endDateTime!);
+              DateTime eventTime = element.endDateTime!;
               return eventTime.isBefore(DateTime.now());
             },
           );
@@ -191,8 +255,57 @@ class _SalesDiscoverScreenState extends State<SalesDiscoverScreen> {
                       ),
                     ),
                   ),
-                )
+                ),
               ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.topRight,
+            child: GestureDetector(
+              onTap: () => _openFiltersBottomSheet(),
+              child: Container(
+                height: 30,
+                margin: const EdgeInsets.only(right: 20),
+                constraints: const BoxConstraints(maxWidth: 130),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+                decoration: BoxDecoration(
+                    color: ColorStyle.primaryColorExtraLight,
+                    borderRadius: BorderRadius.circular(8)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.filter_list_sharp,
+                      size: 20,
+                      color: ColorStyle.primaryColor,
+                    ),
+                    const SizedBox(width: 3),
+                    const Flexible(
+                      child: Text(
+                        "Filters",
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: ColorStyle.primaryColor,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    if (!_checkDefaultFilter())
+                      Container(
+                        margin: const EdgeInsets.only(left: 5),
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: ColorStyle.primaryColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Text("1+",
+                            style: TextStyle(
+                                color: ColorStyle.whiteColor, fontSize: 8)),
+                      )
+                  ],
+                ),
+              ),
             ),
           ),
           Expanded(
@@ -200,7 +313,7 @@ class _SalesDiscoverScreenState extends State<SalesDiscoverScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : salesList == null
                     ? _errorCard()
-                    : salesList!.isEmpty
+                    : filteredSalesList!.isEmpty
                         ? _emptyCaseCard()
                         : ListView.builder(
                             itemCount: filteredSalesList!.length,
@@ -227,6 +340,27 @@ class _SalesDiscoverScreenState extends State<SalesDiscoverScreen> {
         ]),
       ),
     );
+  }
+
+  void _openFiltersBottomSheet() async {
+    SaleFilter? res = await showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(30.0),
+        ),
+      ),
+      useSafeArea: true,
+      isScrollControlled: true,
+      builder: (BuildContext context) => SaleFilterSheet(
+        preFilters: saleFilters,
+      ),
+    );
+    if (res != null) {
+      // _setCityAndGetList(city);
+      saleFilters = res;
+      _searchListings();
+    }
   }
 
   _emptyCaseCard() {

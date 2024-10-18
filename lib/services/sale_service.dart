@@ -42,6 +42,8 @@ class SaleService {
         "content-type": "application/json"
       });
 
+      
+
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
         SaleResponse apiResponse = SaleResponse.fromJson(responseBody);
@@ -51,7 +53,7 @@ class SaleService {
         return BaseResponse(null, response.body);
       }
     } catch (ex) {
-      //print(ex.toString());
+      // print(ex.toString());
       return BaseResponse(null, ex.toString());
     }
   }
@@ -108,14 +110,11 @@ class SaleService {
       var params = HashMap();
       params["listing_visibile"] = listingVisible;
 
-      
-
       http.Response response =
           await http.put(url, body: json.encode(params), headers: {
         "Authorization": "Bearer ${PrefUtils().getToken}",
         "content-type": "application/json"
       });
-      
 
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);

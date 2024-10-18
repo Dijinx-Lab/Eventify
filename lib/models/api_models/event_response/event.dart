@@ -13,10 +13,10 @@ class Event {
   String? city;
   double? latitude;
   double? longitude;
-  int? maxCapacity;
+  String? maxCapacity;
   String? priceType;
-  int? priceStartsFrom;
-  int? priceGoesUpto;
+  String? priceStartsFrom;
+  String? priceGoesUpto;
   bool? listingVisible;
   bool? myEvent;
   List<String>? images;
@@ -51,35 +51,37 @@ class Event {
       this.approvedOn});
 
   factory Event.fromJson(Map<String, dynamic> json) => Event(
-      id: json["id"],
-      name: json["name"],
-      description: json["description"],
-      dateTime: json["date_time"],
-      address: json["address"],
-      city: json["city"],
-      latitude: json["latitude"]?.toDouble(),
-      longitude: json["longitude"]?.toDouble(),
-      maxCapacity: json["max_capacity"],
-      priceType: json["price_type"],
-      priceStartsFrom: json["price_starts_from"],
-      priceGoesUpto: json["price_goes_upto"],
-      listingVisible: json["listing_visibile"],
-      myEvent: json["my_event"],
-      images: json["images"] == null
-          ? []
-          : List<String>.from(json["images"]!.map((x) => x)),
-      passes: json["passes"] == null
-          ? []
-          : List<Pass>.from(json["passes"]!.map((x) => Pass.fromJson(x))),
-      category:
-          json["category"] == null ? null : Category.fromJson(json["category"]),
-      contact:
-          json["contact"] == null ? null : Contact.fromJson(json["contact"]),
-      stats: json["stats"] == null ? null : Stats.fromJson(json["stats"]),
-      preference: json["preference"] == null
-          ? null
-          : Preference.fromJson(json["preference"]),
-      approvedOn: json["approved_on"]);
+        id: json["id"],
+        name: json["name"],
+        description: json["description"],
+        dateTime: json["date_time"],
+        address: json["address"],
+        city: json["city"],
+        latitude: json["latitude"]?.toDouble(),
+        longitude: json["longitude"]?.toDouble(),
+        maxCapacity: json["max_capacity"]?.toString(),
+        priceType: json["price_type"],
+        priceStartsFrom: json["price_starts_from"]?.toString(),
+        priceGoesUpto: json["price_goes_upto"]?.toString(),
+        listingVisible: json["listing_visibile"],
+        myEvent: json["my_event"],
+        images: json["images"] == null
+            ? []
+            : List<String>.from(json["images"]!.map((x) => x)),
+        passes: json["passes"] == null
+            ? []
+            : List<Pass>.from(json["passes"]!.map((x) => Pass.fromJson(x))),
+        category: json["category"] == null
+            ? null
+            : Category.fromJson(json["category"]),
+        contact:
+            json["contact"] == null ? null : Contact.fromJson(json["contact"]),
+        stats: json["stats"] == null ? null : Stats.fromJson(json["stats"]),
+        preference: json["preference"] == null
+            ? null
+            : Preference.fromJson(json["preference"]),
+        approvedOn: json["approved_on"],
+      );
 
   Map<String, dynamic> toJson() => {
         "id": id,

@@ -118,10 +118,10 @@ class CustomSaleContainer extends StatelessWidget {
             width: 3,
           ),
           Text(
-            sale.contact?.name ?? "",
+            sale.contact?.organization ?? "",
             style: const TextStyle(
                 color: ColorStyle.whiteColor,
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: FontWeight.w600),
           ),
         ],
@@ -130,28 +130,60 @@ class CustomSaleContainer extends StatelessWidget {
   }
 
   _buildPriceCard() {
-    return Container(
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-          color: ColorStyle.primaryColor.withOpacity(0.70),
-          borderRadius: BorderRadius.circular(8)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.sell_outlined,
-              color: ColorStyle.accentColor, size: 14),
-          const SizedBox(
-            width: 3,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+              color: ColorStyle.primaryColor.withOpacity(0.70),
+              borderRadius: BorderRadius.circular(8)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                sale.website != null &&
+                        sale.website != "" &&
+                        sale.linkToStores != null &&
+                        sale.linkToStores != ""
+                    ? "Online & Offline Sale"
+                    : sale.linkToStores != null && sale.linkToStores != ""
+                        ? "Offline Sale"
+                        : "Online Sale",
+                style: const TextStyle(
+                    color: ColorStyle.accentColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600),
+              ),
+            ],
           ),
-          Text(
-            sale.discountDescription ?? "",
-            style: const TextStyle(
-                color: ColorStyle.accentColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+              color: ColorStyle.primaryColor.withOpacity(0.70),
+              borderRadius: BorderRadius.circular(8)),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.sell_outlined,
+                  color: ColorStyle.accentColor, size: 14),
+              const SizedBox(
+                width: 3,
+              ),
+              Text(
+                sale.discountDescription ?? "",
+                style: const TextStyle(
+                    color: ColorStyle.accentColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -242,8 +274,7 @@ class CustomSaleContainer extends StatelessWidget {
                 width: 3,
               ),
               Text(
-                DateFormat('MMM d, y')
-                    .format(DateTime.parse(sale.endDateTime!)),
+                DateFormat('MMM d, y').format(sale.endDateTime!),
                 style: const TextStyle(
                     color: ColorStyle.whiteColor,
                     fontSize: 10,
@@ -261,7 +292,7 @@ class CustomSaleContainer extends StatelessWidget {
                 width: 3,
               ),
               Text(
-                DateFormat('h:mm a').format(DateTime.parse(sale.endDateTime!)),
+                DateFormat('h:mm a').format(sale.endDateTime!),
                 style: const TextStyle(
                     color: ColorStyle.whiteColor,
                     fontSize: 10,

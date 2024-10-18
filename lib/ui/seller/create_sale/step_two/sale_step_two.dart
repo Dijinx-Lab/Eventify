@@ -39,7 +39,7 @@ class _SaleStepTwoState extends State<SaleStepTwo> {
     if (_vendorWebsiteController.text != "" ||
         _vendorLocationsListController.text != "") {
       eventArgs.website = _vendorWebsiteController.text.trim();
-      eventArgs.linkToStores = _vendorWebsiteController.text.trim();
+      eventArgs.linkToStores = _vendorLocationsListController.text.trim();
       widget.onDataFilled(eventArgs, true);
     } else {
       widget.onDataFilled(eventArgs, false);

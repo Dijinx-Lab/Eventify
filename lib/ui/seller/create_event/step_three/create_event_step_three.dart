@@ -32,7 +32,7 @@ class _StepThreeContainerState extends State<StepThreeContainer> {
 
   _alertParentWidget() {
     if (_capacityController.text != "") {
-      eventArgs.maxCapacity = int.parse(_capacityController.text);
+      eventArgs.maxCapacity = _capacityController.text;
       widget.onDataFilled(eventArgs, true);
     } else {
       widget.onDataFilled(eventArgs, false);

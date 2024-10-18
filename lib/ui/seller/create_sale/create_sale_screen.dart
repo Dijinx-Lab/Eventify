@@ -52,8 +52,8 @@ class _CreateSaleScreenState extends State<CreateSaleScreen> {
       listingVisible: event.listingVisibile,
       name: event.name,
       description: event.description,
-      startDateTime: event.startDateTime,
-      endDateTime: event.endDateTime,
+      startDateTime: event.startDateTime?.toIso8601String(),
+      endDateTime: event.endDateTime?.toIso8601String(),
       linkToStores: event.linkToStores,
       website: event.website,
       discountDescription: event.discountDescription,
@@ -116,7 +116,8 @@ class _CreateSaleScreenState extends State<CreateSaleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // SmartDialog.dismiss();
+    
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () {
         if (stepperIndex > 0) {
@@ -396,8 +397,8 @@ class _CreateSaleScreenState extends State<CreateSaleScreen> {
           builder: (_) => LoadingUtil(
                 type: 4,
                 text: eventArgs.listingVisible!
-                    ? "Publishing your event..."
-                    : "Saving your event...",
+                    ? "Publishing your listing..."
+                    : "Saving your listing...",
               ));
 
       saleService.uploadSale(eventArgs).then((value) {
