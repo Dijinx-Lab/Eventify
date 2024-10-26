@@ -6,7 +6,7 @@ class LoadingUtil extends StatefulWidget {
   final int type;
 
   @override
-  _LoadingUtilState createState() => _LoadingUtilState();
+  State<LoadingUtil> createState() => _LoadingUtilState();
 }
 
 class _LoadingUtilState extends State<LoadingUtil>
@@ -17,7 +17,7 @@ class _LoadingUtilState extends State<LoadingUtil>
   void initState() {
     _controller = AnimationController(
       duration: const Duration(milliseconds: 800),
-      vsync: this,
+    vsync: this,
     );
     _controller.forward();
     _controller.addStatusListener((status) {

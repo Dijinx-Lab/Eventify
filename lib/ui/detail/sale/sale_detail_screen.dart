@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eventify/constants/route_keys.dart';
@@ -26,7 +25,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SaleDetailScreen extends StatefulWidget {
   final CreateSaleArgs args;
@@ -111,76 +109,76 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
     // ));
   }
 
-  launchSms() async {
-    final Uri launchUri = Uri(
-      scheme: 'sms',
-      path: sale.contact!.phone,
-    );
-    await launchUrl(launchUri);
-  }
+  // launchSms() async {
+  //   final Uri launchUri = Uri(
+  //     scheme: 'sms',
+  //     path: sale.contact!.phone,
+  //   );
+  //   await launchUrl(launchUri);
+  // }
 
-  launchPhone() async {
-    final Uri launchUri = Uri(
-      scheme: 'tel',
-      path: sale.contact!.phone,
-    );
-    await launchUrl(launchUri);
-  }
+  // launchPhone() async {
+  //   final Uri launchUri = Uri(
+  //     scheme: 'tel',
+  //     path: sale.contact!.phone,
+  //   );
+  //   await launchUrl(launchUri);
+  // }
 
-  launchWhatsapp() async {
-    var whatsapp = sale.contact!.whatsapp ?? ""; //+92xx enter like this
-    var whatsappURlAndroid = "whatsapp://send?phone=$whatsapp&text=";
-    var whatsappURLIos = "https://wa.me/$whatsapp?text=";
-    if (Platform.isIOS) {
-      // for iOS phone only
-      if (await canLaunchUrl(Uri.parse(whatsappURLIos))) {
-        await launchUrl(Uri.parse(
-          whatsappURLIos,
-        ));
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Whatsapp not installed")));
-        }
-      }
-    } else {
-      // android , web
-      if (await canLaunchUrl(Uri.parse(whatsappURlAndroid))) {
-        await launchUrl(Uri.parse(whatsappURlAndroid));
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Whatsapp not installed")));
-        }
-      }
-    }
-  }
+  // launchWhatsapp() async {
+  //   var whatsapp = sale.contact!.whatsapp ?? ""; //+92xx enter like this
+  //   var whatsappURlAndroid = "whatsapp://send?phone=$whatsapp&text=";
+  //   var whatsappURLIos = "https://wa.me/$whatsapp?text=";
+  //   if (Platform.isIOS) {
+  //     // for iOS phone only
+  //     if (await canLaunchUrl(Uri.parse(whatsappURLIos))) {
+  //       await launchUrl(Uri.parse(
+  //         whatsappURLIos,
+  //       ));
+  //     } else {
+  //       if (mounted) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //             const SnackBar(content: Text("Whatsapp not installed")));
+  //       }
+  //     }
+  //   } else {
+  //     // android , web
+  //     if (await canLaunchUrl(Uri.parse(whatsappURlAndroid))) {
+  //       await launchUrl(Uri.parse(whatsappURlAndroid));
+  //     } else {
+  //       if (mounted) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //             const SnackBar(content: Text("Whatsapp not installed")));
+  //       }
+  //     }
+  //   }
+  // }
 
-  _launchUrl(String url) async {
-    Uri launchableUrl = Uri.parse(url);
-    if (await canLaunchUrl(launchableUrl)) {
-      await launchUrl(launchableUrl, mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not launch $launchableUrl';
-    }
-  }
+  // _launchUrl(String url) async {
+  //   Uri launchableUrl = Uri.parse(url);
+  //   if (await canLaunchUrl(launchableUrl)) {
+  //     await launchUrl(launchableUrl, mode: LaunchMode.externalApplication);
+  //   } else {
+  //     throw 'Could not launch $launchableUrl';
+  //   }
+  // }
 
-  launchEmail() async {
-    final Uri emailLaunchUri = Uri(
-      scheme: 'mailto',
-      path: sale.contact!.email,
-      queryParameters: {
-        'subject': '',
-        'body': '',
-      },
-    );
+  // launchEmail() async {
+  //   final Uri emailLaunchUri = Uri(
+  //     scheme: 'mailto',
+  //     path: sale.contact!.email,
+  //     queryParameters: {
+  //       'subject': '',
+  //       'body': '',
+  //     },
+  //   );
 
-    if (await canLaunch(emailLaunchUri.toString())) {
-      await launch(emailLaunchUri.toString());
-    } else {
-      //print('Could not launch $emailLaunchUri');
-    }
-  }
+  //   if (await canLaunch(emailLaunchUri.toString())) {
+  //     await launch(emailLaunchUri.toString());
+  //   } else {
+  //     //print('Could not launch $emailLaunchUri');
+  //   }
+  // }
 
   _buildPriceCard() {
     return Container(
@@ -775,269 +773,269 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
                             ),
                           ),
                     const SizedBox(height: 20),
-                    const Text(
-                      "Contact",
-                      style: TextStyle(
-                          color: ColorStyle.secondaryTextColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 15),
-                    Container(
-                        // height: 45,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 15, horizontal: 10),
-                        decoration: BoxDecoration(
-                            color: ColorStyle.whiteColor,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                  offset: const Offset(0, 4),
-                                  blurRadius: 4,
-                                  color:
-                                      ColorStyle.blackColor.withOpacity(0.25))
-                            ]),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${sale.contact?.name ?? ""} - Ad Lister",
-                              style: const TextStyle(
-                                color: ColorStyle.primaryTextColor,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      await launchEmail();
-                                    },
-                                    child: Container(
-                                      // width: 35,
-                                      height: 40,
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 3),
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                          color:
-                                              ColorStyle.primaryColorExtraLight,
-                                          borderRadius:
-                                              BorderRadius.circular(8)),
-                                      child: const Icon(Icons.email_outlined,
-                                          color: ColorStyle.primaryColor,
-                                          size: 20),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      await launchSms();
-                                    },
-                                    child: Container(
-                                      // width: 35,
-                                      height: 40,
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 3),
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                          color:
-                                              ColorStyle.primaryColorExtraLight,
-                                          borderRadius:
-                                              BorderRadius.circular(8)),
-                                      child: const Icon(Icons.chat_outlined,
-                                          color: ColorStyle.primaryColor,
-                                          size: 20),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      launchWhatsapp();
-                                    },
-                                    child: Container(
-                                      // width: 35,
-                                      height: 40,
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 3),
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                          color:
-                                              ColorStyle.primaryColorExtraLight,
-                                          borderRadius:
-                                              BorderRadius.circular(8)),
-                                      child: Image.asset(
-                                        "assets/pngs/ic_whatsapp.png",
-                                        fit: BoxFit.scaleDown,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      await launchPhone();
-                                    },
-                                    child: Container(
-                                      // width: 35,
-                                      height: 40,
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 3),
-                                      padding: const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                          color:
-                                              ColorStyle.primaryColorExtraLight,
-                                          borderRadius:
-                                              BorderRadius.circular(8)),
-                                      child: const Icon(Icons.call_outlined,
-                                          color: ColorStyle.primaryColor,
-                                          size: 20),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        )),
-                    const SizedBox(height: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            if (sale.website != null && sale.website != "")
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => _launchUrl(sale.website!),
-                                  child: Container(
-                                    height: 85,
-                                    width: double.maxFinite,
-                                    padding: const EdgeInsets.only(
-                                        top: 15, bottom: 15, left: 10),
-                                    decoration: BoxDecoration(
-                                        color: ColorStyle.whiteColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              offset: const Offset(0, 4),
-                                              blurRadius: 4,
-                                              color: ColorStyle.blackColor
-                                                  .withOpacity(0.25))
-                                        ]),
-                                    child: const Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Online Store",
-                                            style: TextStyle(
-                                                color:
-                                                    ColorStyle.primaryTextColor,
-                                                fontSize: 12),
-                                          ),
-                                          SizedBox(height: 15),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(Icons.shopping_bag_outlined,
-                                                  color: ColorStyle
-                                                      .primaryColorLight,
-                                                  size: 20),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
-                                              Text(
-                                                "View Store",
-                                                style: TextStyle(
-                                                  color:
-                                                      ColorStyle.primaryColor,
-                                                  fontSize: 13,
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                  decorationColor:
-                                                      ColorStyle.primaryColor,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ]),
-                                  ),
-                                ),
-                              ),
-                            if (sale.website != null &&
-                                sale.website != "" &&
-                                sale.linkToStores != null &&
-                                sale.linkToStores != "")
-                              const SizedBox(width: 20),
-                            if (sale.linkToStores != null &&
-                                sale.linkToStores != "")
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => _launchUrl(sale.linkToStores!),
-                                  child: Container(
-                                    height: 85,
-                                    width: double.maxFinite,
-                                    padding: const EdgeInsets.only(
-                                        top: 15, bottom: 15, left: 10),
-                                    decoration: BoxDecoration(
-                                        color: ColorStyle.whiteColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              offset: const Offset(0, 4),
-                                              blurRadius: 4,
-                                              color: ColorStyle.blackColor
-                                                  .withOpacity(0.25))
-                                        ]),
-                                    child: const Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Store Locations",
-                                            style: TextStyle(
-                                                color:
-                                                    ColorStyle.primaryTextColor,
-                                                fontSize: 12),
-                                          ),
-                                          SizedBox(height: 15),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(Icons.pin_drop_outlined,
-                                                  color: ColorStyle
-                                                      .primaryColorLight,
-                                                  size: 20),
-                                              SizedBox(
-                                                width: 10,
-                                              ),
-                                              Text(
-                                                "View Locations",
-                                                style: TextStyle(
-                                                  color:
-                                                      ColorStyle.primaryColor,
-                                                  fontSize: 13,
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                  decorationColor:
-                                                      ColorStyle.primaryColor,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ]),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
+                    // const Text(
+                    //   "Contact",
+                    //   style: TextStyle(
+                    //       color: ColorStyle.secondaryTextColor,
+                    //       fontSize: 16,
+                    //       fontWeight: FontWeight.bold),
+                    // ),
+                    // const SizedBox(height: 15),
+                    // Container(
+                    //     // height: 45,
+                    //     padding: const EdgeInsets.symmetric(
+                    //         vertical: 15, horizontal: 10),
+                    //     decoration: BoxDecoration(
+                    //         color: ColorStyle.whiteColor,
+                    //         borderRadius: BorderRadius.circular(12),
+                    //         boxShadow: [
+                    //           BoxShadow(
+                    //               offset: const Offset(0, 4),
+                    //               blurRadius: 4,
+                    //               color:
+                    //                   ColorStyle.blackColor.withOpacity(0.25))
+                    //         ]),
+                    //     child: Column(
+                    //       crossAxisAlignment: CrossAxisAlignment.start,
+                    //       children: [
+                    //         Text(
+                    //           "${sale.contact?.name ?? ""} - Ad Lister",
+                    //           style: const TextStyle(
+                    //             color: ColorStyle.primaryTextColor,
+                    //             fontSize: 14,
+                    //           ),
+                    //         ),
+                    //         const SizedBox(height: 10),
+                    //         Row(
+                    //           children: [
+                    //             Expanded(
+                    //               child: GestureDetector(
+                    //                 onTap: () async {
+                    //                   await launchEmail();
+                    //                 },
+                    //                 child: Container(
+                    //                   // width: 35,
+                    //                   height: 40,
+                    //                   margin: const EdgeInsets.symmetric(
+                    //                       horizontal: 3),
+                    //                   padding: const EdgeInsets.all(10),
+                    //                   decoration: BoxDecoration(
+                    //                       color:
+                    //                           ColorStyle.primaryColorExtraLight,
+                    //                       borderRadius:
+                    //                           BorderRadius.circular(8)),
+                    //                   child: const Icon(Icons.email_outlined,
+                    //                       color: ColorStyle.primaryColor,
+                    //                       size: 20),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //             Expanded(
+                    //               child: GestureDetector(
+                    //                 onTap: () async {
+                    //                   await launchSms();
+                    //                 },
+                    //                 child: Container(
+                    //                   // width: 35,
+                    //                   height: 40,
+                    //                   margin: const EdgeInsets.symmetric(
+                    //                       horizontal: 3),
+                    //                   padding: const EdgeInsets.all(10),
+                    //                   decoration: BoxDecoration(
+                    //                       color:
+                    //                           ColorStyle.primaryColorExtraLight,
+                    //                       borderRadius:
+                    //                           BorderRadius.circular(8)),
+                    //                   child: const Icon(Icons.chat_outlined,
+                    //                       color: ColorStyle.primaryColor,
+                    //                       size: 20),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //             Expanded(
+                    //               child: GestureDetector(
+                    //                 onTap: () {
+                    //                   launchWhatsapp();
+                    //                 },
+                    //                 child: Container(
+                    //                   // width: 35,
+                    //                   height: 40,
+                    //                   margin: const EdgeInsets.symmetric(
+                    //                       horizontal: 3),
+                    //                   padding: const EdgeInsets.all(10),
+                    //                   decoration: BoxDecoration(
+                    //                       color:
+                    //                           ColorStyle.primaryColorExtraLight,
+                    //                       borderRadius:
+                    //                           BorderRadius.circular(8)),
+                    //                   child: Image.asset(
+                    //                     "assets/pngs/ic_whatsapp.png",
+                    //                     fit: BoxFit.scaleDown,
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //             Expanded(
+                    //               child: GestureDetector(
+                    //                 onTap: () async {
+                    //                   await launchPhone();
+                    //                 },
+                    //                 child: Container(
+                    //                   // width: 35,
+                    //                   height: 40,
+                    //                   margin: const EdgeInsets.symmetric(
+                    //                       horizontal: 3),
+                    //                   padding: const EdgeInsets.all(10),
+                    //                   decoration: BoxDecoration(
+                    //                       color:
+                    //                           ColorStyle.primaryColorExtraLight,
+                    //                       borderRadius:
+                    //                           BorderRadius.circular(8)),
+                    //                   child: const Icon(Icons.call_outlined,
+                    //                       color: ColorStyle.primaryColor,
+                    //                       size: 20),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         )
+                    //       ],
+                    //     )),
+                    const SizedBox(height: 10),
+                    // Column(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //     Row(
+                    //       children: [
+                    //         if (sale.website != null && sale.website != "")
+                    //           Expanded(
+                    //             child: GestureDetector(
+                    //               onTap: () => _launchUrl(sale.website!),
+                    //               child: Container(
+                    //                 height: 85,
+                    //                 width: double.maxFinite,
+                    //                 padding: const EdgeInsets.only(
+                    //                     top: 15, bottom: 15, left: 10),
+                    //                 decoration: BoxDecoration(
+                    //                     color: ColorStyle.whiteColor,
+                    //                     borderRadius: BorderRadius.circular(12),
+                    //                     boxShadow: [
+                    //                       BoxShadow(
+                    //                           offset: const Offset(0, 4),
+                    //                           blurRadius: 4,
+                    //                           color: ColorStyle.blackColor
+                    //                               .withOpacity(0.25))
+                    //                     ]),
+                    //                 child: const Column(
+                    //                     crossAxisAlignment:
+                    //                         CrossAxisAlignment.start,
+                    //                     children: [
+                    //                       Text(
+                    //                         "Online Store",
+                    //                         style: TextStyle(
+                    //                             color:
+                    //                                 ColorStyle.primaryTextColor,
+                    //                             fontSize: 12),
+                    //                       ),
+                    //                       SizedBox(height: 15),
+                    //                       Row(
+                    //                         mainAxisSize: MainAxisSize.min,
+                    //                         children: [
+                    //                           Icon(Icons.shopping_bag_outlined,
+                    //                               color: ColorStyle
+                    //                                   .primaryColorLight,
+                    //                               size: 20),
+                    //                           SizedBox(
+                    //                             width: 10,
+                    //                           ),
+                    //                           Text(
+                    //                             "View Store",
+                    //                             style: TextStyle(
+                    //                               color:
+                    //                                   ColorStyle.primaryColor,
+                    //                               fontSize: 13,
+                    //                               decoration:
+                    //                                   TextDecoration.underline,
+                    //                               decorationColor:
+                    //                                   ColorStyle.primaryColor,
+                    //                             ),
+                    //                           ),
+                    //                         ],
+                    //                       ),
+                    //                     ]),
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         if (sale.website != null &&
+                    //             sale.website != "" &&
+                    //             sale.linkToStores != null &&
+                    //             sale.linkToStores != "")
+                    //           const SizedBox(width: 20),
+                    //         if (sale.linkToStores != null &&
+                    //             sale.linkToStores != "")
+                    //           Expanded(
+                    //             child: GestureDetector(
+                    //               onTap: () => _launchUrl(sale.linkToStores!),
+                    //               child: Container(
+                    //                 height: 85,
+                    //                 width: double.maxFinite,
+                    //                 padding: const EdgeInsets.only(
+                    //                     top: 15, bottom: 15, left: 10),
+                    //                 decoration: BoxDecoration(
+                    //                     color: ColorStyle.whiteColor,
+                    //                     borderRadius: BorderRadius.circular(12),
+                    //                     boxShadow: [
+                    //                       BoxShadow(
+                    //                           offset: const Offset(0, 4),
+                    //                           blurRadius: 4,
+                    //                           color: ColorStyle.blackColor
+                    //                               .withOpacity(0.25))
+                    //                     ]),
+                    //                 child: const Column(
+                    //                     crossAxisAlignment:
+                    //                         CrossAxisAlignment.start,
+                    //                     children: [
+                    //                       Text(
+                    //                         "Store Locations",
+                    //                         style: TextStyle(
+                    //                             color:
+                    //                                 ColorStyle.primaryTextColor,
+                    //                             fontSize: 12),
+                    //                       ),
+                    //                       SizedBox(height: 15),
+                    //                       Row(
+                    //                         mainAxisSize: MainAxisSize.min,
+                    //                         children: [
+                    //                           Icon(Icons.pin_drop_outlined,
+                    //                               color: ColorStyle
+                    //                                   .primaryColorLight,
+                    //                               size: 20),
+                    //                           SizedBox(
+                    //                             width: 10,
+                    //                           ),
+                    //                           Text(
+                    //                             "View Locations",
+                    //                             style: TextStyle(
+                    //                               color:
+                    //                                   ColorStyle.primaryColor,
+                    //                               fontSize: 13,
+                    //                               decoration:
+                    //                                   TextDecoration.underline,
+                    //                               decorationColor:
+                    //                                   ColorStyle.primaryColor,
+                    //                             ),
+                    //                           ),
+                    //                         ],
+                    //                       ),
+                    //                     ]),
+                    //               ),
+                    //             ),
+                    //           ),
+                    //       ],
+                    //     ),
+                    //   ],
+                    // ),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -1284,7 +1282,7 @@ class _SaleDetailScreenState extends State<SaleDetailScreen>
             width: 3,
           ),
           Text(
-            sale.contact?.name ?? "",
+            sale.brand ?? "",
             style: const TextStyle(
                 color: ColorStyle.primaryTextColor,
                 fontSize: 12,

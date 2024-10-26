@@ -100,4 +100,10 @@ class PrefUtils {
   set setAppPreference(String value) {
     _sharedPreferences!.setString(appSide, value);
   }
+
+  String get lastBrand => _sharedPreferences!.getString(lastBrandName) ?? '';
+
+  set lastBrand(String value) {
+    _sharedPreferences!.setString(lastBrandName, value);
+  }
 }

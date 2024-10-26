@@ -9,11 +9,7 @@ class SaleArgs {
   String? website;
   String? discountDescription;
   List<String>? images;
-  String? contactName;
-  String? contactPhone;
-  String? contactEmail;
-  String? contactWhatsApp;
-  String? contactOrganization;
+  String? brandName;
 
   SaleArgs({
     this.eventId,
@@ -26,10 +22,6 @@ class SaleArgs {
     this.website,
     this.discountDescription,
     this.images,
-    this.contactName,
-    this.contactPhone,
-    this.contactEmail,
-    this.contactWhatsApp,
-    this.contactOrganization,
+    this.brandName,
   });
 }

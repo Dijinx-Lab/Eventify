@@ -1,5 +1,6 @@
 import 'package:eventify/models/screen_args/sale_args.dart';
 import 'package:eventify/styles/color_style.dart';
+import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,7 @@ class SaleStepTwo extends StatefulWidget {
 }
 
 class _SaleStepTwoState extends State<SaleStepTwo> {
+  final TextEditingController _vendorNameController = TextEditingController();
   final TextEditingController _vendorWebsiteController =
       TextEditingController();
   final TextEditingController _vendorLocationsListController =
@@ -25,7 +27,7 @@ class _SaleStepTwoState extends State<SaleStepTwo> {
     eventArgs = widget.sale;
     _vendorWebsiteController.text = eventArgs.website ?? "";
     _vendorLocationsListController.text = eventArgs.linkToStores ?? "";
-
+    _vendorNameController.text = eventArgs.brandName ?? PrefUtils().lastBrand;
     super.initState();
     Future.delayed(const Duration(microseconds: 800)).then((value) {
       _alertParentWidget();
@@ -33,13 +35,16 @@ class _SaleStepTwoState extends State<SaleStepTwo> {
 
     _vendorWebsiteController.addListener(() => _alertParentWidget());
     _vendorLocationsListController.addListener(() => _alertParentWidget());
+    _vendorNameController.addListener(() => _alertParentWidget());
   }
 
   _alertParentWidget() {
-    if (_vendorWebsiteController.text != "" ||
-        _vendorLocationsListController.text != "") {
+    if ((_vendorWebsiteController.text != "" ||
+            _vendorLocationsListController.text != "") &&
+        _vendorNameController.text != "") {
       eventArgs.website = _vendorWebsiteController.text.trim();
       eventArgs.linkToStores = _vendorLocationsListController.text.trim();
+      eventArgs.brandName = _vendorNameController.text.trim();
       widget.onDataFilled(eventArgs, true);
     } else {
       widget.onDataFilled(eventArgs, false);
@@ -51,6 +56,13 @@ class _SaleStepTwoState extends State<SaleStepTwo> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const SizedBox(height: 20),
+        CustomTextField(
+          controller: _vendorNameController,
+          hint: "Brand Name",
+          icon: const Icon(Icons.work_outline_rounded),
+          keyboardType: TextInputType.name,
+        ),
         const SizedBox(height: 20),
         CustomTextField(
           controller: _vendorWebsiteController,

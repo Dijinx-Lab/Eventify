@@ -12,10 +12,10 @@ import 'package:eventify/ui/seller/base/base_seller_screen.dart';
 import 'package:eventify/ui/seller/create_sale/step_five/sale_step_five.dart';
 import 'package:eventify/ui/seller/create_sale/step_four/sale_step_four.dart';
 import 'package:eventify/ui/seller/create_sale/step_one/sale_step_one.dart';
-import 'package:eventify/ui/seller/create_sale/step_six/sale_step_six.dart';
 import 'package:eventify/ui/seller/create_sale/step_three/sale_step_three.dart';
 import 'package:eventify/ui/seller/create_sale/step_two/sale_step_two.dart';
 import 'package:eventify/utils/loading_utils.dart';
+import 'package:eventify/utils/pref_utils.dart';
 import 'package:eventify/utils/toast_utils.dart';
 import 'package:eventify/widgets/custom_rounded_button.dart';
 import 'package:flutter/material.dart';
@@ -58,11 +58,7 @@ class _CreateSaleScreenState extends State<CreateSaleScreen> {
       website: event.website,
       discountDescription: event.discountDescription,
       images: event.images,
-      contactName: event.contact?.name,
-      contactPhone: event.contact?.phone,
-      contactWhatsApp: event.contact?.whatsapp,
-      contactEmail: event.contact?.email,
-      contactOrganization: event.contact?.organization,
+      brandName: event.brand,
     );
   }
 
@@ -88,10 +84,10 @@ class _CreateSaleScreenState extends State<CreateSaleScreen> {
           sale: eventArgs,
           onDataFilled: (event, validation) =>
               _childDataFilled(event, validation)),
-      SaleStepSix(
-          sale: eventArgs,
-          onDataFilled: (event, validation) =>
-              _childDataFilled(event, validation)),
+      // SaleStepSix(
+      //     sale: eventArgs,
+      //     onDataFilled: (event, validation) =>
+      //         _childDataFilled(event, validation)),
     ];
   }
 
@@ -101,7 +97,7 @@ class _CreateSaleScreenState extends State<CreateSaleScreen> {
     "Enter the discount range that you are offering",
     "Add images and a name for your sale",
     "Tell people more about the specifics of your sale",
-    "Contact information for inquiries",
+    // "Contact information for inquiries",
   ];
 
   _childDataFilled(SaleArgs updatedEventArgs, bool validation) {
@@ -116,7 +112,6 @@ class _CreateSaleScreenState extends State<CreateSaleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () {
@@ -211,9 +206,9 @@ class _CreateSaleScreenState extends State<CreateSaleScreen> {
                             textWeight: FontWeight.bold,
                           )
                         : CustomRoundedButton(
-                            stepperIndex < 5 ? 'Continue' : 'Publish',
+                            stepperIndex < 4 ? 'Continue' : 'Publish',
                             () async {
-                              if (stepperIndex < 5 && isValidToProceed) {
+                              if (stepperIndex < 4 && isValidToProceed) {
                                 setState(() {
                                   stepperIndex++;
                                   isValidToProceed = false;
@@ -406,6 +401,7 @@ class _CreateSaleScreenState extends State<CreateSaleScreen> {
         if (value.snapshot != null) {
           SaleResponse apiResponse = value.snapshot;
           if (apiResponse.success ?? false) {
+            PrefUtils().lastBrand = apiResponse.data?.sale?.brand ?? "";
             BaseSellerScreen.eventBus.fire(RefreshMyEvents());
             ToastUtils.showCustomSnackbar(
               context: context,
@@ -445,6 +441,7 @@ class _CreateSaleScreenState extends State<CreateSaleScreen> {
         if (value.snapshot != null) {
           SaleResponse apiResponse = value.snapshot;
           if (apiResponse.success ?? false) {
+            PrefUtils().lastBrand = apiResponse.data?.sale?.brand ?? "";
             BaseSellerScreen.eventBus.fire(RefreshMyEvents());
             ToastUtils.showCustomSnackbar(
               context: context,
@@ -635,39 +632,39 @@ class _CreateSaleScreenState extends State<CreateSaleScreen> {
             ),
           )),
         ),
-        const SizedBox(width: 2),
-        Container(
-          width: 20,
-          height: 2,
-          color: stepperIndex >= 5
-              ? ColorStyle.primaryColorLight
-              : ColorStyle.cardColor,
-        ),
-        const SizedBox(width: 2),
-        AnimatedContainer(
-          height: 25,
-          width: 25,
-          curve: Curves.decelerate,
-          duration: const Duration(milliseconds: 300),
-          decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                  color: stepperIndex >= 5
-                      ? ColorStyle.primaryColor
-                      : ColorStyle.cardColor),
-              color: stepperIndex >= 5
-                  ? ColorStyle.primaryColorLight
-                  : ColorStyle.cardColor),
-          child: Center(
-              child: Visibility(
-            visible: stepperIndex == 5,
-            child: const Text(
-              "6",
-              style: TextStyle(
-                  color: ColorStyle.whiteColor, fontWeight: FontWeight.bold),
-            ),
-          )),
-        ),
+        // const SizedBox(width: 2),
+        // Container(
+        //   width: 20,
+        //   height: 2,
+        //   color: stepperIndex >= 5
+        //       ? ColorStyle.primaryColorLight
+        //       : ColorStyle.cardColor,
+        // ),
+        // const SizedBox(width: 2),
+        // AnimatedContainer(
+        //   height: 25,
+        //   width: 25,
+        //   curve: Curves.decelerate,
+        //   duration: const Duration(milliseconds: 300),
+        //   decoration: BoxDecoration(
+        //       shape: BoxShape.circle,
+        //       border: Border.all(
+        //           color: stepperIndex >= 5
+        //               ? ColorStyle.primaryColor
+        //               : ColorStyle.cardColor),
+        //       color: stepperIndex >= 5
+        //           ? ColorStyle.primaryColorLight
+        //           : ColorStyle.cardColor),
+        //   child: Center(
+        //       child: Visibility(
+        //     visible: stepperIndex == 4,
+        //     child: const Text(
+        //       "6",
+        //       style: TextStyle(
+        //           color: ColorStyle.whiteColor, fontWeight: FontWeight.bold),
+        //     ),
+        //   )),
+        // ),
       ],
     );
   }

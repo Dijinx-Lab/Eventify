@@ -42,8 +42,6 @@ class SaleService {
         "content-type": "application/json"
       });
 
-      
-
       if (response.statusCode == 200) {
         var responseBody = json.decode(response.body);
         SaleResponse apiResponse = SaleResponse.fromJson(responseBody);
@@ -69,13 +67,14 @@ class SaleService {
     params["website"] = eventArgs.website;
     params["discount_description"] = eventArgs.discountDescription;
     params["images"] = eventArgs.images;
-    params["contact"] = {
-      "name": eventArgs.contactName,
-      "phone": eventArgs.contactPhone,
-      "email": eventArgs.contactEmail,
-      "whatsapp": eventArgs.contactWhatsApp,
-      "organization": eventArgs.contactOrganization
-    };
+    params["brand"] = eventArgs.brandName;
+    // params["contact"] = {
+    //   "name": eventArgs.contactName,
+    //   "phone": eventArgs.contactPhone,
+    //   "email": eventArgs.contactEmail,
+    //   "whatsapp": eventArgs.contactWhatsApp,
+    //   "organization": eventArgs.contactOrganization
+    // };
 
     return params;
   }

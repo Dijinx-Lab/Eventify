@@ -118,7 +118,7 @@ class CustomSaleContainer extends StatelessWidget {
             width: 3,
           ),
           Text(
-            sale.contact?.organization ?? "",
+            sale.brand ?? "",
             style: const TextStyle(
                 color: ColorStyle.whiteColor,
                 fontSize: 12,

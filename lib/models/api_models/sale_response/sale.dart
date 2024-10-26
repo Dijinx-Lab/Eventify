@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:eventify/models/api_models/event_response/contact.dart';
 import 'package:eventify/models/api_models/event_response/preference.dart';
 import 'package:eventify/models/api_models/event_response/stats.dart';
 
@@ -14,8 +12,8 @@ class Sale {
   String? linkToStores;
   String? website;
   String? discountDescription;
+  String? brand;
   List<String>? images;
-  Contact? contact;
   Stats? stats;
   DateTime? approvedOn;
   bool? myEvent;
@@ -33,8 +31,8 @@ class Sale {
     this.linkToStores,
     this.website,
     this.discountDescription,
+    this.brand,
     this.images,
-    this.contact,
     this.stats,
     this.approvedOn,
     this.myEvent,
@@ -61,11 +59,10 @@ class Sale {
         linkToStores: json["link_to_stores"],
         website: json["website"],
         discountDescription: json["discount_description"],
+        brand: json["brand"]?.toString(),
         images: json["images"] == null
             ? []
             : List<String>.from(json["images"]!.map((x) => x)),
-        contact:
-            json["contact"] == null ? null : Contact.fromJson(json["contact"]),
         stats: json["stats"] == null ? null : Stats.fromJson(json["stats"]),
         approvedOn: json["approved_on"] == null
             ? null
@@ -92,9 +89,9 @@ class Sale {
         "link_to_stores": linkToStores,
         "website": website,
         "discount_description": discountDescription,
+        "brand": brand,
         "images":
             images == null ? [] : List<dynamic>.from(images!.map((x) => x)),
-        "contact": contact?.toJson(),
         "stats": stats?.toJson(),
         "approved_on": approvedOn?.toIso8601String(),
         "my_event": myEvent,

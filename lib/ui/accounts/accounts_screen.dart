@@ -100,6 +100,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
     PrefUtils().setToken = "";
     PrefUtils().setIsUserLoggedIn = false;
     PrefUtils().setIsAppTypeCustomer = true;
+    PrefUtils().lastBrand = "";
     SmartDialog.dismiss();
     if (mounted) {
       Navigator.of(context).pushNamedAndRemoveUntil(signupRoute, (e) => false,
